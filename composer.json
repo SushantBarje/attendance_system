@@ -1,0 +1,11 @@
+{
+    "name": "acer/attendance_sys",
+    "description": "Online Attendance System",
+    "authors": [
+        {
+            "name": "Sushant Barje",
+            "email": "sushantbarje4@gmail.com"
+        }
+    ],
+    "require": {}
+}
