@@ -1,4 +1,8 @@
 <?php
+namespace app\model;
+require_once __DIR__ . 'autoloader.php';
+use \PDOException;
+use app\database\Database;
 
 class Faculty extends Database {
 
@@ -28,7 +32,7 @@ class Faculty extends Database {
 		try{
 			$sql = "SELECT * FROM academic WHERE academic_id = ?";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$username]);
+			$stmt->execute([$acd_year_id]);
 			$result = $stmt->fetch();
 			return $stmt->fetch();
 		}
@@ -318,7 +322,7 @@ class Faculty extends Database {
 			$stmt->execute();
 			return $stmt->fetchAll();
 		}catch(PDOException $e){
-			return array("e" => $e->getMessages());
+			return array("e" => $e->getMessage());
 		}
 	}
 
@@ -332,7 +336,7 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM department";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $this->fetch();
+			return $stmt->fetch();
 		}
 		catch(PDOException $e){
 			return array("e"=> $e->getMessage());
@@ -347,9 +351,9 @@ class Faculty extends Database {
 	public function insertDepartment($data){
 		try{
 			$sql = "INSERT INTO department VALUES(?,?);";
-			$stm = $this->connect()->prepare($sql);
+			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute([$data]);
-			return $this->fetch();
+			return $stmt->fetch();
 		}
 		catch(PDOException $e){
 			return array("e" => $e->getMessage());
@@ -432,7 +436,7 @@ class Faculty extends Database {
 			return $stmt->fetch();
 		}
 		catch(PDOException $e){
-			return array("e" => $e->getMessagse());
+			return array("e" => $e->getMessage());
 		}
 	}
 
