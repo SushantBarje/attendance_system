@@ -1,6 +1,6 @@
 <?php
 namespace app\model;
-require_once __DIR__ . 'autoloader.php';
+
 use \PDOException;
 use app\database\Database;
 
@@ -64,7 +64,6 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM faculty WHERE faculty_id = ?";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute([$username]);
-			$result = $stmt->fetch();
 			return $stmt->fetch();
 		}
 		catch (PDOException $e){
