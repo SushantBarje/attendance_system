@@ -7,5 +7,10 @@
             "email": "sushantbarje4@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "app\\": "./"
+        }
+    },
     "require": {}
 }
