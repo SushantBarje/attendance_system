@@ -24,7 +24,7 @@ class FacultyController extends Faculty {
         if(count($result) > 0 && $result['faculty_id'] == $this->faculty_id && $this->password == $result['password'] ){
             $_SESSION['faculty_id'] = $result['faculty_id'];
             $_SESSION['role'] = $result['role_id'];
-            if($result['role_id'] == 0) header("Location:views/admin/admindash.php");
+            if($result['role_id'] == 0) header("Location:admin/admindash.php");
             if($result['role_id'] == 1) header("Location:hod.php");
             if($result['role_id'] == 2) header("Location:staff.php");
         }
@@ -32,5 +32,5 @@ class FacultyController extends Faculty {
             $errors["invalid"] = "Invalid Faculty Id or Password";
             header("Location:index.php");
         }
-    } 
+    }
 }

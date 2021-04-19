@@ -135,7 +135,7 @@ class Faculty extends Database {
 	#	@params faculty_id, first_name, last_name, dept(department), role(0 => Admin, 1 => HOD, 2 => Staff).
 	#	@return array containing two values array[0] = true or false, array[1] = if true null else if catch exception then error message.
 	*/
-	public function addOneFaculty($faculty_id, $first_name, $last_name, $dept, $role, $password){
+	public function insertOneFaculty($faculty_id, $first_name, $last_name, $dept, $role, $password){
 		try{
 			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role, password) VALUES (?,?,?,?,?,?);";
 			$stmt = $this->connect()->prepare($sql);
@@ -153,7 +153,7 @@ class Faculty extends Database {
 	#	@params $filepath
 	#	@return array containing two values array[0] = true or false, array[1] = if true null else if catch exception then error message.
 	########################################################################################################################################*/
-	public function addMultipleFaculty($file) {
+	public function insertMultipleFaculty($file) {
 
 	}
 
@@ -230,9 +230,7 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM student WHERE prn_no = ?";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute([$prn_no]);
-			if($stmt->rowCount){
-				return $stmt->fetch();
-			}
+			return $stmt->fetch();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -485,5 +483,15 @@ class Faculty extends Database {
 		}
 	}
 
-
+	public function getCourses(){
+		try{
+			$sql = "SELECT * FROM courses";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute();
+			return $stmt->fetch();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
 };

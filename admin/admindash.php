@@ -1,5 +1,5 @@
 <?php
-namespace app\views\admin;
+namespace app\admin;
 use app\controller\FacultyController;
 
 ?>
