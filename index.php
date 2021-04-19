@@ -21,7 +21,7 @@
   
   </ul>
 </nav>
-	<center>
+	
 
 <header>
 

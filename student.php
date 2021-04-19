@@ -44,7 +44,6 @@ a:hover, a:active {
   </ul>
 </nav>
 
-<center>
 
 <header>
 </br>
