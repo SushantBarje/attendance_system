@@ -1,4 +1,4 @@
-@import '../style.css';
+
 
 :root {
     --main-color: #7adef7;
@@ -144,7 +144,7 @@ header label span {
     margin-right: 1rem;
 }
 
-user-wrapper small {
+.user-wrapper small {
     display: inline-block;
     color: var(--text-grey);
     margin-top: -3px !important;
@@ -189,6 +189,11 @@ main {
 .cards-single:last-child div:last-child span, 
 .cards-single:last-child div:first-child span {
     color: #fff;
+}
+
+.main-content main input{
+    border:none;
+    outline:none;
 }
 
 @media only screen and (max-width:1200px) {
@@ -360,3 +365,4 @@ main {
       .dropdown a:hover {background-color: #ddd;}
       
       .show {display: block;}
+

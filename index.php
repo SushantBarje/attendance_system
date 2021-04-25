@@ -1,55 +1,68 @@
 <?php
     require_once __DIR__ . '\vendor\autoload.php';
-    session_start();
     use app\controller\FacultyController;
     use app\controller\StudentController;
-    $err = [];
-    if(isset($_REQUEST['btn-login'])){
-      $user = new FacultyController();
-        $user->userLogin();
-    }
-    if(isset($_REQUEST['student-login'])){
-      $student = new StudentController();
-      $err = $student->studentLogin();
-      echo '<script>alert("'.$err["invalid"].'")</script>';
+    session_start();
+    $user = new FacultyController();
+    $student = new StudentController;
+    if(isset($_REQUEST['faculty-login'])){
+        $err = $user->userLogin();
+        if(isset($err["invalid"])) echo '<script> alert("'.$err['invalid'].'")</script>';
     }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>skn online attendence</title>
-	<link rel="stylesheet" href="style.css">
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-<body>     
-<nav class="navbar navbar-expand-sm bg-primary navbar-dark">
-  <ul class="navbar-nav">
-    <li class="nav-item active">
-      <a class="nav-link">SKN Sinhgad College Of Engineering Korti,Pandharpur</a>
-    </li>
-  </ul>
-</nav>
-<header>
-  <h1>Online Attendance System </h1>
-</header>
-</br></br>
-<div class="back">
-  <div class="div-center">
-    <div class="content">
-      <h3>Student Login</h3>
-      <hr />
-      <form class="justify-content-center" method="POST">
-        <div class="form-group">
-          <label for="exampleInputEmail1">Student Username</label>
-          <input type="text" class="form-control" id="exampleInputusername" name="prn_no" placeholder="Enter Your PRN " >
+<body>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-4">
+                <div class="header">
+                    <h3>Login</h3>
+                </div>
+                <form method="post">
+                    <div class="form-group">
+                        <label for="faculty_id">Faculty ID</label>
+                        <div class="input-group mb-3 input-group-sm">
+                            <input type="text" class="form-control" name="faculty_id" placeholder="Faculty ID" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-group mb-3 input-group-sm">
+                            <input type="password" class="form-control" name="password" placeholder="Password" />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" name="faculty-login" type="submit">Log In</button>
+                </form>
+            </div>
+            <div class="col-sm-2"></div>
+            <div class="col-sm-4">
+                <div class="header">
+                    <h3>Login</h3>
+                </div>
+                <form id="student-login">
+                    <div class="form-group">
+                        <label for="prn_no">PRN</label>
+                        <div class="input-group mb-3 input-group-sm">
+                            <input type="text" class="form-control" name="prn_no" placeholder="Enter PRN">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" name="stundet-login" type="submit">Log In</button>
+                </form>
+            </div>
+            <div class="col-sm-1"></div>
         </div>
-        <button type="submit" name ="student-login" class="btn btn-primary">Login</button>
-      </form>
     </div>
-    </span>
-  </div>
 </body>
+</html>

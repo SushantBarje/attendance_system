@@ -6,10 +6,10 @@ use app\database\Database;
 
 class Faculty extends Database {
 
-	/*
-	# 	This function will get academic Year from database.
-	#	@params 
-	#	@return array().
+	/**
+	* 	This function will get academic Year from database.
+	*	@param  
+	*	@return array[].
 	*/
 	public function getAcademicYear(){
 		try {
@@ -333,7 +333,7 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM department";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
 		}
 		catch(PDOException $e){
 			return array("e"=> $e->getMessage());
@@ -357,11 +357,11 @@ class Faculty extends Database {
 		}
 	}
 
-	/*
-	#	Function will update the Department in the table.
-	#	@params $dept_id:= ID of the department to be change.
-	#	@params $data:= Array containg key value pair. $key = name of columns to set and $value = New value of columns.
-	#	@return 
+	/** 
+	*	Function will update the Department in the table
+	*	@param string $dept_id  ID of the department to be change.
+	*	@param array $data:= Array containg key value pair. $key = name of columns to set and $value = New value of columns.
+	*	@return 
 	*/
 
 	public function updateDepartment($dept_id,$data){
@@ -384,10 +384,10 @@ class Faculty extends Database {
 		}
 	}
 
-	/*
-	#	Function will delete the specific department in the table.
-	#	@params $dept_id:= ID of the department to be change.
-	#	@return 
+	/**
+	*	Function will delete the specific department in the table.
+	*	@param string $dept_id:= ID of the department to be change.
+	*	@return bool
 	*/
 
 	public function deleteDepartment($dept_id){
@@ -412,7 +412,7 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM student_class";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
