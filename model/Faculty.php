@@ -13,10 +13,10 @@ class Faculty extends Database {
 	*/
 	public function getAcademicYear(){
 		try {
-			$sql = "SELECT * FROM academic_year;";
+			$sql = "SELECT * FROM academic_year";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();	
+			return $stmt->fetchAll();	
 		}  
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -28,13 +28,12 @@ class Faculty extends Database {
 	#	@params $acad_year_id
 	#	@return array().
 	*/
-	public function getByAcademicYearById($acd_year_id){
+	public function getAcademicYearById($acd_year_id){
 		try{
-			$sql = "SELECT * FROM academic WHERE academic_id = ?";
+			$sql = "SELECT * FROM academic_year WHERE acedemic_id = ?";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute([$acd_year_id]);
-			$result = $stmt->fetch();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -43,9 +42,11 @@ class Faculty extends Database {
 
 	public function insertAcademicYear($data){
 		try{
-			$sql = "INSERT INTO academic_year VALUES (?)";
+			$sql = "INSERT INTO academic_year(academic_descr) VALUES (?);";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($data);
+			$id = $this->connect()->lastInsertId();
+			return $id;
 		}	
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());

@@ -2,12 +2,14 @@
     require_once __DIR__ . '\vendor\autoload.php';
     use app\controller\FacultyController;
     use app\controller\StudentController;
-    session_start();
     $user = new FacultyController();
     $student = new StudentController;
+    session_start();
     if(isset($_REQUEST['faculty-login'])){
         $err = $user->userLogin();
         if(isset($err["invalid"])) echo '<script> alert("'.$err['invalid'].'")</script>';
+    }
+    if(isset($_REQUEST['student-login'])){
     }
 ?>
 <!DOCTYPE html>
@@ -21,14 +23,24 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="CSS/login.css">
 </head>
 <body>
+    <div class="container-fluid" id="heading">
+        <div class="row mb-5">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-6">
+                <h1>Online Attendance System</h1>
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+    </div>
     <div class="container">
-        <div class="row mt-5">
+        <div class="row">
             <div class="col-sm-1"></div>
-            <div class="col-sm-4">
+            <div class="col-sm-4" id="faculty-section">
                 <div class="header">
-                    <h3>Login</h3>
+                    <h3>Faculty</h3>
                 </div>
                 <form method="post">
                     <div class="form-group">
@@ -47,9 +59,9 @@
                 </form>
             </div>
             <div class="col-sm-2"></div>
-            <div class="col-sm-4">
+            <div class="col-sm-4" id="student-section">
                 <div class="header">
-                    <h3>Login</h3>
+                    <h3>Student</h3>
                 </div>
                 <form id="student-login">
                     <div class="form-group">

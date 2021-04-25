@@ -1,6 +1,16 @@
+<?php
+    namespace app\admin;
+    require_once __DIR__ . '\..\vendor\autoload.php';
+    session_start();
+    use app\controller\FacultyController;
+    $user = new FacultyController();
+    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+        header('Location:../index.php');
+    }
+?>
+
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../CSS/tables.css">
@@ -10,13 +20,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Add Hod</title>
 </head>
-
 <body>
-
     <?php include 'adminHeader.php'; ?>
-
     <main>
-
         <div class="cards">
             <div class="container">
 
@@ -77,9 +83,7 @@
                     </div>
                 </div>
             </div>
-
         </div>
-
         <table class="">
             <tr border="4px">
                 <th>First Name </th>
@@ -88,7 +92,6 @@
                 <th>Department Name </th>
                 <th>Password </th>
                 <th>Edit</th>
-             
             </tr>
             <tr>
                 <td>Prakash </td>
@@ -96,11 +99,8 @@
                 <td>Gadeker</td>
                 <td>Computer Science & Engineering</td>
                 <td>Prakash@123</td>
-            </tr>
-            
+            </tr> 
         </table>
     </main>
-
 </body>
-
 </html>

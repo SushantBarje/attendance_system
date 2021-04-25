@@ -5,8 +5,11 @@ use app\controller\FacultyController;
 
 $faculty = new FacultyController();
 
-if($_REQUEST['action'] == 'addDepartment'){
-    $faculty->getDepartment()
+$req = $_GET['action'];
+
+if($req == "addAcademicYear"){
+    $r =  $faculty->addAcadYear();
+    echo $r;
 }
 
 ?>

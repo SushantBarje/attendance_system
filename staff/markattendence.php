@@ -10,7 +10,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Mark Attendence</title>
 </head>
-
 <body>
 <?php   include "staffHeader.php" ?>
     <main>
@@ -47,10 +46,10 @@
                     <div class="container">
                         <form>
                             <label class="radio-inline">
-                                Present <input type="radio" name="optradio" checked>
+                                Present <input type="radio" name="optradio">
                             </label>
                             <label class="radio-inline">
-                                Absent <input type="radio" name="optradio">
+                                Absent <input type="radio" name="optradio" checked>
                             </label>
                         </form>
                     </div>
@@ -63,10 +62,10 @@
                     <div class="container">
                         <form>
                             <label class="radio-inline">
-                                Present <input type="radio" name="optradio" checked>
+                                Present <input type="radio" name="optradio" >
                             </label>
                             <label class="radio-inline">
-                                Absent <input type="radio" name="optradio">
+                                Absent <input type="radio" name="optradio" checked>
                             </label>
                         </form>
                     </div>

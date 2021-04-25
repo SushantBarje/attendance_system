@@ -20,6 +20,7 @@ function dropdownbtn() {
 
 $(document).ready(function(){
     processAddDepartment();
+    processAddAcademicYear();
 });
 
 function processAddDepartment(){
@@ -37,8 +38,34 @@ function processAddDepartment(){
             success: function(res){
                 console.log(res);
             }
-        })
-    })
-   
-    
+        });
+    });    
+}
+
+
+function processAddAcademicYear(){
+    $("#academic-form").on("submit", function(e){
+        var data = {};
+        $('#academic-form input').each(function(k,v){
+            data[$(this).attr('name')] = $(this).val();
+        });
+        console.log(data);
+        $.ajax({
+            url: '../controller/ajaxController.php?action=addAcademicYear',
+            type: 'post',
+            data : data,
+            dataType: 'json',
+            success: function(res){
+                console.log(res);
+                if(res.error){
+                    var html = "";
+                    for(var i = 0; i < res.data.length; i++){
+                        html += '<tr><td>'+res.data[i].academic_descr+'</td><td><button type="button" class="btn btn-primary">Edit</button><button class="btn btn-danger">Delete</button></td></tr>';
+                    }
+                    $('#myModal').modal('hide');
+                    $('#acad-table').append(html);
+                }
+            }
+        });
+    });
 }

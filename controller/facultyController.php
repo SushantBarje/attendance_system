@@ -1,4 +1,5 @@
 <?php
+
 namespace app\controller;
 use app\model\Faculty;
 
@@ -21,7 +22,7 @@ class FacultyController extends Faculty {
     public function checkEmpty(){
         foreach ($_POST as $p){
 			if(empty($p)){
-				return array('error' => 'empty');
+				return true;
 			}
 		}
     }
@@ -44,8 +45,8 @@ class FacultyController extends Faculty {
             $_SESSION['dept'] = $result['dept_id'];
             $_SESSION['role'] = $result['role_id'];
             if($result['role_id'] == 0) header("Location:admin/admindash.php");
-            if($result['role_id'] == 1) header("Location:hod/hod.php");
-            if($result['role_id'] == 2) header("Location:staff/staffdash.php");
+            if($result['role_id'] == 1) header("Location:hod/hodHeader.php");
+            if($result['role_id'] == 2) header("Location:staff/staffHeader.php");
         }
         else{
             $this->errors["invalid"] = "Invalid Faculty Id or Password";
@@ -56,6 +57,15 @@ class FacultyController extends Faculty {
     // public function addDepartment($dept_id, $dept_name){
     //     return $this->
     // }
+
+    public function addAcadYear(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        echo "ididid".$_POST['acd'];
+        $lastid = $this->insertAcademicYear([$_POST['acd']]);
+        $getresult = $this->getAcademicYear();
+        return json_encode(array("error" => $lastid,"data" => $getresult));
+       
+    }
 
     public function getFacultyId(){
         return $this->faculty_id;
