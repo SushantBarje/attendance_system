@@ -46,14 +46,13 @@
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <form action="#" class="modal-body">
-                                    
                                     <label for="fname"><b>First Name</b></label>
                                     <input type="text" placeholder="Fisrst Name" name="fname" required><br>
                                     <label for="mname"><b>Middle Name</b></label>
                                     <input type="text" placeholder="Middle Name" name="mname" required><br>
                                     <label for="lname"><b>Last Name</b></label>
                                     <input type="text" placeholder="Last Name" name="lname" required><br>
-                                    
+
                                     <label for="dept"><b>Department</b></label>
                                     <select name="dept" id="dept" form="dept">
                                         <option value="na">NA</option>
@@ -85,22 +84,56 @@
             </div>
         </div>
         <table class="">
-            <tr border="4px">
-                <th>First Name </th>
-                <th>Middlle Name </th>
-                <th>Last Name </th>
-                <th>Department Name </th>
-                <th>Password </th>
-                <th>Edit</th>
-            </tr>
-            <tr>
-                <td>Prakash </td>
-                <td>Vitthal</td>
-                <td>Gadeker</td>
-                <td>Computer Science & Engineering</td>
-                <td>Prakash@123</td>
-            </tr> 
+            <thead>
+                <tr border="4px">
+                    <th>First Name </th>
+                    <th>Department Name </th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $data = $user->getAllHod();
+                    if(!$data) die("<tr><td colspan='2'>Nothing Found</td></tr>");
+                    foreach($data as $d){
+                        echo '<tr>
+                                <td>'.$d['last_name'].' '.$d['first_name'].'</td>
+                                <td>"'.$d['dept_name'].'"</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" id="edit-btn" data-control="'.$d['faculty_id'].'" data-toggle="modal" data-target="#editModal">Edit</button>
+                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['faculty_id'].'">Delete</button>
+                                </td>
+                                <td></td>
+                            </tr>';
+                    }
+                ?>
+            </tbody>
         </table>
+
+        <div class="modal" id="editModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h2>Edit Department</h2>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <form id="edit-dept" class="modal-body">
+                            <label for="fname"><b>Department Name</b></label>
+                            <input type="text" id="modalinput" placeholder="Department Name" name="editdptname">
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">ADD</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                            </div>
+                            <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 </html>

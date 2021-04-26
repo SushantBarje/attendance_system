@@ -4,8 +4,7 @@ namespace app\model;
 use \PDOException;
 use app\database\Database;
 
-class Faculty extends Database {
-
+class Faculty extends Database{
 	/**
 	* 	This function will get academic Year from database.
 	*	@param  
@@ -13,8 +12,9 @@ class Faculty extends Database {
 	*/
 	public function getAcademicYear(){
 		try {
+			$con = $this->connect();
 			$sql = "SELECT * FROM academic_year";
-			$stmt = $this->connect()->prepare($sql);
+			$stmt = $con->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();	
 		}  
@@ -31,8 +31,8 @@ class Faculty extends Database {
 	public function getAcademicYearById($acd_year_id){
 		try{
 			$sql = "SELECT * FROM academic_year WHERE acedemic_id = ?";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$acd_year_id]);
+			$stmt = $this->dbconn->prepare($sql);
+			$stmt->execute($acd_year_id);
 			return $stmt->fetchAll();
 		}
 		catch (PDOException $e) {
@@ -42,10 +42,11 @@ class Faculty extends Database {
 
 	public function insertAcademicYear($data){
 		try{
+			$con = $this->connect();
 			$sql = "INSERT INTO academic_year(academic_descr) VALUES (?);";
-			$stmt = $this->connect()->prepare($sql);
+			$stmt = $con->prepare($sql);
 			$stmt->execute($data);
-			$id = $this->connect()->lastInsertId();
+			$id = $con->lastInsertId();
 			return $id;
 		}	
 		catch (PDOException $e) {
@@ -120,7 +121,7 @@ class Faculty extends Database {
 	*/
 	public function getAllHod(){
 		try{
-			$sql = "SELECT * FROM faculty WHERE role_id = 1";
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND role_id = 1";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();
@@ -129,6 +130,19 @@ class Faculty extends Database {
 			return array("e" => $e->getMessage());
 		}
 		
+	}
+
+	public function insertOneHod($data){
+		try{
+			$role = "SELECT role_id FROM role WHERE role_id = 2";
+			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role_id, password) VALUES (?,?,?,?,?,?);";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute();
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
 	}
 
 	/*
@@ -341,6 +355,19 @@ class Faculty extends Database {
 		}
 	}
 
+	public function getDepartmentById($id){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT * FROM department WHERE dept_id = ?";
+			$stmt = $con->prepare($sql);
+			$stmt->execute($id);
+			return $stmt->fetchAll();	
+		}
+		catch(PDOException $e){
+			return array("e"=> $e->getMessage());
+		}
+	}
+
 	/*
 	#	This function will insert the department into database
 	#	@params $data:= Array containing all the details of department.
@@ -348,10 +375,12 @@ class Faculty extends Database {
 	*/
 	public function insertDepartment($data){
 		try{
-			$sql = "INSERT INTO department VALUES(?,?);";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$data]);
-			return $stmt->fetch();
+			$con = $this->connect();
+			$sql = "INSERT INTO department(dept_name) VALUES(?);";
+			$stmt = $con->prepare($sql);
+			$stmt->execute($data);
+			$lastid = $con->lastInsertId();
+			return $lastid;
 		}
 		catch(PDOException $e){
 			return array("e" => $e->getMessage());
@@ -365,22 +394,14 @@ class Faculty extends Database {
 	*	@return 
 	*/
 
-	public function updateDepartment($dept_id,$data){
-		$setPart = array();
-        $bindings = array();
-
-        foreach ($data as $key => $value)
-        {
-            $setPart[] = "{$key} = :{$key}";
-            $bindings[":{$key}"] = $value;
-    	}
-        $bindings[":dept_id"] = $dept_id;
-        try{
-			$sql = "UPDATE department SET".implode(',',$setPart)." WHERE dept_id = :dept_id;";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute($bindings);
-		}
-		catch(PDOException $e){
+	public function updateDepartmentById($data){
+		try{
+			$con = $this->connect();
+			$sql = "UPDATE department SET dept_name = ? WHERE dept_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+			else return false;
+		}catch(PDOException $e){
 			return array("e" => $e->getMessage());
 		}
 	}
@@ -393,9 +414,10 @@ class Faculty extends Database {
 
 	public function deleteDepartment($dept_id){
 		try {
-			$sql = "DELETE * FROM department WHERE dept_id = ?;";
+			$sql = "DELETE FROM department WHERE dept_id = ?;";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$dept_id]);
+			if($stmt->execute($dept_id)) return true;
+			else return false;
 		}
 		catch(PDOException $e){
 			return array("e" => $e->getMessage());
