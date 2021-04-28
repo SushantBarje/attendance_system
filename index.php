@@ -11,7 +11,12 @@
     }
     if(isset($_REQUEST['student-login'])){
     }
+
+    // if(isset($_REQUEST['log'])){
+    //     $user->test();
+    // }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,5 +81,13 @@
             <div class="col-sm-1"></div>
         </div>
     </div>
+
+    <!-- <form method="post">
+        <input type="text" name="pwd">
+        <button type="submit" name="log">Submit</button>
+    </form> -->
 </body>
 </html>
+<?php
+    
+?>

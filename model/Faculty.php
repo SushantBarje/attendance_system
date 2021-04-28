@@ -1,10 +1,9 @@
 <?php
 namespace app\model;
-
 use \PDOException;
 use app\database\Database;
 
-class Faculty extends Database{
+class Faculty extends Database {
 	/**
 	* 	This function will get academic Year from database.
 	*	@param  
@@ -61,12 +60,24 @@ class Faculty extends Database{
 	#	@params usernme = faculty_id for staff.													
 	#	@returns Associative array contanining single row.
 	###################################################################################################*/
-	public function getByFacultyId($username){
+	public function getFacultyById($id){
 		try{
-			$sql = "SELECT * FROM faculty WHERE faculty_id = ?";
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND a.faculty_id = ?";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$username]);
-			return $stmt->fetch();
+			$stmt->execute($id);
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getFacultyByRole($role){
+		try{
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND role_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute($role);
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -80,30 +91,10 @@ class Faculty extends Database{
 	#####################################################################################################*/
 	public function getAllFaculty(){
 		try{
-			$sql = "SELECT * FROM faculty";
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();
-		}
-		catch (PDOException $e){
-			return array("e" => $e->getMessage());
-		}
-		
-	}
-
-
-	/*
-	#	Function will run query to select only HOD if his faculty_id matches.   
-	#	@params usernme = faculty_id for staff.
-	#	@returns Associative array contanining single row.
-	*/
-	public function getHodBy($username){ 
-		try{
-			$sql = "SELECT * FROM faculty WHERE faculty_id = ?";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$username]);
-			$result = $stmt->fetch();
-			return $result;
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -119,26 +110,12 @@ class Faculty extends Database{
 	#	@params no_parameters;
 	#	@return Arrays of Associative Array containing multiple rows;
 	*/
-	public function getAllHod(){
-		try{
-			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND role_id = 1";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute();
-			return $stmt->fetchAll();
-		}
-		catch (PDOException $e){
-			return array("e" => $e->getMessage());
-		}
-		
-	}
 
 	public function insertOneHod($data){
 		try{
-			$role = "SELECT role_id FROM role WHERE role_id = 2";
 			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role_id, password) VALUES (?,?,?,?,?,?);";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute();
-			return $stmt->fetchAll();
+			$stmt->execute($data);
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -150,12 +127,11 @@ class Faculty extends Database{
 	#	@params faculty_id, first_name, last_name, dept(department), role(0 => Admin, 1 => HOD, 2 => Staff).
 	#	@return array containing two values array[0] = true or false, array[1] = if true null else if catch exception then error message.
 	*/
-	public function insertOneFaculty($faculty_id, $first_name, $last_name, $dept, $role, $password){
+	public function insertOneFaculty($data){
 		try{
-			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role, password) VALUES (?,?,?,?,?,?);";
+			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role_id, password) VALUES (?,?,?,?,?,?);";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$faculty_id, $first_name, $last_name, $dept, $role, $password]);
-			return array(true, null);
+			if($stmt->execute($data)) return true;
 		}catch (PDOException $e){
 			return array(false, $e->getMessage());
 		}
@@ -209,9 +185,9 @@ class Faculty extends Database{
 
 	public function deleteFacultyById($faculty_id){
 		try{
-			$sql = "DELETE * FROM faculty WHERE faculty_id = ?;";
+			$sql = "DELETE FROM faculty WHERE faculty_id = ?;";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$faculty_id]);
+			if($stmt->execute($faculty_id)) return true;
 		} catch (PDOException $e){
 			return array("e" => $e->getMessage());
 		}
@@ -414,10 +390,10 @@ class Faculty extends Database{
 
 	public function deleteDepartment($dept_id){
 		try {
+			$con = $this->connect();
 			$sql = "DELETE FROM department WHERE dept_id = ?;";
-			$stmt = $this->connect()->prepare($sql);
+			$stmt = $con->prepare($sql);
 			if($stmt->execute($dept_id)) return true;
-			else return false;
 		}
 		catch(PDOException $e){
 			return array("e" => $e->getMessage());
@@ -467,10 +443,10 @@ class Faculty extends Database{
 	*/
 	public function getSemesterByYearId($year_id){
 		try {
-			$sql = "SELECT * FROM semester WHERE s_class_id = ?;";
+			$sql = "SELECT a.sem_id, a.sem_name FROM semester as a INNER JOIN student_class as b WHERE a.s_class_id = b.s_class_id AND a.s_class_id = ?;";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$year_id]);
-			return $stmt->fetch();
+			$stmt->execute($year_id);
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -487,7 +463,7 @@ class Faculty extends Database{
 			$sql = "SELECT * FROM division;";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -499,7 +475,7 @@ class Faculty extends Database{
 			$sql = "SELECT * FROM batch;";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -508,7 +484,7 @@ class Faculty extends Database{
 
 	public function getCourses(){
 		try{
-			$sql = "SELECT * FROM courses";
+			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetch();

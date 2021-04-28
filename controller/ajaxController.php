@@ -19,6 +19,18 @@ if($req == "addAcademicYear"){
 }else if($req == "delDept"){
     $r = $faculty->removeDepartment();
     die($r);
+}else if ($req == "addHod"){
+    $r = $faculty->addOneHod();
+    die($r);
+}else if($req == "delHod"){
+    $r = $faculty->removeHod();
+    die($r);
+}else if($req == "hodDetails"){
+    $r = $faculty->getAjaxHodDetailsById();
+    die($r);
+}else if($req = "getSem"){
+    $r = $faculty->getSemesterByClassYear();
+    die($r);
 }
 ob_end_flush();
 ?>
