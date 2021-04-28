@@ -1,3 +1,14 @@
+<?php
+    namespace app\admin;
+    require_once __DIR__ . '\..\vendor\autoload.php';
+    session_start();
+    use app\controller\FacultyController;
+    $user = new FacultyController();
+    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+        header('Location:../index.php');
+    }
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,32 +41,37 @@
                             </div>
                             <!-- Modal body -->
                             <div class="modal-body">
-                                <form action="#" class="modal-body">
-                                    <!-- <label for="fname"><b>Add Academic Year</b></label> -->
-                                    <input type="text" placeholder="Academic Year" name="dptname" required>
-                                    <!-- Modal footer -->
-                                    <div class="modal-footer">
-                                        <button type="submit" class="btn btn-success">ADD</button>
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                    </div>
-                                    <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
-                                </form>
+                                <form id="academic-form" method="POST">
+                                    <input type="text" placeholder="Academic Year" name="acd" required> 
+                                    <button type="submit" form="academic-form" class="btn btn-success">ADD</button>
+                                </form> 
+                                
+                            </div>
+                            <div class="modal-footer">
+                                
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <table class="">
+        <table id="acad-table">
             <tr border="4px">
                 <th>Academic Year</th>
                 <th>Edit</th>
             </tr>
-            <tr>
-                <td>2018-2019</td>
-            </tr>
+            <?php 
+                $data = $user->getAcademicYear();
+                if(!$data){
+                    echo "<tr><td colspan='2'>Nothing Found</td></tr>";
+                }
+                foreach($data as $d){
+                    echo '<tr><td>'.$d['academic_descr'].'</td><td><button type="button" class="btn btn-primary">Edit</button><button class="btn btn-danger">Delete</button></td></tr>';
+                }
+            ?>
         </table>
     </main>
+    <script src="../assets/js/admin/script.js"></script>
 </body>
 </html>

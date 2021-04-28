@@ -1,0 +1,28 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#heading{
+    background-color: #4b94c5;
+    padding: 10px;
+    color: white;
+}
+
+
+
+#faculty-section,
+#student-section{
+    margin-top: 90px;
+    padding: 20px;
+    height: 300px;
+}
+
+#faculty-section .header,
+#student-section .header{
+    border-bottom: 3px solid black;
+    margin-bottom: 20px;
+    width: 150px;
+}
+

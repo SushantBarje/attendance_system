@@ -1,6 +1,16 @@
+<?php
+    namespace app\admin;
+    require_once __DIR__ . '\..\vendor\autoload.php';
+    session_start();
+    use app\controller\FacultyController;
+    $user = new FacultyController();
+    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+        header('Location:../index.php');
+    }
+?>
+
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../CSS/tables.css">
@@ -8,6 +18,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="../assets/js/admin/script.js"></script>
     <title>Add Department</title>
 </head>
 <body>
@@ -16,137 +27,100 @@
         <div class="cards">
             <div class="container">
                 <!-- Button to Open the Modal -->
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#courseAddModal">
                     Add Course
                 </button>
 
                 <!-- The Modal -->
-                <div class="modal" id="myModal">
+                <div class="modal" id="courseAddModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
-
                             <!-- Modal Header -->
                             <div class="modal-header">
                                 <h1>Course Details</h1>
-
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
-
                             <!-- Modal body -->
                             <div class="modal-body">
-                                <form action="#" class="modal-body">
-
-                                    <h5>Course Teacher Information </h5>
-                                    <label for="fname"><b>First Name</b></label>
-                                    <input type="text" placeholder="Fisrst Name" name="fname" required><br>
-                                    <label for="mname"><b>Middle Name</b></label>
-                                    <input type="text" placeholder="Middle Name" name="mname" required><br>
-                                    <label for="lname"><b>Last Name</b></label>
-                                    <input type="text" placeholder="Last Name" name="lname" required><br>
-                                    <hr>
-
-                                    <h5>Course Information </h5>
-                                    <label for="dept"><b>Department</b></label>
-                                    <select name="dept" id="dept" form="dept">
-                                        <option value="na">NA</option>
-                                        <option value="cse">CSE</option>
-                                        <option value="entc">EN & TC</option>
-                                        <option value="civil">CIVIL</option>
-                                        <option value="mechanical">MECHANICAL</option>
-                                        <option value="electrical">ELECTRIACL</option>
-                                    </select>
-
-                                    <label for="dept"><b>Semister</b></label>
-                                    <select name="sem" id="sem" form="semlist">
-                                        <option value="na">NA</option>
-                                        <option value="sem-i">SEM-I</option>
-                                        <option value="sem-ii">SEM-II</option>
-                                        <option value="sem-iii">SEM-III</option>
-                                        <option value="sem-iv">SEM-IV</option>
-                                        <option value="sem-v">SEM-V</option>
-                                        <option value="sem-vi">SEM-VI</option>
-                                        <option value="sem-vii">SEM-VII</option>
-                                        <option value="sem-viii">SEM-VIII</option>
-
-
-                                    </select>
-                                    <br>
-
-
-
-                                    <label for="fname"><b>Subject Code</b></label>
-                                    <input type="text" placeholder="Subject Code" name="fname" required>
-
-                                    <br>
-                                    <label for="lname"><b>Course Name</b></label>
-                                    <input type="text" placeholder="Course Name" name="lname" required>
+                                <form id="add-course">
+                                    <div class="form-group">
+                                        <label for="course_id">Course Code: </label>
+                                        <input type="text" name="course_id" class="form-control form-control-sm" placeholder="Course Code">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="course_id">Course Name: </label>
+                                        <input type="text" name="course_name" class="form-control form-control-sm" placeholder="Course Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="course-dept">Department: </label>
+                                        <select id="course-dept" name="course_dept" class="form-control form-control-sm">
+                                        <?php 
+                                            $data = $user->getDepartment();
+                                            if(!$data) die("<option>Department Not Available</option>");
+                                            foreach($data as $d){
+                                                echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
+                                            }
+                                        ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="class_year">Class: </label>
+                                        <select id="class_year" name="course_class" class="form-control form-control-sm">
+                                        <option value=" "> </option>
+                                        <?php 
+                                            $data = $user->getClassYear();
+                                            if(!$data) die("<option>Department Not Available</option>");
+                                            foreach($data as $d){
+                                                echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                            }
+                                        ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="s_sem"><b>Semester</b></label>
+                                        <select name="s_sem" name="course_sem" id="s_sem" class="form-control form-control-sm" disabled>
+                                            <option value=" ">Select Year</option>
+                                        </select>
+                                    </div>
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
-
                                         <button type="submit" class="btn btn-success">ADD</button>
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                     </div>
                                     <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
                                 </form>
                             </div>
-
-
-
-
-
                         </div>
-
                     </div>
                 </div>
             </div>
-
         </div>
-
         <table class="">
-            <tr border="3px">
-
-                <th>First Name</th>
-                <th>Middle Name</th>
-                <th>Last Name</th>
-                <th>Department</th>
-
-                <th>Semister</th>
-
-                <th>Subject Code</th>
-                <th>Course Name</th>
-                <th>Edit</th>
-
-            </tr>
-            <tr>
-                <td>Vishal</td>
-                <td>Tanaji</td>
-                <td>Phule</td>
-                <td>CSE</td>
-                <td>SEM-III</td>
-
-                <td>5776766</td>
-                <td>Artificial Intellegence</td>
-            </tr>
-            <tr>
-                <td>Vishal</td>
-                <td>Tanaji</td>
-                <td>Phule</td>
-                <td>CSE</td>
-                <td>SEM-III</td>
-
-                <td>5776766</td>
-                <td>Artificial Intellegence</td>
-            </tr>
-            <tr>
-                <td>Vishal</td>
-                <td>Tanaji</td>
-                <td>Phule</td>
-                <td>CSE</td>
-                <td>SEM-III</td>
-
-                <td>5776766</td>
-                <td>Artificial Intellegence</td>
-            </tr>
+            <thead>
+                <tr border="3px">
+                    <th>Course Code</th>
+                    <th>Course Name</th>
+                    <th>Department</th>
+                    <th>Class<th>
+                    <th>Semester</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $data = $user->getCourses();
+                    if(!$data) echo "<tr><td>Nothing Found<td></tr>";
+                    foreach($data as $d){
+                        echo '<tr>
+                                <td>'.$d['course_id'].'</td>
+                                <td>'.$d['course_name'].'</td>
+                                <td>'.$d['dept_name'].'</td>
+                                <td>'.$d['s_class_name'].'</td>
+                                <td>'.$d['sem_name'].'</td>
+                            </tr>';
+                    }
+                ?>
+            </tbody>
         </table>
 
 

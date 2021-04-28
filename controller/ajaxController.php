@@ -2,11 +2,35 @@
 namespace app\controller;
 require_once __DIR__ . '\..\vendor\autoload.php';
 use app\controller\FacultyController;
-
 $faculty = new FacultyController();
 
-if($_REQUEST['action'] == 'addDepartment'){
-    $faculty->getDepartment()
-}
+ob_start();
+$req = $_GET['action'];
 
+if($req == "addAcademicYear"){
+    $r =  $faculty->addAcadYear();
+    die($r);
+}else if($req == "addDept"){
+    $r = $faculty->addDepartment();
+    die($r);
+}else if($req == "editDept"){
+    $r = $faculty->editDepartment();
+    die($r);
+}else if($req == "delDept"){
+    $r = $faculty->removeDepartment();
+    die($r);
+}else if ($req == "addHod"){
+    $r = $faculty->addOneHod();
+    die($r);
+}else if($req == "delHod"){
+    $r = $faculty->removeHod();
+    die($r);
+}else if($req == "hodDetails"){
+    $r = $faculty->getAjaxHodDetailsById();
+    die($r);
+}else if($req = "getSem"){
+    $r = $faculty->getSemesterByClassYear();
+    die($r);
+}
+ob_end_flush();
 ?>

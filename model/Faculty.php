@@ -1,11 +1,9 @@
 <?php
 namespace app\model;
-
 use \PDOException;
 use app\database\Database;
 
 class Faculty extends Database {
-
 	/**
 	* 	This function will get academic Year from database.
 	*	@param  
@@ -13,10 +11,11 @@ class Faculty extends Database {
 	*/
 	public function getAcademicYear(){
 		try {
-			$sql = "SELECT * FROM academic_year;";
-			$stmt = $this->connect()->prepare($sql);
+			$con = $this->connect();
+			$sql = "SELECT * FROM academic_year";
+			$stmt = $con->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();	
+			return $stmt->fetchAll();	
 		}  
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -28,13 +27,12 @@ class Faculty extends Database {
 	#	@params $acad_year_id
 	#	@return array().
 	*/
-	public function getByAcademicYearById($acd_year_id){
+	public function getAcademicYearById($acd_year_id){
 		try{
-			$sql = "SELECT * FROM academic WHERE academic_id = ?";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$acd_year_id]);
-			$result = $stmt->fetch();
-			return $stmt->fetch();
+			$sql = "SELECT * FROM academic_year WHERE acedemic_id = ?";
+			$stmt = $this->dbconn->prepare($sql);
+			$stmt->execute($acd_year_id);
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -43,9 +41,12 @@ class Faculty extends Database {
 
 	public function insertAcademicYear($data){
 		try{
-			$sql = "INSERT INTO academic_year VALUES (?)";
-			$stmt = $this->connect()->prepare($sql);
+			$con = $this->connect();
+			$sql = "INSERT INTO academic_year(academic_descr) VALUES (?);";
+			$stmt = $con->prepare($sql);
 			$stmt->execute($data);
+			$id = $con->lastInsertId();
+			return $id;
 		}	
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -59,12 +60,24 @@ class Faculty extends Database {
 	#	@params usernme = faculty_id for staff.													
 	#	@returns Associative array contanining single row.
 	###################################################################################################*/
-	public function getByFacultyId($username){
+	public function getFacultyById($id){
 		try{
-			$sql = "SELECT * FROM faculty WHERE faculty_id = ?";
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND a.faculty_id = ?";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$username]);
-			return $stmt->fetch();
+			$stmt->execute($id);
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getFacultyByRole($role){
+		try{
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND role_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute($role);
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -78,30 +91,10 @@ class Faculty extends Database {
 	#####################################################################################################*/
 	public function getAllFaculty(){
 		try{
-			$sql = "SELECT * FROM faculty";
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();
-		}
-		catch (PDOException $e){
-			return array("e" => $e->getMessage());
-		}
-		
-	}
-
-
-	/*
-	#	Function will run query to select only HOD if his faculty_id matches.   
-	#	@params usernme = faculty_id for staff.
-	#	@returns Associative array contanining single row.
-	*/
-	public function getHodBy($username){ 
-		try{
-			$sql = "SELECT * FROM faculty WHERE faculty_id = ?";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$username]);
-			$result = $stmt->fetch();
-			return $result;
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -117,17 +110,16 @@ class Faculty extends Database {
 	#	@params no_parameters;
 	#	@return Arrays of Associative Array containing multiple rows;
 	*/
-	public function getAllHod(){
+
+	public function insertOneHod($data){
 		try{
-			$sql = "SELECT * FROM faculty WHERE role_id = 1";
+			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role_id, password) VALUES (?,?,?,?,?,?);";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute();
-			return $stmt->fetchAll();
+			$stmt->execute($data);
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
 		}
-		
 	}
 
 	/*
@@ -135,12 +127,11 @@ class Faculty extends Database {
 	#	@params faculty_id, first_name, last_name, dept(department), role(0 => Admin, 1 => HOD, 2 => Staff).
 	#	@return array containing two values array[0] = true or false, array[1] = if true null else if catch exception then error message.
 	*/
-	public function insertOneFaculty($faculty_id, $first_name, $last_name, $dept, $role, $password){
+	public function insertOneFaculty($data){
 		try{
-			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role, password) VALUES (?,?,?,?,?,?);";
+			$sql = "INSERT INTO faculty(faculty_id, first_name, last_name, dept_id, role_id, password) VALUES (?,?,?,?,?,?);";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$faculty_id, $first_name, $last_name, $dept, $role, $password]);
-			return array(true, null);
+			if($stmt->execute($data)) return true;
 		}catch (PDOException $e){
 			return array(false, $e->getMessage());
 		}
@@ -194,9 +185,9 @@ class Faculty extends Database {
 
 	public function deleteFacultyById($faculty_id){
 		try{
-			$sql = "DELETE * FROM faculty WHERE faculty_id = ?;";
+			$sql = "DELETE FROM faculty WHERE faculty_id = ?;";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$faculty_id]);
+			if($stmt->execute($faculty_id)) return true;
 		} catch (PDOException $e){
 			return array("e" => $e->getMessage());
 		}
@@ -340,6 +331,19 @@ class Faculty extends Database {
 		}
 	}
 
+	public function getDepartmentById($id){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT * FROM department WHERE dept_id = ?";
+			$stmt = $con->prepare($sql);
+			$stmt->execute($id);
+			return $stmt->fetchAll();	
+		}
+		catch(PDOException $e){
+			return array("e"=> $e->getMessage());
+		}
+	}
+
 	/*
 	#	This function will insert the department into database
 	#	@params $data:= Array containing all the details of department.
@@ -347,10 +351,12 @@ class Faculty extends Database {
 	*/
 	public function insertDepartment($data){
 		try{
-			$sql = "INSERT INTO department VALUES(?,?);";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$data]);
-			return $stmt->fetch();
+			$con = $this->connect();
+			$sql = "INSERT INTO department(dept_name) VALUES(?);";
+			$stmt = $con->prepare($sql);
+			$stmt->execute($data);
+			$lastid = $con->lastInsertId();
+			return $lastid;
 		}
 		catch(PDOException $e){
 			return array("e" => $e->getMessage());
@@ -364,22 +370,14 @@ class Faculty extends Database {
 	*	@return 
 	*/
 
-	public function updateDepartment($dept_id,$data){
-		$setPart = array();
-        $bindings = array();
-
-        foreach ($data as $key => $value)
-        {
-            $setPart[] = "{$key} = :{$key}";
-            $bindings[":{$key}"] = $value;
-    	}
-        $bindings[":dept_id"] = $dept_id;
-        try{
-			$sql = "UPDATE department SET".implode(',',$setPart)." WHERE dept_id = :dept_id;";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute($bindings);
-		}
-		catch(PDOException $e){
+	public function updateDepartmentById($data){
+		try{
+			$con = $this->connect();
+			$sql = "UPDATE department SET dept_name = ? WHERE dept_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+			else return false;
+		}catch(PDOException $e){
 			return array("e" => $e->getMessage());
 		}
 	}
@@ -392,9 +390,10 @@ class Faculty extends Database {
 
 	public function deleteDepartment($dept_id){
 		try {
-			$sql = "DELETE * FROM department WHERE dept_id = ?;";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$dept_id]);
+			$con = $this->connect();
+			$sql = "DELETE FROM department WHERE dept_id = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($dept_id)) return true;
 		}
 		catch(PDOException $e){
 			return array("e" => $e->getMessage());
@@ -444,10 +443,10 @@ class Faculty extends Database {
 	*/
 	public function getSemesterByYearId($year_id){
 		try {
-			$sql = "SELECT * FROM semester WHERE s_class_id = ?;";
+			$sql = "SELECT a.sem_id, a.sem_name FROM semester as a INNER JOIN student_class as b WHERE a.s_class_id = b.s_class_id AND a.s_class_id = ?;";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$year_id]);
-			return $stmt->fetch();
+			$stmt->execute($year_id);
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -464,7 +463,7 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM division;";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -476,7 +475,7 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM batch;";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -485,7 +484,7 @@ class Faculty extends Database {
 
 	public function getCourses(){
 		try{
-			$sql = "SELECT * FROM courses";
+			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetch();

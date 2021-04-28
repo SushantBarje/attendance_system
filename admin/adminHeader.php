@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,17 +18,16 @@
         <div class="sidebar-menu">
             <ul>
                 <li>
-                    <a href="header.php" class="active"><span class="fa fa-fw fa-home"></span>
-                        <span>Home</span></a>
+                    <a href="admindash.php" class="active"><span class="fa fa-fw fa-home"></span>
+                    <span>Home</span></a>
                 </li>
                 <li>
                     <a href="academic.php"><span class="las la-users"></span>
-                        <span>Add Academic Year</span></a>
+                    <span>Add Academic Year</span></a>
                 </li>
                 <li>
                     <a href="addpt.php"><span class="las la-users"></span>
-                        <span>Departments</span></a>
-                   
+                    <span>Departments</span></a>
                 </li>
                 <li>
                     <a href="adcourse.php"><span class="las la-shopping-bag"></span>
@@ -65,7 +63,6 @@
                 </label>
                Online Attendence System
             </h2>
-
             <div class="user-wrapper">
                 <img src="../img/2.jpg" width="30px" height="30px" alt="">
                 <div>
@@ -80,8 +77,6 @@
 
                             </div>
                     </small>
-
-
                     <script>
                         /* When the user clicks on the button, 
                         toggle between hiding and showing the dropdown content */
@@ -103,13 +98,12 @@
                             }
                         }
                     </script>
-
                 </div>
-
             </div>
-    </div>
+        </div>
     </header>
-
+    <div class="cards"> 
+        <h3>ONRELDSA</h3>
+    </div>
 </body>
-
 </html>
