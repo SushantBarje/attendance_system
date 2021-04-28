@@ -1,51 +1,55 @@
-<?php
-    namespace app\admin;
-    require_once __DIR__ . '\..\vendor\autoload.php';
-    session_start();
-    use app\controller\FacultyController;
-    $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
-        header('Location:../index.php');
-    }
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashbord</title>
+    <title>Faculty Dashbord</title>
     <link rel="stylesheet" href="../assests/css/styles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
     <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/font-awesome-line-awesome/css/all.min.css">
 </head>
 <body>
     <input type="checkbox" id="nav-toggle">
-    <?php include "includes/sidebar.php"?>
+    <?php include "staffsidebar.php" ?>
     <div class="main-content">
         <header>
-            <h2>
-                <label for="nav-toggle">
-                    <span class="las la-bars"></span>
-                </label>
-                Dashboard
-            </h2>
+            <h2><label for="nav-toggle"><span class="las la-bars"></span></label class="label">Faculty Dashboard</h2>
             <div class="user-wrapper">
                 <img src="../img/2.jpg" width="30px" height="30px" alt="">
                 <div>
-                    <h4><?php $_SESSION['first_name']?></h4>
+                    <h4>vishal phule</h4>
                    <small>
                         <div class="dropdown">
-                            <button onclick="myFunction()" class="dropbtn"><?php echo $_SESSION['first_name']." ".$_SESSION['last_name']?></button>
+                            <button onclick="myFunction()" class="dropbtn">Faculty</button>
                             <div id="myDropdown" class="dropdown-content">
                                 <a href="#"><i class="fa fa-fw fa-user"></i> Login</a>
                                 <a href="#"><i class="fa fa-fw fa-user"></i>Logout</a>
                                 <a href="#"><i class="fa fa-fw fa-envelope"></i> Contact</a>
                             </div>
                         </div>
-                    </small> 
+                   </small>
+                    <script>
+                        /* When the user clicks on the button, 
+                        toggle between hiding and showing the dropdown content */
+                        function myFunction() {
+                            document.getElementById("myDropdown").classList.toggle("show");
+                        }
+                        
+                        // Close the dropdown if the user clicks outside of it
+                        window.onclick = function(event) {
+                            if (!event.target.matches('.dropbtn')) {
+                            var dropdowns = document.getElementsByClassName("dropdown-content");
+                            var i;
+                            for (i = 0; i < dropdowns.length; i++) {
+                                var openDropdown = dropdowns[i];
+                                if (openDropdown.classList.contains('show')) {
+                                openDropdown.classList.remove('show');
+                                }
+                            }
+                            }
+                        }
+                    </script>   
                 </div>
             </div>
         </header>
@@ -54,7 +58,7 @@
                 <div class="cards-single">
                     <div>
                         <h1></h1>
-                        <span>  <a class="active" href="#"> Home</a> </span>
+                        <span>  <a class="active" href="#"> View Attendence</a> </span>
                     </div>
                     <div>
                         <span class="fa fa-fw fa-home"></span>
@@ -64,13 +68,14 @@
                 <div class="cards-single">
                     <div>
                         <h1></h1>
-                        <span> <a class="active" href="#"> ADD</a></span>
+                        <span> <a class="active" href="#"> See Reports</a></span>
                     </div>
                     <div>
                         <span class="las la-clipboard"></span>
                     </div>
-                </div>
+                <!-- </div>
                 <div class="cards-single">
+
                     <div>
                         <h1></h1>
                         <span> <a class="active" href="#"> UPDATE</a></span>
@@ -80,6 +85,7 @@
                     </div>
                 </div>
                 <div class="cards-single">
+
                     <div>
                         <h1></h1>
                         <span> <a class="active" href="#"> DELETE</a></span>
@@ -87,7 +93,7 @@
                     <div>
                         <span class="lab la-google-wallet"></span>
                     </div>
-                </div>
+                </div> -->
                 <!-- <div class="recent-grid">
                     <div class="projects">
                         <div class="card">
@@ -96,12 +102,12 @@
                                 <button>See All <span class="las la-arrow-right"></span></button>
                             </div>
                             <div class="card-body">
-    <table>
+<!-- <table>
     <th>
         <tr>
             <td>Project Title</td>
             <td>Departments</td>
-            <td>Status</td> 
+            <td>Status</td>
           
         </tr>
     </th>
@@ -118,7 +124,6 @@
                         </div>
                     </div>
                     <div class="customers">
-
                     </div>
                 </div> -->
         </main>

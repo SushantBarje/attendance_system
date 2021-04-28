@@ -11,14 +11,14 @@ class StudentController extends Faculty {
     private $dept;
     private $sem;
     private $div;
-    public $errors = [];
+    private $errors = [];
 
     public function studentLogin(){
         if($_SERVER['REQUEST_METHOD'] != "POST") $errors["post"] = "ERROR!: METHOD NOT POST";    
         $this->prn_no = $_POST['prn_no'];
         if(!filter_var($_SERVER['REQUEST_URI'], FILTER_VALIDATE_URL) === false ){
-            $errors["url"] = "URL not Valid.";
-            return $errors;
+           $this->errors["url"] = "URL not Valid.";  
+           return $this->errors;       
         }
         
         $result = $this->getStudentById((int)$this->prn_no);
@@ -27,8 +27,8 @@ class StudentController extends Faculty {
             header("Location:student/studentdash.php");
         }
         else{
-            $errors = array("invalid" => "Invalid PRN Number");
-            return $errors;
+           $this->errors["invalid"] = "Invalid PRN Number";
+           return $this->errors;
         }
     } 
 }
