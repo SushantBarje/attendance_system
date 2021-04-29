@@ -1,6 +1,8 @@
 $(document).ready(function(){
     processOnChangeClass();
     processAddStudent();
+    processAddStaff();
+    addClass()
 });
 
 function processOnChangeClass(){
@@ -39,10 +41,10 @@ function processAddStudent(){
             data[$(this).attr('name')] = $(this).val();
         });
         console.log(data);
-        $('#myModal #add-hod').trigger("reset");
-        $('#myModal').modal('hide');
+        $('#addModal #add-hod').trigger("reset");
+        $('#addModal').modal('hide');
         $.ajax({
-            url : '../controller/ajaxController.php?action=addstudent',
+            url : '../controller/ajaxController.php?action=addStudent',
             type : 'post',
             data : data,
             dataType : 'json',
@@ -62,7 +64,66 @@ function processAddStudent(){
                         var html = "";
                         console.log(res.data.length);
                         if(res.data.length < 1) {
-                            $('#hod-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            $('#student-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                        }else{
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<tr>\
+                                            <td>'+res.data[i].prn_no+'</td>\
+                                            <td>'+res.data[i].last_name+' '+res.data[i].first_name+' '+res.data[i].middle_name+'</td>\
+                                            <td>'+res.data[i].roll_no+'</td>\
+                                            <td>'+res.data[i].s_class_name+'</td>\
+                                            <td>'+res.data[i].dept_name+'</td>\
+                                            <td>'+res.data[i].div_name+'</td>\
+                                            <td>'+res.data[i].batch_name+'</td>\
+                                            <td>\
+                                                <button type="button" class="btn btn-primary" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button>\
+                                                <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button>\
+                                            </td>\
+                                        </tr>';
+                            }
+                            $('#student-table tbody').html(html);
+                        }
+                        
+                        break;     
+                }
+            }
+        })
+    })
+}
+
+function processAddStaff(){
+    $('#add-staff').on("submit",function(e){
+        e.preventDefault();
+        var data = {};
+        $('#add-staff input').each(function(k,v){
+            data[$(this).attr('name')] = $(this).val();
+        })
+        //data[$('#add-staff select').attr('name')] = $('#add-staff select').val();
+        console.log(data);
+        $('#addStaffModal #add-staff').trigger("reset");
+        $('#addStaffModal').modal('hide');
+        $.ajax({
+            url : '../controller/ajaxController.php?action=addStaff',
+            type : 'post',
+            data : data,
+            dataType : 'json',
+            success : function(res) {
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please Fill all the fields");
+                        break;
+                    case "exists":
+                        alert("HOD already Exists");
+                        break;
+                    case "notinsert":
+                        alert("Data Not Inserted");
+                        break;
+                    case "none":
+                        var html = "";
+                        console.log(res.data.length);
+                        if(res.data.length < 1) {
+                            $('#staff-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
                         }else{
                             for(var i = 0; i < res.data.length; i++){
                                 html += '<tr>\
@@ -75,11 +136,31 @@ function processAddStudent(){
                                 </td>\
                             </tr>'
                             }
-                            $('#hod-table tbody').html(html);
+                            $('#staff-table tbody').html(html);
                         }
                         
                         break;     
                 }
+            }
+        })
+    })
+}
+
+
+function addClass(){
+    $("#add-class").on("submit", function(e){
+        e.preventDefault();
+        var data = {};
+        data[$("#add-class #faculty_s").attr("name")] = $("#add-class #faculty_s").val();
+        data[$("#add-class #courses_s").attr("name")] = $("#courses_s").val();
+        console.log(data);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=addClass",
+            type : "post",
+            data : data,
+            dataType : 'json',
+            success : function(res){
+                console.log(res);
             }
         })
     })

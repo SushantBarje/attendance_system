@@ -95,13 +95,13 @@
                 </div>
             </div>
         </div>
-        <table class="">
+        <table id="course-table">
             <thead>
                 <tr border="3px">
                     <th>Course Code</th>
                     <th>Course Name</th>
                     <th>Department</th>
-                    <th>Class<th>
+                    <th>Class</th>
                     <th>Semester</th>
                     <th>Edit</th>
                 </tr>
@@ -117,6 +117,10 @@
                                 <td>'.$d['dept_name'].'</td>
                                 <td>'.$d['s_class_name'].'</td>
                                 <td>'.$d['sem_name'].'</td>
+                                <td>
+                                    <button type="button" class="btn btn-success" id="view-btn" data-control="'.$d['course_id'].'" data-toggle="modal" data-target="#viewModal">View Details</button>
+                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['course_id'].'">Delete</button>
+                                </td>
                             </tr>';
                     }
                 ?>

@@ -2,7 +2,7 @@
 
 namespace app\controller;
 use app\model\Faculty;
-
+session_start();
 class FacultyController extends Faculty {
     private $faculty_id;
     private $first_name;
@@ -11,12 +11,31 @@ class FacultyController extends Faculty {
     private $role;
     private $password;
     private $errors = [];
+    private $course_id;
+    private $course_name;
+    private $class;
+    private $sem;
+    private $s_first_name;
+    private $s_middle_name;
+    private $s_last_name;
+    private $s_roll_no;
+    private $s_div;
+    private $s_batch;
+    private $courses_ar;
+
 
     public function verifyInput($data){
-        $data = trim($data);
-        $data = stripslashes($data);
-        $data = htmlspecialchars($data);
-        return $data;
+        if(is_array($data)){
+            $data = array_map('trim', $data);
+            $data = array_map('stripslashes', $data);
+            $data = array_map('htmlspecialchars',$data);
+            return $data;
+        }else{
+            $data = trim($data);
+            $data = stripslashes($data);
+            $data = htmlspecialchars($data);
+            return $data;
+        }
     }
 
     public function checkEmpty(){
@@ -58,6 +77,7 @@ class FacultyController extends Faculty {
         }
     }
 
+
     public function addDepartment(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $data = $this->verifyInput($_POST['dptname']);
@@ -73,10 +93,14 @@ class FacultyController extends Faculty {
 
     public function addAcadYear(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
-        $data = $this->verifyInput($_POST['acd']);
-        $lastid = $this->insertAcademicYear([$data]);
-        $getresult = $this->getAcademicYearById([$lastid]);
-        return json_encode(array("error" => $lastid,"data" => $getresult));
+        $data = $this->verifyInput($_POST['academic_year']);
+        $result = $this->insertAcademicYear([$data]);
+        if($result){
+            $getacd = $this->getAcademicYear();
+        }else{
+            return json_encode(array("error" => "notinsert"));
+        }
+        return json_encode(array("error" => "none","data" => $getacd));
        
     }
 
@@ -152,6 +176,101 @@ class FacultyController extends Faculty {
         $getdata = $this->getSemesterByYearId([$id]);
         return json_encode(array("error" => "none","data" => $getdata));
     }
+
+    public function addCourse(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->course_id = $this->verifyInput($_POST['course_id']);
+        if($this->getCourseById([$this->course_id])) return json_encode(array("error" => "exists"));
+        $this->course_name = $this->verifyInput($_POST['course_name']);
+        $this->dept = (int)$this->verifyInput($_POST['course_dept']);
+        $this->class = (int)$this->verifyInput($_POST['course_class']);
+        $this->sem = (int)$this->verifyInput($_POST['s_sem']);
+        $result = $this->insertCourse([$this->course_id, $this->course_name, $this->dept, $this->class, $this->sem]);
+        if($result){ 
+            $getHod = $this->getCourses();
+        }
+        else {
+            return json_encode(array("error" => "notinsert"));
+        }
+        return json_encode(array("error" => "none","data" => $getHod));
+    }
+
+
+    public function addStudent(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->prn_no = $this->verifyInput($_POST['prn']);
+        if($this->getStudentById([$this->prn_no])) return json_encode(array("error" => "exists"));
+        $this->s_first_name = $this->verifyInput($_POST['fname']);
+        $this->s_middle_name = $this->verifyInput($_POST['mname']);
+        $this->s_last_name = $this->verifyInput($_POST['lname']);
+        $this->s_roll_no = $this->verifyInput($_POST['roll_no']);
+        $this->class = (int)$this->verifyInput($_POST['class_year']);
+        $this->dept = (int)$this->verifyInput($_POST['s_dept']);
+        $this->s_div = (int)$this->verifyInput($_POST['s_div']);
+        $this->s_batch = (int)$this->verifyInput($_POST['s_batch']);
+        $result = $this->insertOneStudent([$this->prn_no, $this->s_first_name, $this->s_middle_name, $this->s_last_name, $this->s_roll_no, $this->dept, $this->class, $this->s_div, $this->s_batch]);
+        if($result){ 
+            $getdata = $this->getAllStudent();
+        }
+        else {
+            return json_encode(array("error" => "notinsert"));
+        }
+        return json_encode(array("error" => "none","data" => $getdata));
+    }
+
+    public function addStaff(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->faculty_id = $this->verifyInput($_POST['faculty_id']);
+        if($this->getFacultyById([$this->faculty_id])) return json_encode(array("error" => "exists"));
+        $this->first_name = $this->verifyInput($_POST['fname']);
+        $this->last_name = $this->verifyInput($_POST['lname']);
+        $this->role = 2;
+        $this->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $result = $this->insertOneFaculty([$this->faculty_id, $this->first_name, $this->last_name, $_SESSION['dept'], $this->role, $this->password]);
+        if($result){ 
+            $getStaff = $this->getFacultyByRole([2]);
+        }
+        else {
+            return json_encode(array("error" => "notinsert"));
+        }
+        return json_encode(array("error" => "none","data" => $getStaff));
+    }
+
+
+    public function addClass(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->faculty_id = $this->verifyInput($_POST['faculty_s']);
+        $this->courses_ar = $this->verifyInput($_POST['courses']);
+        $result = [];
+        $course_d = [];
+        array_push($course_d, $this->faculty_id);
+        foreach($this->courses_ar as $course){
+            array_push($course_d,$this->getCourseById([$course]));
+            // $result = $this->insertOneClass([$this->faculty_id, $course, $_SESSION['dept'], $this->div, $this->sem, $this->acd_year]);
+            // if(!$result) return json_encode(array("error" => "notinsert"));
+        }
+        foreach($course_d as $d){
+            echo json_encode($d);
+        }
+        // echo json_encode($course_d);
+        // $getclass = $this->getClassByDept([$_SESSION['dept']]);
+        // return json_encode(array("error" => "none", "data" => $getclass));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function getFacultyId(){
         return $this->faculty_id;

@@ -3,18 +3,14 @@
     use app\controller\FacultyController;
     use app\controller\StudentController;
     $user = new FacultyController();
-    $student = new StudentController;
-    session_start();
+    $student = new StudentController();
+
     if(isset($_REQUEST['faculty-login'])){
         $err = $user->userLogin();
         if(isset($err["invalid"])) echo '<script> alert("'.$err['invalid'].'")</script>';
     }
     if(isset($_REQUEST['student-login'])){
     }
-
-    // if(isset($_REQUEST['log'])){
-    //     $user->test();
-    // }
 ?>
 
 <!DOCTYPE html>

@@ -21,13 +21,14 @@
 $(document).ready(function(){
     processAddAcademicYear();
     processAddDepartment();
-    Inputplaceholder();
+    inputPlaceholder();
     processEditDepartment();
     processDeleteDepartment();
     processAddHod();
     processDeleteHod();
     processHodDetail();
     processOnChangeClass()
+    processAddCourse();
     // $("#dept-m").on("click", function(){
     //     $(this).find("option:selected",this).remove();
     // })
@@ -47,18 +48,26 @@ function processAddAcademicYear(){
             dataType: 'json',
             success: function(res){
                 console.log(res);
-                if(res.error){
-                    var html = "";
-                    for(var i = 0; i < res.data.length; i++){
-                        html += '<tr><td>'+res.data[i].academic_descr+'</td><td><button type="button" class="btn btn-primary">Edit</button><button class="btn btn-danger">Delete</button></td></tr>';
-                    }
-                    $('#myModal').modal('hide');
-                    $('#acad-table').append(html);
+                switch(res.error){
+                    case "empty":
+                        alert("Please Fill all the fields");
+                        break;
+                    case "notinsert":
+                        alert("Data Not Inserted");
+                        break;
+                    case "none":
+                        var html = "";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<tr><td>'+res.data[i].academic_descr+'</td><td><button type="button" class="btn btn-primary">Edit</button><button class="btn btn-danger">Delete</button></td></tr>';
+                        }
+                        $('#addAcdModal').modal('hide');
+                        $('#acad-table').append(html);     
                 }
             }
         });
     });
 }
+
 
 function processAddDepartment() {
     $('#dpt-form').submit(function(e){
@@ -96,7 +105,7 @@ function processAddDepartment() {
     })
 }
 
-function Inputplaceholder(){
+function inputPlaceholder(){
     $("#dept-table").on("click","#edit-btn",function(){
         var c = $(this).closest("tr").find('.dept-name').text();
         $("#editModal input").val(c);
@@ -233,7 +242,6 @@ function processAddHod(){
                             }
                             $('#hod-table tbody').html(html);
                         }
-                        
                         break;     
                 }
             }
@@ -350,18 +358,20 @@ function processOnChangeClass(){
 }
 
 function processAddCourse(){
-    $('#add-hod').on("submit",function(e){
+    $('#add-course').on("submit",function(e){
         e.preventDefault();
         var data = {};
-        $('#add-hod input').each(function(k,v){
+        $('#add-course input').each(function(k,v){
             data[$(this).attr('name')] = $(this).val();
         })
-        data[$('#add-hod select').attr('name')] = $('#add-hod select').val();
+        $("#add-course select").each(function(k,v){
+            data[$(this).attr('name')] = $(this).val();
+        })
         console.log(data);
-        $('#myModal #add-hod').trigger("reset");
-        $('#myModal').modal('hide');
+        $('#courseAddModal #add-course').trigger("reset");
+        $('#courseAddModal').modal('hide');
         $.ajax({
-            url : '../controller/ajaxController.php?action=addHod',
+            url : '../controller/ajaxController.php?action=addCourse',
             type : 'post',
             data : data,
             dataType : 'json',
@@ -381,20 +391,22 @@ function processAddCourse(){
                         var html = "";
                         console.log(res.data.length);
                         if(res.data.length < 1) {
-                            $('#hod-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            $('#course-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
                         }else{
                             for(var i = 0; i < res.data.length; i++){
                                 html += '<tr>\
-                                <td>'+res.data[i].faculty_id+'</td>\
-                                <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                <td>'+res.data[i].course_id+'</td>\
+                                <td>'+res.data[i].course_name+'</td>\
                                 <td>'+res.data[i].dept_name+'</td>\
+                                <td>'+res.data[i].s_class_name+'</td>\
+                                <td>'+res.data[i].sem_name+'</td>\
                                 <td>\
-                                    <button type="button" class="btn btn-success" id="view-btn" data-control="'+res.data[i].faculty_id+'" data-toggle="modal" data-target="#viewModal">View Details</button>\
-                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].faculty_id+'">Delete</button>\
+                                    <button type="button" class="btn btn-success" id="view-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#viewModal">View Details</button>\
+                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].course_id+'">Delete</button>\
                                 </td>\
                             </tr>'
                             }
-                            $('#hod-table tbody').html(html);
+                            $('#course-table tbody').html(html);
                         }
                         
                         break;     
@@ -403,3 +415,53 @@ function processAddCourse(){
         })
     })
 }
+
+// function processDeleteCourse(){
+//     $('#hod-table').on("click","#del-btn",function(){
+//         if(confirm("Are you sure you want to delete ?")){
+//             var id;
+//             id = $(this).attr("data-control");
+//             console.log(id);
+//             var data = {};
+//             data['id'] = id;
+//             console.log(data);
+//             $.ajax({
+//                 url : "../controller/ajaxController.php?action=delHod",
+//                 type : "post",
+//                 data : data,
+//                 dataType : 'json',
+//                 success : function(res){
+//                     console.log(res);
+//                     switch(res.error){
+//                         case "empty":
+//                             alert("Please Fill all the fields");
+//                             break;
+//                         case "notdelete":
+//                             alert("Data Not Deleted");
+//                             break;
+//                         case "none":
+//                             console.log(res.data.length);
+//                             if(res.data.length < 1) {
+//                                 $('#hod-table tbody').html("<tr><td colspan='4'>Nothing Found</td></tr>");
+//                             }else{
+//                                 for(var i = 0; i < res.data.length; i++){
+//                                     html += '<tr>\
+//                                     <td>'+res.data[i].faculty_id+'</td>\
+//                                     <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+//                                     <td>'+res.data[i].dept_name+'</td>\
+//                                     <td>\
+//                                         <button type="button" class="btn btn-success" id="view-btn" data-control="'+res.data[i].faculty_id+'" data-toggle="modal" data-target="#viewModal">View Details</button>\
+//                                         <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].faculty_id+'">Delete</button>\
+//                                     </td>\
+//                                 </tr>'
+//                                 }
+//                                 $('#hod-table tbody').html(html);
+//                             }
+                            
+//                             break;     
+//                     }
+//                 }
+//             })
+//         }
+//     })
+// }
