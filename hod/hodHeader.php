@@ -36,6 +36,11 @@
                         <span>Manage Courses</span></a>
                    
                 </li>
+                <li>
+                    <a href="managestaff.php"><span class="las la-users"></span>
+                        <span>Manage Staff</span></a>
+                   
+                </li>
                 <!-- <li>
                     <a href="markattendence.php"><span class="las la-shopping-bag"></span>
                         <span>Mark Attendence</span></a>

@@ -27,11 +27,11 @@
         <div class="cards">
             <div class="container">
                 <!-- Button to Open the Modal -->
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addAcdModal">
                     Add Academic Year
                 </button>
                 <!-- The Modal -->
-                <div class="modal" id="myModal">
+                <div class="modal" id="addAcdModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <!-- Modal Header -->
@@ -42,7 +42,7 @@
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <form id="academic-form" method="POST">
-                                    <input type="text" placeholder="Academic Year" name="acd" required> 
+                                    <input type="text" placeholder="Academic Year" name="academic_year" required> 
                                     <button type="submit" form="academic-form" class="btn btn-success">ADD</button>
                                 </form> 
                                 

@@ -44,9 +44,7 @@ class Faculty extends Database {
 			$con = $this->connect();
 			$sql = "INSERT INTO academic_year(academic_descr) VALUES (?);";
 			$stmt = $con->prepare($sql);
-			$stmt->execute($data);
-			$id = $con->lastInsertId();
-			return $id;
+			if($stmt->execute($data)) return true;
 		}	
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -77,6 +75,18 @@ class Faculty extends Database {
 			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND role_id = ?";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($role);
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getFacultyByDept($data){
+		try{
+			$sql = "SELECT * FROM faculty as a INNER JOIN department as b WHERE a.dept_id = b.dept_id AND a.dept_id = ? AND role_id = 2";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute($data);
 			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
@@ -199,7 +209,7 @@ class Faculty extends Database {
 	*/
 	public function getAllStudent(){
 		try {
-			$sql = "SELECT * FROM student";
+			$sql = "SELECT a.*, b.dept_name,c.s_class_name,d.div_name,e.batch_name FROM student as a JOIN department as b ON a.dept_id = b.dept_id JOIN student_class as c ON a.year_id = c.s_class_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();
@@ -218,9 +228,9 @@ class Faculty extends Database {
 	*/
 	public function getStudentById($prn_no) {
 		try{
-			$sql = "SELECT * FROM student WHERE prn_no = ?";
+			$sql = "SELECT a.*, b.dept_name,c.s_class_name,d.div_name,e.batch_name FROM student as a JOIN department as b ON a.dept_id = b.dept_id JOIN student_class as c ON a.year_id = c.s_class_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id WHERE a.prn_no = ?";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$prn_no]);
+			$stmt->execute($prn_no);
 			return $stmt->fetch();
 		}
 		catch (PDOException $e){
@@ -236,12 +246,10 @@ class Faculty extends Database {
 	*/
 	public function insertOneStudent($data){
 		try{
-			$sql = "INSERT INTO student VALUES(?,?,?,?,?,?,?,?)";
+			$sql = "INSERT INTO student(prn_no,first_name,middle_name, last_name, roll_no, dept_id, year_id, div_id, batch_id) VALUES(?,?,?,?,?,?,?,?,?)";
 			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute($data);
-			if($stmt->rowCount()){
-				return true;
-			}
+			if($stmt->execute($data)) return true;
+			
 		}catch (PDOException $e){
 			return array("e" => $e->getMessage());
 		}
@@ -487,7 +495,55 @@ class Faculty extends Database {
 			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetch();
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getCourseById($id){
+		try{
+			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id WHERE course_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute($id);
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function insertCourse($data){
+		try{
+			$con = $this->connect(); 
+			$sql = "INSERT INTO courses(course_id, course_name, dept_id, s_class_id, sem_id) VALUES(?,?,?,?,?);";
+			$stmt = $this->connect()->prepare($sql);
+			if($stmt->execute($data)) return true;
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function insertOneClass($data){
+		try{
+			$con = $this->connect();
+			$sql = "INSERT INTO class(faculty_id,course_id,dept_id,div_id,sem_id,academic_id) VALUES(?,?,?,?,?,?)";
+			$stmt = $con->prepare($sql);
+			$stmt->execute($data);
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getClassByDept($data){
+		try{
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, f.div_name, g.sem_name, h.academic_descr   FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN division as f ON a.div_id = f.div_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id WHERE dept_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute($data);
+			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());

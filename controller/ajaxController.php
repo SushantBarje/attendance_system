@@ -28,8 +28,20 @@ if($req == "addAcademicYear"){
 }else if($req == "hodDetails"){
     $r = $faculty->getAjaxHodDetailsById();
     die($r);
-}else if($req = "getSem"){
+}else if($req == "getSem"){
     $r = $faculty->getSemesterByClassYear();
+    die($r);
+}else if($req == "addCourse"){
+    $r = $faculty->addCourse();
+    die($r);
+}else if($req == "addStudent"){
+    $r = $faculty->addStudent();
+    die($r);
+}else if($req == "addStaff"){
+    $r = $faculty->addStaff();
+    die($r);
+}else if($req == "addClass"){
+    $r = $faculty->addClass();
     die($r);
 }
 ob_end_flush();
