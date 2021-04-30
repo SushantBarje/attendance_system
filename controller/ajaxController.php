@@ -10,6 +10,9 @@ $req = $_GET['action'];
 if($req == "addAcademicYear"){
     $r =  $faculty->addAcadYear();
     die($r);
+}else if($req == "delAcademicYear"){
+    $r = $faculty->removeAcademicYear();
+    die($r);
 }else if($req == "addDept"){
     $r = $faculty->addDepartment();
     die($r);
@@ -42,6 +45,9 @@ if($req == "addAcademicYear"){
     die($r);
 }else if($req == "addClass"){
     $r = $faculty->addClass();
+    die($r);
+}else if($req == "attendanceSheet"){
+    $r = $faculty->getStudentByClass();
     die($r);
 }
 ob_end_flush();

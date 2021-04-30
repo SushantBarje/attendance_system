@@ -21,7 +21,7 @@ class FacultyController extends Faculty {
     private $s_roll_no;
     private $s_div;
     private $s_batch;
-    private $courses_ar;
+    private $courses_ar = [];
 
 
     public function verifyInput($data){
@@ -66,7 +66,7 @@ class FacultyController extends Faculty {
             $_SESSION['first_name'] = $result[0]['first_name'];
             $_SESSION['last_name'] = $result[0]['last_name'];
             $_SESSION['dept'] = $result[0]['dept_id'];
-            $_SESSION['role'] = $result[0]['role_id'];
+            $_SESSION['role_id'] = $result[0]['role_id'];
             if($result[0]['role_id'] == 0) header("Location:admin/admindash.php");
             if($result[0]['role_id'] == 1) header("Location:hod/hodHeader.php");
             if($result[0]['role_id'] == 2) header("Location:staff/staffHeader.php");
@@ -76,7 +76,6 @@ class FacultyController extends Faculty {
             return $this->errors;
         }
     }
-
 
     public function addDepartment(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
@@ -102,6 +101,19 @@ class FacultyController extends Faculty {
         }
         return json_encode(array("error" => "none","data" => $getacd));
        
+    }
+
+    public function removeAcademicYear(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $id = $this->verifyInput($_POST['id']);
+        $result = $this->deleteAcademicYear([$id]);
+        if($result){ 
+            $getAcd = $this->getAcademicYear(); 
+        }
+        else {
+            return json_encode(array("error" => "notdelete"));
+        }
+        return json_encode(array("error" => "none","data" => $getAcd));
     }
 
     public function editDepartment(){
@@ -241,23 +253,19 @@ class FacultyController extends Faculty {
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $this->faculty_id = $this->verifyInput($_POST['faculty_s']);
         $this->courses_ar = $this->verifyInput($_POST['courses']);
-        $result = [];
-        $course_d = [];
-        array_push($course_d, $this->faculty_id);
         foreach($this->courses_ar as $course){
-            array_push($course_d,$this->getCourseById([$course]));
-            // $result = $this->insertOneClass([$this->faculty_id, $course, $_SESSION['dept'], $this->div, $this->sem, $this->acd_year]);
-            // if(!$result) return json_encode(array("error" => "notinsert"));
+            $result = $this->insertOneClass($this->faculty_id, $course, 83);
+            if(!$result) return json_encode(array("error" => "notinsert"));
         }
-        foreach($course_d as $d){
-            echo json_encode($d);
-        }
-        // echo json_encode($course_d);
-        // $getclass = $this->getClassByDept([$_SESSION['dept']]);
-        // return json_encode(array("error" => "none", "data" => $getclass));
+        $getclass = $this->getClassByDept([$_SESSION['dept']]);
+        return json_encode(array("error" => "none", "data" => $getclass));
     }
 
-
+    public function getStudentByClass(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->class_id = $this->verifyInput($_POST['data']);
+        return json_encode($this->selectStudentByDeptAndClass([$_SESSION['dept_id'],$this->class_id]));
+    }
 
 
 

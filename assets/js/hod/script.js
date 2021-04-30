@@ -161,6 +161,38 @@ function addClass(){
             dataType : 'json',
             success : function(res){
                 console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please Fill all the fields");
+                        break;
+                    case "exists":
+                        alert("HOD already Exists");
+                        break;
+                    case "notinsert":
+                        alert("Data Not Inserted");
+                        break;
+                    case "none":
+                        var html = "";
+                        console.log(res.data.length);
+                        if(res.data.length < 1) {
+                            $('#staff-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                        }else{
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<tr>\
+                                <td>'+res.data[i].faculty_id+'</td>\
+                                <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                <td>'+res.data[i].dept_name+'</td>\
+                                <td>\
+                                    <button type="button" class="btn btn-success" id="view-btn" data-control="'+res.data[i].faculty_id+'" data-toggle="modal" data-target="#viewModal">View Details</button>\
+                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].faculty_id+'">Delete</button>\
+                                </td>\
+                            </tr>'
+                            }
+                            $('#staff-table tbody').html(html);
+                        }
+                        
+                        break;  
+                }   
             }
         })
     })

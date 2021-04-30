@@ -86,7 +86,7 @@
                             <button onclick="myFunction()" class="dropbtn">Admin</button>
                             <div id="myDropdown" class="dropdown-content">
 
-                                <a href="../login.php"><i class="fa fa-fw fa-user"></i>Logout</a>
+                                <a href="../logout.php"><i class="fa fa-fw fa-user"></i>Logout</a>
 
                             </div>
                     </small>

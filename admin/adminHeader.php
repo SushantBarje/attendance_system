@@ -102,8 +102,5 @@
             </div>
         </div>
     </header>
-    <div class="cards"> 
-        <h3>ONRELDSA</h3>
-    </div>
 </body>
 </html>

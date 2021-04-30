@@ -4,12 +4,13 @@
     use app\controller\StudentController;
     $user = new FacultyController();
     $student = new StudentController();
-
     if(isset($_REQUEST['faculty-login'])){
         $err = $user->userLogin();
         if(isset($err["invalid"])) echo '<script> alert("'.$err['invalid'].'")</script>';
     }
     if(isset($_REQUEST['student-login'])){
+        $err = $student->studentLogin();
+        if(isset($err["invalid"])) echo '<script> alert("'.$err['invalid'].'")</script>';
     }
 ?>
 
@@ -64,14 +65,14 @@
                 <div class="header">
                     <h3>Student</h3>
                 </div>
-                <form id="student-login">
+                <form method="post">
                     <div class="form-group">
                         <label for="prn_no">PRN</label>
                         <div class="input-group mb-3 input-group-sm">
                             <input type="text" class="form-control" name="prn_no" placeholder="Enter PRN">
                         </div>
                     </div>
-                    <button class="btn btn-primary" name="stundet-login" type="submit">Log In</button>
+                    <button class="btn btn-primary" name="student-login" type="submit">Log In</button>
                 </form>
             </div>
             <div class="col-sm-1"></div>
