@@ -1,10 +1,11 @@
 <?php
-    namespace app\admin;
+    namespace app\hod;
     require_once __DIR__ . '\..\vendor\autoload.php';
     session_start();
     use app\controller\FacultyController;
     $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 1){
+        echo '<script> alert("Invalid User")</script>';
         header('Location:../index.php');
     }
 ?>

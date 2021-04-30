@@ -4,7 +4,7 @@
     session_start();
     use app\controller\FacultyController;
     $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 0){
         header('Location:../index.php');
     }
 ?>
@@ -25,3 +25,8 @@
     <?php include "adminHeader.php";?>
 </body>
 </html>
+
+<?php
+
+
+?>

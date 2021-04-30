@@ -4,7 +4,8 @@
     session_start();
     use app\controller\FacultyController;
     $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 2){
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 1){
+        echo '<script> alert("Invalid User")</script>';
         header('Location:../index.php');
     }
 ?>
@@ -98,11 +99,6 @@
                                     <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
                                 </form>
                             </div>
-
-
-
-
-
                         </div>
 
                     </div>
@@ -112,35 +108,34 @@
         </div>
 
         <table class="">
-            <tr border="4px">
-                <th>Department Name</th>
-
-                <th>Edit</th>
-
-
-            </tr>
-            <tr>
-                <td>Computer Science And Engineering</td>
-
-            </tr>
-            <tr>
-                <td>Electrical Engineering</td>
-
-            </tr>
-            <td>Civil Engineering</td>
-            </tr>
-
-            </tr>
-            <td>Electronic And Telecumminication Engineering</td>
-            </tr>
-            </tr>
-            <td>Mechanical Engineering</td>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Class ID</th>
+                    <th>Course Name</th>
+                    <th>Faculty</th>
+                    <th>Class</th>
+                    <th> </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $data = $user->getClassByDept([$_SESSION['dept']]);
+                    if(!$data) echo "<tr><td>Nothing Found</td</tr>";
+                    foreach($data as $d){
+                        echo '<tr>
+                                <td>'.$d['class_id'].'</td>
+                                <td>'.$d['course_name'].'</td>
+                                <td>'.$d['first_name'].' '.$d['last_name'].'</td>
+                                <td>'.$d['s_class_name'].'</td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['class_id'].'">Delete</button>
+                                </td>        
+                            </tr>';
+                    }
+                ?>
+            </tbody>
         </table>
-
-
     </main>
-
 </body>
 
 </html>

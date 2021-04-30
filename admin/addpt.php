@@ -4,7 +4,7 @@
     session_start();
     use app\controller\FacultyController;
     $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 0){
         header('Location:../index.php');
     }
 ?>
@@ -42,8 +42,10 @@
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <form id="dpt-form" class="modal-body">
-                                    <label for="fname"><b>Department Name</b></label>
-                                    <input type="text" placeholder="Department Name" name="dptname">
+                                    <div class="form-group">
+                                        <label for="fname"><b>Department Name</b></label>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Department Name" name="dptname">
+                                    </div>
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-success">ADD</button>

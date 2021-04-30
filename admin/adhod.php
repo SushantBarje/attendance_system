@@ -4,7 +4,7 @@
     session_start();
     use app\controller\FacultyController;
     $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 0){
         header('Location:../index.php');
     }
 ?>
@@ -45,32 +45,41 @@
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <form id="add-hod">
-                                    <label for="faculty_id"><b>Faculty ID</b></label>
-                                    <input type="text" placeholder="Faculty ID" name="faculty_id" required><br>
-                                    <label for="fname"><b>First Name</b></label>
-                                    <input type="text" placeholder="Fisrst Name" name="fname" required><br>
-                                    <label for="lname"><b>Last Name</b></label>
-                                    <input type="text" placeholder="Last Name" name="lname" required><br>
-
-                                    <label for="dept"><b>Department</b></label>
-                                    <select name="dept" id="dept">
-                                        <?php 
-                                            $data = $user->getDepartment();
-                                            if(!$data) echo "<option>Department Not Available</option>";
-                                            else{
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
+                                    <div class="form-group">
+                                        <label for="faculty_id"><b>Faculty ID</b></label>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Faculty ID" name="faculty_id" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-sm-6">
+                                            <label for="fname"><b>First Name</b></label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="Fisrst Name" name="fname" required>
+                                        </div>
+                                        <div class="form-group col-sm-6">
+                                            <label for="lname"><b>Last Name</b></label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="Last Name" name="lname" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="dept"><b>Department</b></label>
+                                        <select name="dept" class="form-control form-control-sm" id="dept">
+                                            <?php 
+                                                $data = $user->getDepartment();
+                                                if(!$data) echo "<option>Department Not Available</option>";
+                                                else{
+                                                    foreach($data as $d){
+                                                        echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
+                                                    }
                                                 }
-                                            }
-                                        ?>
-                                    </select>
-                                    <br>
-                                    <label for="password"><b>Password</b></label>
-                                    <input type="password" placeholder="Enter Password" name="password" required>
-
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password"><b>Password</b></label>
+                                        <input type="password" class="form-control form-control-sm" placeholder="Enter Password" name="password" required>
+                                    </div>
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
-
                                         <button type="submit" class="btn btn-success">ADD</button>
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                     </div>

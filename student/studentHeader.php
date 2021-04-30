@@ -21,25 +21,20 @@
         <div class="sidebar-menu">
             <ul>
                 <li>
-                    <a href="header.php" class="active"><span class="fa fa-fw fa-home"></span>
+                    <a href="studentdash.php" class="active"><span class="fa fa-fw fa-home"></span>
                         <span>Home</span></a>
                 </li>
                 <li>
                     <a href="viewattendence.php"><span class="las la-users"></span>
                         <span>View Attendence</span></a>
                 </li>
-               
                 <li>
                     <a href="generatereport.php"><span class="las la-clipboard-list"></span>
                         <span> Generate Reports</span></a>
                 </li>
-              
-                
             </ul>
         </div>
     </div>
-
-
     <div class="main-content">
         <header>
             <h2>
@@ -54,12 +49,12 @@
                 <div>
                     <h4>vishal phule</h4>
                     <small>
-
+=
                         <div class="dropdown">
                             <button onclick="myFunction()" class="dropbtn">Admin</button>
                             <div id="myDropdown" class="dropdown-content">
 
-                                <a href="../login.php"><i class="fa fa-fw fa-user"></i>Logout</a>
+                                <a href="../logout.php"><i class="fa fa-fw fa-user"></i>Logout</a>
 
                             </div>
                     </small>
@@ -90,9 +85,9 @@
                 </div>
 
             </div>
-    </div>
+        </div>
     </header>
-    <h3>ONRELDSA</h3>
+    
 </body>
 
 </html>

@@ -4,7 +4,7 @@
     session_start();
     use app\controller\FacultyController;
     $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) && !isset($_SESSION['faculty_id']) && !$_SESSION['role_id'] == 1){
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 0){
         header('Location:../index.php');
     }
 ?>
@@ -42,34 +42,42 @@
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <form id="academic-form" method="POST">
-                                    <input type="text" placeholder="Academic Year" name="academic_year" required> 
-                                    <button type="submit" form="academic-form" class="btn btn-success">ADD</button>
+                                    <div class="form-group">
+                                        <label for="acd_year">Academic Year</label>
+                                        <input type="text" class="form-control" placeholder="e.g. 2020-2021" name="academic_year" required>
+                                    </div>
+                                     
+                                    <div class="modal-footer">
+                                        <button type="submit" form="academic-form" class="btn btn-success">ADD</button>
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                    </div>
                                 </form> 
                                 
                             </div>
-                            <div class="modal-footer">
-                                
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <table id="acad-table">
-            <tr border="4px">
-                <th>Academic Year</th>
-                <th>Edit</th>
-            </tr>
-            <?php 
-                $data = $user->getAcademicYear();
-                if(!$data){
-                    echo "<tr><td colspan='2'>Nothing Found</td></tr>";
-                }
-                foreach($data as $d){
-                    echo '<tr><td>'.$d['academic_descr'].'</td><td><button type="button" class="btn btn-primary">Edit</button><button class="btn btn-danger">Delete</button></td></tr>';
-                }
-            ?>
+            <thead>
+                <tr border="4px">
+                    <th>Academic Year</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $data = $user->getAcademicYear();
+                    if(!$data){
+                        echo "<tr><td colspan='2'>Nothing Found</td></tr>";
+                    }
+                    foreach($data as $d){
+                        echo '<tr><td>'.$d['academic_descr'].'</td><td><button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['acedemic_id'].'">Delete</button></td></tr>';
+                    }
+                ?>
+            </tbody>
         </table>
     </main>
     <script src="../assets/js/admin/script.js"></script>

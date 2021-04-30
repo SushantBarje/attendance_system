@@ -20,6 +20,7 @@
 
 $(document).ready(function(){
     processAddAcademicYear();
+    processDeleteAcademicYear()
     processAddDepartment();
     inputPlaceholder();
     processEditDepartment();
@@ -58,14 +59,58 @@ function processAddAcademicYear(){
                     case "none":
                         var html = "";
                         for(var i = 0; i < res.data.length; i++){
-                            html += '<tr><td>'+res.data[i].academic_descr+'</td><td><button type="button" class="btn btn-primary">Edit</button><button class="btn btn-danger">Delete</button></td></tr>';
+                            html += '<tr><td>'+res.data[i].academic_descr+'</td><td><button class="btn btn-danger">Delete</button></td></tr>';
                         }
                         $('#addAcdModal').modal('hide');
-                        $('#acad-table').append(html);     
+                        $('#acad-table body').append(html);     
                 }
             }
         });
     });
+}
+
+function processDeleteAcademicYear(){
+    $('#acad-table').on("click", "#del-btn",function(){
+        if(confirm("Are you sure you want to delete ?")){
+            var id;
+            id = $(this).attr("data-control");
+            console.log(id);
+            var data = {};
+            data['id'] = id;
+            console.log(data);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=delAcademicYear",
+                type : "post",
+                data : data,
+                dataType : 'json',
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please Fill all the fields");
+                            break;
+                        case "notdelete":
+                            alert("Data Not Inserted");
+                            break;
+                        case "none":
+                            var html = "";
+                            if(res.data.length == 0) {
+                                $('#acad-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            }else{
+                                var html = "";
+                                console.log(res.data.length);
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr><td>'+res.data[i].academic_descr+'</td><td><button class="btn btn-danger">Delete</button></td></tr>';
+                                }
+    
+                                $('#acad-table tbody').html(html); 
+                            }
+                            break;  
+                    }
+                }
+            })
+        }
+    })
 }
 
 
