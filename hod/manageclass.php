@@ -82,7 +82,7 @@
                                     <div class="form-group">
                                         <select class="form-control selectpicker " name="courses[]" id="courses_s" multiple data-live-search="true">
                                             <?php 
-                                                $data = $user->getCourses();
+                                                $data = $user->getCoursesByDept([$_SESSION['dept']]);
                                                 if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
                                                 foreach($data as $d){
                                                     echo '<option value="'.$d['course_id'].'">'.$d['course_name'].'</option>';

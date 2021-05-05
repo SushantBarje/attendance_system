@@ -49,6 +49,9 @@ if($req == "addAcademicYear"){
 }else if($req == "attendanceSheet"){
     $r = $faculty->getStudentByClass();
     die($r);
+}else if($req == "save_attend"){
+    $r = $faculty->saveAttendance();
+    die($r);
 }
 ob_end_flush();
 ?>

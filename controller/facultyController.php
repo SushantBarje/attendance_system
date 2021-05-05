@@ -22,6 +22,8 @@ class FacultyController extends Faculty {
     private $s_div;
     private $s_batch;
     private $courses_ar = [];
+    private $time;
+    private $attend = [];
 
 
     public function verifyInput($data){
@@ -240,7 +242,7 @@ class FacultyController extends Faculty {
         $this->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $result = $this->insertOneFaculty([$this->faculty_id, $this->first_name, $this->last_name, $_SESSION['dept'], $this->role, $this->password]);
         if($result){ 
-            $getStaff = $this->getFacultyByRole([2]);
+            $getStaff = $this->getFacultyByDept([$_SESSION['dept']]);
         }
         else {
             return json_encode(array("error" => "notinsert"));
@@ -264,21 +266,30 @@ class FacultyController extends Faculty {
     public function getStudentByClass(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $this->class_id = $this->verifyInput($_POST['data']);
-        return json_encode($this->selectStudentByDeptAndClass([$_SESSION['dept_id'],$this->class_id]));
+        return json_encode($this->selectStudentByDeptAndClassForAttend([$_SESSION['dept'],$this->class_id]));
     }
 
+    public function saveAttendance(){
+        $this->class = $this->verifyInput($_POST['class']);
+        $this->attend = $this->verifyInput($_POST['attend']);
+        $this->year = $this->verifyInput($_POST['academic_year']);
+        date_default_timezone_set('Asia/Kolkata');
+        $timestamp = date("Y-m-d H:i:s");
+        $this->time = $timestamp;
+        $result = $this->insertAttendanceList([$this->class,$this->time,(int)$this->year]);
+        if($result){
+            foreach((array)$this->attend as $key => $value){
+                $r = $this->insertStudentAttendance([(int)$result,(int)$key,(int)$value]);
+                if(!$r) return json_encode(array("error" => "notinsert"));
+            }
+            
+        }else{
+            return json_encode(array("error" => "notinsert"));
+        }
+        return json_encode(array("error" => "none"));
+    }
 
-
-
-
-
-
-
-
-
-
-
-
+    
 
     public function getFacultyId(){
         return $this->faculty_id;
