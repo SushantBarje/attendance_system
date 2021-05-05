@@ -85,7 +85,7 @@
             </thead>
             <tbody>
                 <?php 
-                    $data = $user->getFacultyByRole([2]);
+                    $data = $user->getFacultyByDept([$_SESSION['dept']]);
                     if(!$data) die("<tr><td colspan='4'>Nothing Found</td></tr>");
                     foreach($data as $d){
                         echo '<tr>

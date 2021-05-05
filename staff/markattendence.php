@@ -27,25 +27,46 @@
 <body>
 <?php   include "staffHeader.php" ?>
     <main>
-        
-        <!-- <form class="form-inline" action="/action_page.php">
-            <label for="email" class="mr-sm-2">Select Course:</label>
-            <select class="form-control ">
+        <form class="form-inline" method="post" id="check-attend">
+            <label for="email" class="mr-sm-2">Select Academic Year: </label>
+            <select id="select-acd" name="academic_year" class="form-control form-control-sm mr-3"> 
+                <option value=" "> </option>
                 <?php 
-
-                
-                ?>
+                    $data = $user->getAcademicYear();
+                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                    foreach($data as $d){
+                        echo '<option value="'.$d['acedemic_id'].'" >'.$d['academic_descr'].'</option>';
+                    }
+                ?>  
             </select>
-            <label for="pwd" class="mr-sm-2">Division:</label>
-            <input type="password" class="form-control mb-2 mr-sm-2" placeholder="Enter password" id="pwd">
-            <div class="form-check mb-2 mr-sm-2">
-                <label class="form-check-label">
-                <input class="form-check-input" type="checkbox"> Remember me
-                </label>
-            </div>
-            <button type="submit" class="btn btn-primary mb-2">Submit</button>
-        </form> -->
-        <table id="class-table">
+            <label for="email" class="mr-sm-2">Select Class:</label>
+            <select id="select-class" name="class" class="form-control form-control-sm"> 
+                <option value=" " data-class=" "> </option>
+                <?php 
+                    $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
+                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                    foreach($data as $d){
+                        echo '<option value="'.$d['class_id'].'" data-class="'.$d['s_class_id'].'">'.$d['course_name'].'</option>';
+                    }
+                ?>  
+            </select>
+            <table id="attendance-table" class="table mt-4" hidden>
+                <thead>
+                    <tr>
+                        <th>Roll no.</th>
+                        <th>Student Name</th>
+                        <th>Attendance</th>
+                        <th hidden>Prn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                </tbody>
+            </table> 
+            <button class="btn btn-primary" id="save-btn" type="submit" hidden>Save</button> 
+        </form>
+        
+        <!-- <table id="class-table">
             <thead>
                 <tr>
                     <th>Class ID</th>
@@ -64,35 +85,13 @@
                                 <td>'.$d['course_name'].'</td>
                                 <td>'.$d['s_class_name'].'</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary" id="take-btn" data-control="'.$d['s_class_id'].'" data-toggle="modal" data-target="#MarkAttendanceModal">Take Attendance</button>
+                                    <a href="attendance_sheet.php?dept='.$_SESSION['dept'].'&class='.$d['s_class_id'].'" class="btn btn-primary">Take Attendance</a>
                                 </td>        
                             </tr>';
                     }
                 ?>
             </tbody>
-        </table>
-
-        <div class="modal fade" id="MarkAttendanceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="post">
-                        <div class="modal-body" id="attendance_sheet">
-                            
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Add</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        </table> -->
     </main>
 </body>
 

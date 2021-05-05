@@ -22,6 +22,19 @@ class Faculty extends Database {
 		}
 	}
 
+	public function getLastAcademicYear(){
+		try {
+			$con = $this->connect();
+			$sql = "SELECT * FROM academic_year";
+			$stmt = $con->prepare($sql);
+			$stmt->execute();
+			return $stmt->fetchAll();	
+		}  
+		catch (PDOException $e) {
+			return array("e" => $e->getMessage());
+		}
+	}
+
 	/*
 	#	Function will return a particular academic year using id.
 	#	@params $acad_year_id
@@ -524,6 +537,18 @@ class Faculty extends Database {
 		}
 	}
 
+	public function getCoursesByDept($data){
+		try{
+			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id WHERE a.dept_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute($data);
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
 	public function insertCourse($data){
 		try{
 			$con = $this->connect(); 
@@ -578,9 +603,9 @@ class Faculty extends Database {
 		}
 	}
 
-	public function selectStudentByDeptAndClass($data){
+	public function selectStudentByDeptAndClassForAttend($data){
 		try{
-			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id WHERE a.dept_id = ? AND a.s_class_id = ?";
+			$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name FROM student WHERE dept_id = ? AND year_id = ? ORDER BY roll_no+0 ASC";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($data);
 			return $stmt->fetchAll();
@@ -589,4 +614,41 @@ class Faculty extends Database {
 			return array("e" => $e->getMessage());
 		}
 	}
+
+	public function insertAttendanceList($data){
+		try{
+			$con = $this->connect();
+			$sql = "INSERT INTO attendance_list(class_id, date_time,academic_id) VALUES(?,?,?)";
+			$stmt = $con->prepare($sql);
+			$stmt->execute($data);
+			return $con->lastInsertId();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function insertStudentAttendance($data){
+		try{
+			$con = $this->connect();
+			$sql = "INSERT INTO attendance(attendance_id,student_id, status) VALUES(?,?,?)";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	// public function selectStudentByDeptAndClass($data){
+	// 	try{
+	// 		$sql = "SELECT a.roll_no FROM student as a JOIN department as b ON a.dept_id = b.dept_id JOIN student_class as c ON a.year_id = c.s_class_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id";
+	// 		$stmt = $this->connect()->prepare($sql);
+	// 		$stmt->execute($data);
+	// 		return $stmt->fetchAll();
+	// 	}
+	// 	catch (PDOException $e){
+	// 		return array("e" => $e->getMessage());
+	// 	}
+	// }
 };
