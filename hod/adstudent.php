@@ -1,12 +1,14 @@
 <?php
     namespace app\hod;
     require_once __DIR__ . '\..\vendor\autoload.php';
-    session_start();
     use app\controller\FacultyController;
     $user = new FacultyController();
     if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 1){
         echo '<script> alert("Invalid User")</script>';
         header('Location:../index.php');
+    }
+    if(isset($_REQUEST['upload'])){
+        $result = $user->saveBulkStudent();
     }
 ?>
 
@@ -22,8 +24,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>  --> -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>  --> 
     <script src="../assets/js/hod/script.js"></script>
     <title>Add Students</title>
 </head>
@@ -46,11 +48,11 @@
                                 <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <form >
+                            <form id="add-bulk-student" method="post" enctype="multipart/form-data">
                                 <div class="modal-body">
                                     <div class="form-group">
                                         <label for="class" class="mr-sm-2">Class</label>
-                                        <select class="form-control form-control-sm" name="class" id="">
+                                        <select class="form-control form-control-sm" name="class" id="class">
                                             <option value=" "> </option>
                                             <?php
                                                 $data = $user->getClassYear();
@@ -61,15 +63,14 @@
                                             ?>
                                         </select>
                                     </div>
-                                    
                                     <div class="form-group">
                                         <label for="fileupload">Upload File</label>
-                                        <input type="file" class="form-control-file border" id="fileupload" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+                                        <input type="file" name="file" class="form-control-file border" id="fileupload" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
                                     </div> 
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Add</button>
+                                    <button type="submit" name="upload" class="btn btn-primary">Add</button>
                                 </div>
                             </form>
                         </div>

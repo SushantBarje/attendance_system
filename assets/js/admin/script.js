@@ -30,6 +30,7 @@ $(document).ready(function(){
     processHodDetail();
     processOnChangeClass()
     processAddCourse();
+    processReport();
     // $("#dept-m").on("click", function(){
     //     $(this).find("option:selected",this).remove();
     // })
@@ -140,7 +141,7 @@ function processAddDepartment() {
                     case "none":
                         var html = "";
                         for(var i = 0; i < res.data.length; i++){
-                            html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+                            html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-4" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
                         }
                         $('#dept-table tbody').html(html);
                         
@@ -189,7 +190,7 @@ function processEditDepartment(){
                     case "none":
                         var html = "";
                         for(var i = 0; i < res.data.length; i++){
-                            html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+                            html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
                         }
                         $('#dept-table tbody').html(html);     
                 }
@@ -228,7 +229,7 @@ function processDeleteDepartment(){
                                 $('#dept-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
                             }else{
                                 for(var i = 0; i < res.data.length; i++){
-                                    html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+                                    html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
                                 }
                                 $('#dept-table tbody').html(html);
                             }
@@ -510,3 +511,132 @@ function processAddCourse(){
 //         }
 //     })
 // }
+
+
+function processReport(){
+    
+    $(document).on("change", "#acd-year" ,function(){
+        if($(this).val() == " "){
+            $("#dept").attr("disabled","");
+            $("#chartContainer").addClass("chart-hide")
+            alert("Please Select Academic Year!");
+            return;
+        }else{
+            $("#dept").removeAttr("disabled");
+            $("#chartContainer").removeClass("chart-hide");
+            var acd_id = $(this).val();
+            showAcademicChart(acd_id);
+            //else if(class_year_id == " "){
+            //     $.ajax({
+            //         url : "../controller/ajaxController.php?action=report_dept_attend",
+            //         type: "post",
+            //         data : {acd_id : acd_id, dept_id : dept_id},
+            //         dataType: "json",
+            //         success : function(res){
+            //             console.log(res);
+            //         }
+            //     })
+            // }else{
+            //     $.ajax({
+            //         url : "../controller/ajaxController.php?action=report_classyear_attend",
+            //         type: "post",
+            //         data : {acd_id : acd_id, dept_id : dept_id, class_year_id : class_year_id},
+            //         dataType: "json",
+            //         success : function(res){
+            //             console.log(res);
+            //         }
+            //     });
+             }
+            
+
+              
+    })
+
+    // $(document).on("change","#dept", function(){
+    //     var acd_id = $("#acd-year").val();
+    //     var dept_id = $(this).val()
+    //     if(acd_id == " "){
+    //         $("#chartContainer").addClass("chart-hide")
+    //         alert("Please Select Academic Year!");
+    //         return;
+    //     }else if(acd_id!= " "){
+    //         showAcademicChart(acd_id);
+    //     }else if(dept_id != " "){
+    //         $("#chartContainer")
+    //         showDepartmentWiseChart(acd_id,dept_id);
+    //     }
+    // });
+
+    // $(document).on("change","#class-year", function(){
+    //     var acd_id = $("#acd-year").val();
+    //     var dept_id = $("#dept").val();
+    //     var class_year_id = $(this).val();
+    //     if(acd_id == " "){
+    //         $("#chartContainer").addClass("chart-hide")
+    //         alert("Please Select Academic Year!");
+    //         return;
+    //     }else if(acd_id!= " "){
+    //         showAcademicChart(acd_id);
+    //     }else if(dept_id != " "){
+    //         showDepartmentWiseChart(acd_id,dept_id);
+    //     }
+    // });
+}
+
+function showAcademicChart(){
+    // $.ajax({
+    //     url : "../controller/ajaxController.php?action=report_acd_attend",
+    //     type: "post",
+    //     data : {data : acd_id},
+    //     dataType: "json",
+    //     success : function(res){
+    //         console.log(res);
+    //     }
+    // });
+
+
+      //Better to construct options first and then pass it as a parameter
+                // var options = {
+                //     animationEnabled: true,
+                    
+                //     title:{
+                //         text: "Academic Record" ,
+                //         fontFamily: "tahoma",  
+                //     },
+                //     axisY:{
+                //         title:"Total number of Students"
+                //     },
+                //     toolTip: {
+                //         shared: true,
+                //         reversed: true
+                //     },
+                //     data: [{
+                //         type: "stackedColumn",
+                //         name: "Present",
+                //         showInLegend: "true",
+                //         yValueFormatString: "0",
+                //         dataPoints: [
+                //             { y: 50 , label: "CSE" },
+                //             { y: 1, label: "Mech" },
+                //             { y: 1, label: "ENTC" },
+                //         ]
+                //     },
+                //     {
+                //         type: "stackedColumn",
+                //         name: "Absent",
+                //         showInLegend: "true",
+                //           indexLabel: "#total",
+                //           indexLabelPlacement: "outside",
+                //         yValueFormatString: "0",
+                //         dataPoints: [
+                //             { y: 13, label: "CSE" },
+                //             { y: 1, label: "Mech" },
+                //             { y: 1, label: "ENTC" },
+                            
+                //         ]
+                //     }]
+                // };
+                
+                // $("#chartContainer").CanvasJSChart(options);
+           // }
+}

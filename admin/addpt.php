@@ -1,7 +1,7 @@
 <?php
     namespace app\admin;
-    require_once __DIR__ . '\..\vendor\autoload.php';
     session_start();
+    require_once __DIR__ . '\..\vendor\autoload.php';
     use app\controller\FacultyController;
     $user = new FacultyController();
     if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 0){
@@ -74,7 +74,7 @@
                         echo '<tr>
                                 <td class="dept-name">'.$d['dept_name'].'</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary" id="edit-btn" data-control="'.$d['dept_id'].'" data-toggle="modal" data-target="#editModal">Edit</button>
+                                    <button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'.$d['dept_id'].'" data-toggle="modal" data-target="#editModal">Edit</button>
                                     <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['dept_id'].'">Delete</button>
                                 </td>
                             </tr>';

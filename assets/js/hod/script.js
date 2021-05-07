@@ -2,7 +2,9 @@ $(document).ready(function(){
     processOnChangeClass();
     processAddStudent();
     processAddStaff();
-    addClass()
+    addClass();
+    processAddBulkStudent();
+    processAddCourse();
 });
 
 function processOnChangeClass(){
@@ -193,6 +195,86 @@ function addClass(){
                         
                         break;  
                 }   
+            }
+        })
+    })
+}
+
+function processAddBulkStudent(){
+    var data = {};
+    $("#add-bulk-student").on("submit",function(){
+        data[$("#add-bulk-student select").attr("name")] = $("#add-bulk-student select").val();
+        data[$("#add-bulk-student input").attr("name")] = $("#add-bulk-student input").val();
+        console.log(data);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=add_bulk_student",
+            type : "post",
+            data : data,
+            dataType : 'json',
+            contentType: false,
+            cache: false,
+            processData:false,
+            success : function(res){
+                console.log(res);
+            }
+        });
+    });
+}
+
+function processAddCourse(){
+    $('#add-course').on("submit",function(e){
+        e.preventDefault();
+        var data = {};
+        $('#add-course input').each(function(k,v){
+            data[$(this).attr('name')] = $(this).val();
+        })
+        $("#add-course select").each(function(k,v){
+            data[$(this).attr('name')] = $(this).val();
+        })
+        console.log(data);
+        $('#courseAddModal #add-course').trigger("reset");
+        $('#courseAddModal').modal('hide');
+        $.ajax({
+            url : '../controller/ajaxController.php?action=addCourseDept',
+            type : 'post',
+            data : data,
+            dataType : 'json',
+            success : function(res) {
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please Fill all the fields");
+                        break;
+                    case "exists":
+                        alert("HOD already Exists");
+                        break;
+                    case "notinsert":
+                        alert("Data Not Inserted");
+                        break;
+                    case "none":
+                        var html = "";
+                        console.log(res.data.length);
+                        if(res.data.length < 1) {
+                            $('#course-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                        }else{
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<tr>\
+                                <td>'+res.data[i].course_id+'</td>\
+                                <td>'+res.data[i].course_name+'</td>\
+                                <td>'+res.data[i].dept_name+'</td>\
+                                <td>'+res.data[i].s_class_name+'</td>\
+                                <td>'+res.data[i].sem_name+'</td>\
+                                <td>\
+                                    <button type="button" class="btn btn-success" id="view-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#viewModal">View Details</button>\
+                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].course_id+'">Delete</button>\
+                                </td>\
+                            </tr>'
+                            }
+                            $('#course-table tbody').html(html);
+                        }
+                        
+                        break;     
+                }
             }
         })
     })

@@ -52,6 +52,15 @@ if($req == "addAcademicYear"){
 }else if($req == "save_attend"){
     $r = $faculty->saveAttendance();
     die($r);
+}else if($req == "add_bulk_student"){
+    $r = $faculty->saveBulkStudent();
+    die($r);
+}else if($req = "report_acd_attend"){
+    //$r = $faculty->reportAcademicWise();
+    //die($r);
+}else if($req = "addCourseDept"){
+    $r = $faculty->addCourseByDept();
+    die($r);
 }
 ob_end_flush();
 ?>

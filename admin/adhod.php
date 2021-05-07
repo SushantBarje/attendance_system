@@ -1,7 +1,7 @@
 <?php
     namespace app\admin;
-    require_once __DIR__ . '\..\vendor\autoload.php';
     session_start();
+    require_once __DIR__ . '\..\vendor\autoload.php';
     use app\controller\FacultyController;
     $user = new FacultyController();
     if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 0){
