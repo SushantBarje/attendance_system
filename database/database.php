@@ -11,7 +11,7 @@ class Database {
 	private $password = "";
 	private $database_name = "attandance_system";
 
-	public function connect() {
+	protected function connect() {
 		try {
 			$config = "mysql:host=" . $this->host.";dbname=" . $this->database_name;
 			$pdo = new PDO($config, $this->user, $this->password);

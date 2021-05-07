@@ -269,10 +269,9 @@ class Faculty extends Database {
 	*/
 	public function insertOneStudent($data){
 		try{
-			$sql = "INSERT INTO student(prn_no,first_name,middle_name, last_name, roll_no, dept_id, year_id, div_id, batch_id) VALUES(?,?,?,?,?,?,?,?,?)";
+			$sql = "INSERT INTO student(prn_no,first_name,middle_name, last_name, roll_no, dept_id, year_id, batch_id, div_id) VALUES(?,?,?,?,?,?,?,?,?)";
 			$stmt = $this->connect()->prepare($sql);
 			if($stmt->execute($data)) return true;
-			
 		}catch (PDOException $e){
 			return array("e" => $e->getMessage());
 		}

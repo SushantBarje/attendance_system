@@ -2,6 +2,7 @@
 
 namespace app\controller;
 use app\model\Faculty;
+use \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 session_start();
 class FacultyController extends Faculty {
     private $faculty_id;
@@ -46,6 +47,7 @@ class FacultyController extends Faculty {
 				return true;
 			}
 		}
+        return false;
     }
 
     // public function test(){
@@ -209,6 +211,23 @@ class FacultyController extends Faculty {
         return json_encode(array("error" => "none","data" => $getHod));
     }
 
+    public function addCourseByDept(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->course_id = $this->verifyInput($_POST['course_id']);
+        if($this->getCourseById([$this->course_id])) return json_encode(array("error" => "exists"));
+        $this->course_name = $this->verifyInput($_POST['course_name']);
+        $this->dept = (int)$this->verifyInput($_SESSION['dept']);
+        $this->class = (int)$this->verifyInput($_POST['course_class']);
+        $this->sem = (int)$this->verifyInput($_POST['s_sem']);
+        $result = $this->insertCourse([$this->course_id, $this->course_name, $this->dept, $this->class, $this->sem]);
+        if($result){ 
+            $getHod = $this->getCoursesByDept([$_SESSION['dept']]);
+        }
+        else {
+            return json_encode(array("error" => "notinsert"));
+        }
+        return json_encode(array("error" => "none","data" => $getHod));
+    }
 
     public function addStudent(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
@@ -222,7 +241,7 @@ class FacultyController extends Faculty {
         $this->dept = (int)$this->verifyInput($_POST['s_dept']);
         $this->s_div = (int)$this->verifyInput($_POST['s_div']);
         $this->s_batch = (int)$this->verifyInput($_POST['s_batch']);
-        $result = $this->insertOneStudent([$this->prn_no, $this->s_first_name, $this->s_middle_name, $this->s_last_name, $this->s_roll_no, $this->dept, $this->class, $this->s_div, $this->s_batch]);
+        $result = $this->insertOneStudent([$this->prn_no, $this->s_first_name, $this->s_middle_name, $this->s_last_name, $this->s_roll_no, $this->dept, $this->class, $this->s_batch, $this->s_div]);
         if($result){ 
             $getdata = $this->getAllStudent();
         }
@@ -230,6 +249,59 @@ class FacultyController extends Faculty {
             return json_encode(array("error" => "notinsert"));
         }
         return json_encode(array("error" => "none","data" => $getdata));
+    }
+
+    public function saveBulkStudent(){
+        $this->checkEmpty();
+        $this->class = $this->verifyInput($_POST['class']);
+        $this->div_id = isset($_POST['div_id']) ? $_POST['div_id'] : 1;
+        $allowedFileType = [
+            'application/vnd.ms-excel',
+            'text/xls',
+            'text/xlsx',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ];
+        if(in_array($_FILES["file"]["type"], $allowedFileType)) {
+            $targetPath = '../uploads/' . $_FILES['file']['name'];
+            move_uploaded_file($_FILES['file']['tmp_name'], $targetPath);
+    
+            $Reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+    
+            $spreadSheet = $Reader->load($targetPath);
+            $excelSheet = $spreadSheet->getActiveSheet();
+            $spreadSheetAry = $excelSheet->toArray();
+            $sheetCount = count($spreadSheetAry);
+
+            for ($i = 0; $i <= $sheetCount; $i++) {
+                
+                //echo $spreadSheetAry[$i][0]." ".$last_name." ".$spreadSheetAry[$i][2]." ".$spreadSheetAry[$i][3];
+                $roll_no = "";
+                if (isset($spreadSheetAry[$i][0])) {
+                    $roll_no = $this->verifyInput($spreadSheetAry[$i][0]);
+                }
+                $first_name = $last_name = $middle_name = "";
+                if (isset($spreadSheetAry[$i][1])) {
+                    list($last_name, $first_name, $middle_name) = explode(" ",$spreadSheetAry[$i][1]);
+                }
+
+                $prn_no = "";
+                if (isset($spreadSheetAry[$i][2])) {
+                    $prn_no = $this->verifyInput($spreadSheetAry[$i][2]);
+                }
+
+                $batch = "";
+                if (isset($spreadSheetAry[$i][3])) {
+                    $batch = $this->verifyInput($spreadSheetAry[$i][3]);
+                }
+                if (!empty($prn_no) || !empty($first_name) || !empty($middle_name) || !empty($last_name) || !empty($roll_no) || !empty($batch)) {
+                    $result = $this->insertOneStudent([$prn_no, $first_name, $middle_name, $last_name, $roll_no, $_SESSION['dept'], $this->class, $batch, $this->div_id]);
+                    if(!$result) return json_encode(array("error" => "notinsert"));
+                }
+            }
+        } else {
+            return json_encode(array("error" => "type"));
+        }
+        return json_encode(array("error" => "none"));
     }
 
     public function addStaff(){
@@ -270,13 +342,14 @@ class FacultyController extends Faculty {
     }
 
     public function saveAttendance(){
+        $this->checkEmpty();
         $this->class = $this->verifyInput($_POST['class']);
         $this->attend = $this->verifyInput($_POST['attend']);
         $this->year = $this->verifyInput($_POST['academic_year']);
         date_default_timezone_set('Asia/Kolkata');
         $timestamp = date("Y-m-d H:i:s");
         $this->time = $timestamp;
-        $result = $this->insertAttendanceList([$this->class,$this->time,(int)$this->year]);
+        $result = $this->insertAttendanceList([(int)$this->class,$this->time,(int)$this->year]);
         if($result){
             foreach((array)$this->attend as $key => $value){
                 $r = $this->insertStudentAttendance([(int)$result,(int)$key,(int)$value]);
@@ -289,6 +362,11 @@ class FacultyController extends Faculty {
         return json_encode(array("error" => "none"));
     }
 
+    // public function reportAcademicWise(){
+    //     $this->checkEmpty();
+    //     $this->acd_id = $this->verifyInput($_POST['data']);
+        
+    // }
     
 
     public function getFacultyId(){

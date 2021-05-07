@@ -13,6 +13,10 @@
     font-family: 'Poppins', sans-serif;
 }
 
+.chart-hide{
+    display: none;
+}
+
 .sidebar {
     width: 345px;
     position: fixed;
@@ -143,7 +147,7 @@ header label span {
     margin-right: 1rem;
 }
 
-user-wrapper small {
+.user-wrapper small {
     display: inline-block;
     color: var(--text-grey);
     margin-top: -3px !important;
@@ -152,7 +156,7 @@ user-wrapper small {
 main {
     margin-top: 85px;
     padding: 2rem 1.5rem;
-    background: #f1f5f9;
+    background-color: white;
     min-height: calc(100vh - 90px);
 }
 
@@ -360,3 +364,4 @@ main {
       .dropdown a:hover {background-color: #ddd;}
       
       .show {display: block;}
+
