@@ -1,6 +1,5 @@
 <?php
     namespace app\admin;
-    session_start();
     require_once __DIR__ . '\..\vendor\autoload.php';
     use app\controller\FacultyController;
     $user = new FacultyController();
@@ -28,7 +27,7 @@
             <div class="container">
                 <!-- Button to Open the Modal -->
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#myModal">
-                    Add Departments
+                   + Add Departments
                 </button>
                 <!-- The Modal -->
                 <div class="modal" id="myModal">
@@ -44,7 +43,7 @@
                                 <form id="dpt-form" class="modal-body">
                                     <div class="form-group">
                                         <label for="fname"><b>Department Name</b></label>
-                                        <input type="text" class="form-control form-control-sm" placeholder="Department Name" name="dptname">
+                                        <input type="text" id="dptname" class="form-control form-control-sm" placeholder="Department Name" name="dptname">
                                     </div>
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
@@ -59,7 +58,7 @@
                 </div>
             </div>
         </div>
-        <table class="" id="dept-table">
+        <table class="table table-bordered table-hover" id="dept-table">
             <thead>
                 <tr border="4px">
                     <th>Department Name</th>

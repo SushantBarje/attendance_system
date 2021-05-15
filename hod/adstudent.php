@@ -125,18 +125,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="s_dept"><b>Department</b></label>
-                                        <select name="s_dept" class="form-control form-control-sm" id="s_dept">
-                                            <option value=" "> </option>
-                                        <?php 
-                                                $data = $user->getDepartment();
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
-                                                }
-                                            ?>
-                                        </select>
-                                    </div>
                                     <div class="form-row">
                                         <div class="form-group col-sm-6">
                                             <label for="s_div"><b>Division</b></label>
@@ -190,8 +178,8 @@
             </thead>
             <tbody>
                 <?php 
-                    $data = $user->getAllStudent();
-                    if(!$data) echo "<tr><td colspan='2'>Nothing Found</td></tr>";
+                    $data = $user->getStudentByDept([$_SESSION['dept']]);
+                    if(!$data) die("<tr><td colspan='8'>Nothing Found</td></tr>");
                     foreach($data as $d){
                         echo '<tr>
                                 <td>'.$d['prn_no'].'</td>

@@ -1,6 +1,5 @@
 <?php
     namespace app\admin;
-    session_start();
     require_once __DIR__ . '\..\vendor\autoload.php';
     use app\controller\FacultyController;
     $user = new FacultyController();
@@ -60,7 +59,7 @@
                 </div>
             </div>
         </div>
-        <table id="acad-table">
+        <table id="acad-table" class="table table-bordered table-hover">
             <thead>
                 <tr border="4px">
                     <th>Academic Year</th>

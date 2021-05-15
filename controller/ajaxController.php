@@ -55,11 +55,14 @@ if($req == "addAcademicYear"){
 }else if($req == "add_bulk_student"){
     $r = $faculty->saveBulkStudent();
     die($r);
-}else if($req = "report_acd_attend"){
+}else if($req == "report_acd_attend"){
     //$r = $faculty->reportAcademicWise();
     //die($r);
-}else if($req = "addCourseDept"){
+}else if($req == "addCourseDept"){
     $r = $faculty->addCourseByDept();
+    die($r);
+}else if($req == "admin_report"){
+    $r = $faculty->viewAdminReport();
     die($r);
 }
 ob_end_flush();

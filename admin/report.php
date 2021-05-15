@@ -73,7 +73,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
-                <form id="report-form">
+                <form id="report">
                     <div class="row">
                         <div class="form-group col-sm-4">
                             <label for="acd-year">Academic Year</label>
@@ -103,7 +103,7 @@
                         </div>
                         <div class="form-group col-sm-4">
                             <label for="acd-year">Select Class</label>
-                            <select class="form-control" name="classyear" id="class-year" disabled>
+                            <select class="form-control" name="classyear" id="class-year">
                                 <option value=" "> </option>
                                 <?php 
                                     $data = $user->getClassYear();
@@ -125,14 +125,14 @@
                             <input type="date" class="form-control" name="end_date">
                         </div>
                     </div>
+                    <div class="row justify-content-center">
+                        <div class="col-sm-12 ">
+                            <button class="btn btn-success" type="submit">
+                                <i class="bi bi-printer-fill "></i> View
+                            </button>
+                        </div>
+                    </div>
                 </form>
-            </div>
-        </div>
-        <div class="row justify-content-end">
-            <div class="col-sm-12 ">
-                <button class="btn btn-success">
-                    <i class="bi bi-printer-fill "></i> Generate Report
-                </button>
             </div>
         </div>
         <div class="row mt-4">
@@ -148,5 +148,4 @@
 <script src="../assets/js/admin/script.js"></script>
 <script src="../assets/js/jquery.canvasjs.min.js"></script>
 </body>
-
 </html>

@@ -271,6 +271,7 @@ function processAddCourse(){
                             </tr>'
                             }
                             $('#course-table tbody').html(html);
+                            alert("Course Added!");
                         }
                         
                         break;     

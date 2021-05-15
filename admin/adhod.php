@@ -1,6 +1,5 @@
 <?php
     namespace app\admin;
-    session_start();
     require_once __DIR__ . '\..\vendor\autoload.php';
     use app\controller\FacultyController;
     $user = new FacultyController();
@@ -91,7 +90,7 @@
                 </div>
             </div>
         </div>
-        <table class="" id="hod-table">
+        <table class="table table-bordered table-hover" id="hod-table">
             <thead>
                 <tr border="4px">
                     <th>Faculty ID</th>
