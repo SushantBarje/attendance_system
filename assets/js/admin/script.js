@@ -22,7 +22,7 @@ $(document).ready(function(){
     processAddAcademicYear();
     processDeleteAcademicYear()
     processAddDepartment();
-    inputPlaceholder();
+    inputDeptPlaceholder();
     processEditDepartment();
     processDeleteDepartment();
     processAddHod();
@@ -30,6 +30,7 @@ $(document).ready(function(){
     processHodDetail();
     processOnChangeClass()
     processAddCourse();
+    inputCoursePlaceholder();
     processReport();
     // $("#dept-m").on("click", function(){
     //     $(this).find("option:selected",this).remove();
@@ -115,43 +116,85 @@ function processDeleteAcademicYear(){
 }
 
 
+// function processAddDepartment() {
+//     $('#dpt-form').submit(function(e){
+//         e.preventDefault();
+//         var data = {};
+//         $.when(
+//             $('#dpt-form input').each(function(k,v){
+//                 data[$(v).attr('name')] = $(v).val();
+//             })
+//         ).then(            
+//             console.log(jQuery.isEmptyObject(data)),
+//             $('#myModal').modal('hide'),
+//             $.ajax({
+//                 url : '../controller/ajaxController.php?action=addDept',
+//                 type : 'POST',
+//                 data : data,
+//                 dataType : 'json',
+//                 success : function(res) {
+//                     console.log(res);
+//                     switch(res.error){
+//                         case "empty":
+//                             alert("Please Fill all the fields");
+//                             break;
+//                         case "notinsert":
+//                             alert("Data Not Inserted");
+//                             break;
+//                         case "none":
+//                             var html = "";
+//                             for(var i = 0; i < res.data.length; i++){
+//                                 html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-4" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+//                             }
+//                             $('#dept-table tbody').html(html)
+                            
+//                     }
+//                 }
+//             })
+//         );
+//     })
+// }
+
 function processAddDepartment() {
     $('#dpt-form').submit(function(e){
         e.preventDefault();
         var data = {};
-        $('#dpt-form input').each(function(k,v){
-            data[$(this).attr('name')] = $(this).val();
-        })
-        console.log(data);
-        $('#myModal').modal('hide');
-        $.ajax({
-            url : '../controller/ajaxController.php?action=addDept',
-            type : 'POST',
-            data : data,
-            dataType : 'json',
-            success : function(res) {
-                console.log(res);
-                switch(res.error){
-                    case "empty":
-                        alert("Please Fill all the fields");
-                        break;
-                    case "notinsert":
-                        alert("Data Not Inserted");
-                        break;
-                    case "none":
-                        var html = "";
-                        for(var i = 0; i < res.data.length; i++){
-                            html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-4" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
-                        }
-                        $('#dept-table tbody').html(html);
-                        
+        
+            $('#dpt-form input').each(function(k,v){
+                data[$(v).attr('name')] = $(v).val();
+            })
+                
+            console.log(jQuery.isEmptyObject(data));
+            $('#myModal').modal('hide');
+            $.ajax({
+                url : '../controller/ajaxController.php?action=addDept',
+                type : 'POST',
+                data : data,
+                dataType : 'json',
+                success : function(res) {
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please Fill all the fields");
+                            break;
+                        case "notinsert":
+                            alert("Data Not Inserted");
+                            break;
+                        case "none":
+                            var html = "";
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-4" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+                            }
+                            $('#dept-table tbody').html(html)
+                            
+                    }
                 }
-            }
-        })
+            })
+    
     })
 }
 
-function inputPlaceholder(){
+function inputDeptPlaceholder(){
     $("#dept-table").on("click","#edit-btn",function(){
         var c = $(this).closest("tr").find('.dept-name').text();
         $("#editModal input").val(c);
@@ -379,10 +422,10 @@ function processDeleteHod(){
 }
 
 function processOnChangeClass(){
-    $("#class_year").on("change",function(){
+    $(".c-y").on("change",function(){
         var id = $(this).val();
         console.log(id);
-        if(id == " ") return $("#s_sem").html('<option value="'+' '+'">Select Year</option>').prop("disabled",true);
+        if(id == " ") return $(".s-sem").html('<option value="'+' '+'">Select Year</option>').prop("disabled",true);
         $.ajax({
             url : "../controller/ajaxController.php?action=getSem",
             type : "post",
@@ -391,12 +434,12 @@ function processOnChangeClass(){
             success : function(res){
                 console.log(res);
                 if(res.data.length > 0){
-                    $("#s_sem").prop("disabled",false);
+                    $(".s-sem").prop("disabled",false);
                     var html = "";
                     for(var i = 0; i < res.data.length; i++){
                         html += '<option value="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</option>';
                     }
-                    $('#s_sem').html(html);
+                    $('.s-sem').html(html);
                 }
             }
         })
@@ -428,7 +471,7 @@ function processAddCourse(){
                         alert("Please Fill all the fields");
                         break;
                     case "exists":
-                        alert("HOD already Exists");
+                        alert("Course already Exists");
                         break;
                     case "notinsert":
                         alert("Data Not Inserted");
@@ -459,6 +502,39 @@ function processAddCourse(){
                 }
             }
         })
+    })
+}
+
+
+function inputCoursePlaceholder(){
+    $("#course-table").on("click","#edit-btn",function(){
+        var course_id = $(this).closest("tr").find('.course-id').text();
+        var course_name = $(this).closest("tr").find('.course-name').text();
+        var dept_name = $(this).closest("tr").find('.dept-name').attr("id");
+        var s_class_name = $(this).closest("tr").find('.s-class-name').attr("id");
+        var sem_name = $(this).closest("tr").find('.sem-name').attr("id");
+        $("#courseEditModal .c-id").val(course_id);
+        $("#courseEditModal .c-name").val(course_name);
+        $("#courseEditModal #course-dept").val(dept_name);
+        $("#courseEditModal .c-y").val(s_class_name);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=getSem",
+            type : "post",
+            data : {data : s_class_name},
+            dataType : "json",
+            success : function(res){
+                console.log(res);
+                if(res.data.length > 0){
+                    $(".s-sem").prop("disabled",false);
+                    var html = "";
+                    for(var i = 0; i < res.data.length; i++){
+                        html += '<option value="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</option>';
+                    }
+                    $('.s-sem').html(html);
+                }
+            }
+        })
+        $("#courseEditModal .s-sem").val(sem_name);
     })
 }
 
@@ -513,19 +589,19 @@ function processAddCourse(){
 // }
 
 
-function processReport(){
+// function processReport(){
     
-    $(document).on("change", "#acd-year" ,function(){
-        if($(this).val() == " "){
-            $("#dept").attr("disabled","");
-            $("#chartContainer").addClass("chart-hide")
-            alert("Please Select Academic Year!");
-            return;
-        }else{
-            $("#dept").removeAttr("disabled");
-            $("#chartContainer").removeClass("chart-hide");
-            var acd_id = $(this).val();
-            showAcademicChart(acd_id);
+//     $(document).on("change", "#acd-year" ,function(){
+//         if($(this).val() == " "){
+//             $("#dept").attr("disabled","");
+//             $("#chartContainer").addClass("chart-hide")
+//             alert("Please Select Academic Year!");
+//             return;
+//         }else{
+//             $("#dept").removeAttr("disabled");
+//             $("#chartContainer").removeClass("chart-hide");
+//             var acd_id = $(this).val();
+//             showAcademicChart(acd_id);
             //else if(class_year_id == " "){
             //     $.ajax({
             //         url : "../controller/ajaxController.php?action=report_dept_attend",
@@ -546,11 +622,11 @@ function processReport(){
             //             console.log(res);
             //         }
             //     });
-             }
+    //          }
             
 
               
-    })
+    // })
 
     // $(document).on("change","#dept", function(){
     //     var acd_id = $("#acd-year").val();
@@ -581,9 +657,9 @@ function processReport(){
     //         showDepartmentWiseChart(acd_id,dept_id);
     //     }
     // });
-}
+// }
 
-function showAcademicChart(){
+// function showAcademicChart(){
     // $.ajax({
     //     url : "../controller/ajaxController.php?action=report_acd_attend",
     //     type: "post",
@@ -639,4 +715,34 @@ function showAcademicChart(){
                 
                 // $("#chartContainer").CanvasJSChart(options);
            // }
+// }
+
+// function processReport(){
+//     $("#report-form").on("submit", function(){
+//         $.ajax({
+//             url : "../controller/ajaxController.php?action=admin_report",
+//             type : "post",
+//             data : $(this).serialize(),
+//             dataType : 'json',
+//             success: function(res) {
+//                 console.log(res);
+//             }
+//         })
+//     });
+// }
+
+function processReport(){
+    
+    $("#report").on("submit", function(){
+        var data = {};
+        $("#report select").each(function(k,v){
+            data[$(this).attr('name')] = $(this).val();
+        });
+
+        $("#report input").each(function(k,v){
+            data[$(this).attr('name')] = $(this).val();
+        });
+        console.log(jQuery.isEmptyObject(data));
+        console.log(data.department);
+    });
 }

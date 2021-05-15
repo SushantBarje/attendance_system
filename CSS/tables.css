@@ -1,4 +1,4 @@
-table {
+/* table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 100%;
@@ -12,7 +12,7 @@ table {
   
   tr:nth-child(even) {
     background-color: #dddddd;
-  }
+  } */
 
 
 
@@ -40,8 +40,6 @@ body {font-family: Arial, Helvetica, sans-serif;
   display: none;
   position: absolute;
   margin-left: 30%;
-  
- 
   border: 3px solid #f1f1f1;
   z-index: 9;
 }

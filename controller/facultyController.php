@@ -195,7 +195,7 @@ class FacultyController extends Faculty {
 
     public function addCourse(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
-        $this->course_id = $this->verifyInput($_POST['course_id']);
+        $this->course_id = (int)$this->verifyInput($_POST['course_id']);
         if($this->getCourseById([$this->course_id])) return json_encode(array("error" => "exists"));
         $this->course_name = $this->verifyInput($_POST['course_name']);
         $this->dept = (int)$this->verifyInput($_POST['course_dept']);
@@ -238,12 +238,12 @@ class FacultyController extends Faculty {
         $this->s_last_name = $this->verifyInput($_POST['lname']);
         $this->s_roll_no = $this->verifyInput($_POST['roll_no']);
         $this->class = (int)$this->verifyInput($_POST['class_year']);
-        $this->dept = (int)$this->verifyInput($_POST['s_dept']);
+        $this->dept = (!isset($_POST['s_dept'])) ? $_SESSION['dept'] : (int)$this->verifyInput($_POST['s_dept']);
         $this->s_div = (int)$this->verifyInput($_POST['s_div']);
         $this->s_batch = (int)$this->verifyInput($_POST['s_batch']);
         $result = $this->insertOneStudent([$this->prn_no, $this->s_first_name, $this->s_middle_name, $this->s_last_name, $this->s_roll_no, $this->dept, $this->class, $this->s_batch, $this->s_div]);
         if($result){ 
-            $getdata = $this->getAllStudent();
+            $getdata = $this->getStudentByDept([$_SESSION['dept']]);
         }
         else {
             return json_encode(array("error" => "notinsert"));
@@ -360,6 +360,33 @@ class FacultyController extends Faculty {
             return json_encode(array("error" => "notinsert"));
         }
         return json_encode(array("error" => "none"));
+    }
+
+    public function viewAdminReport(){
+        $sql_query = "";
+        $data = [];
+        if(!empty($_POST['academic_year'])){
+            $sql_query .= "academic_year = ?";
+            $data[] = $this->verifyInput($_POST['academic_year']);
+        }
+        if(!empty($_POST['deptartment'])){
+            $sql_query .= "AND dept_id = ?";
+            $data[] = $this->verifyInput($_POST['deptartment']);
+        }
+        if(!empty($_POST['classyear'])){
+            $sql_query .= "AND s_class_id = ?";
+            $data[] = $this->verifyInput($_POST['classyear']);
+        }
+        if(!empty($_POST['start_date'])){
+            $sql_query .= "AND DATE(date_time)) BETWEEN ? AND ?";
+            $data[] = $this->verifyInput($_POST['start_date']);
+        }
+        if(!empty($_POST['end_date'])){
+            $sql_query .= "<= date_time = ?";
+            $data[] = $this->verifyInput($_POST['end_date']);
+        }
+
+        //$result = $this->getAdminReport($sql_query,[$data]);
     }
 
     // public function reportAcademicWise(){
