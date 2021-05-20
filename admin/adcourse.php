@@ -17,6 +17,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
+    <script defer src="../assets/fontawesome/js/brands.js"></script>
+    <script defer src="../assets/fontawesome/js/solid.js"></script>
+    <script defer src="../assets/fontawesome/js/fontawesome.js"></script>
     <script src="../assets/js/admin/script.js"></script>
     <title>Add Department</title>
 </head>
@@ -124,8 +129,8 @@
                                 <td class="s-class-name" id="'.$d['s_class_id'].'">'.$d['s_class_name'].'</td>
                                 <td class="sem-name" id="'.$d['sem_id'].'">'.$d['sem_name'].'</td>
                                 <td>
-                                    <button type="button" class="btn btn-success" id="edit-btn" data-control="'.$d['course_id'].'" data-toggle="modal" data-target="#courseEditModal">Edit</button>
-                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['course_id'].'">Delete</button>
+                                    <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'.$d['course_id'].'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>
+                                    <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['course_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
                                 </td>
                             </tr>';
                     }
@@ -146,7 +151,7 @@
                         <form id="edit-course">
                             <div class="form-group">
                                 <label for="course_id">Course Code: </label>
-                                <input type="text" name="edit_course_id" class="form-control form-control-sm c-id" placeholder="Course Code">
+                                <input type="text" name="edit_course_id" class="form-control form-control-sm c-id" placeholder="Course Code" disabled>
                             </div>
                             <div class="form-group">
                                 <label for="course_id">Course Name: </label>
@@ -179,13 +184,13 @@
                             </div>
                             <div class="form-group">
                                 <label for="s_sem"><b>Semester</b></label>
-                                <select name="s_sem" name="edit_course_sem" id="s_sem" class="form-control form-control-sm s-sem" disabled>
+                                <select name="edit_course_sem" class="form-control form-control-sm s-sem" disabled>
                                     <option value=" ">Select Year</option>
                                 </select>
                             </div>
                             <!-- Modal footer -->
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-success">ADD</button>
+                                <button type="submit" class="btn btn-primary">Edit</button>
                                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                             </div>
                             <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->

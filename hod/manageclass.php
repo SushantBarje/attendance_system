@@ -22,6 +22,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> 
     <script src="../assets/js/hod/script.js"></script>
     <title>Manage Classes</title>
 </head>
@@ -55,7 +57,7 @@
                                 <form id="add-class">
                                     <div class="form-group">
                                         <label for="acd_year">Academic Year</label>
-                                        <select name="" id="" class="form-control form-control-sm">
+                                        <select name="acd_year" id="acd_year" class="form-control form-control-sm">
                                             <option value=" "></option>
                                             <?php
                                                 $data = $user->getAcademicYear();
@@ -106,7 +108,7 @@
 
         </div>
 
-        <table class="">
+        <table id="class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%"">
             <thead>
                 <tr>
                     <th>Class ID</th>

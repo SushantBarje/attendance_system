@@ -181,6 +181,18 @@ class Faculty extends Database {
 
 	}
 
+
+	public function updateOneFaculty($data){
+		try{
+			$con = $this->connect();
+			$sql = "UPDATE faculty SET first_name = ?, last_name = ?, dept_id = ? WHERE faculty_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+		}catch (PDOException $e){
+			return array(false, $e->getMessage());
+		}
+	}
+
 	/*#######################################################################################################################################
 	#	This function will update faculty using there faculty_id. Update the values based of which field is to update. 
 	#	Generally used to update only the field whose values is to be update rather than updating whole table.
@@ -232,7 +244,7 @@ class Faculty extends Database {
 	*/
 	public function getAllStudent(){
 		try {
-			$sql = "SELECT a.*, b.dept_name,c.s_class_name,d.div_name,e.batch_name FROM student as a JOIN department as b ON a.dept_id = b.dept_id JOIN student_class as c ON a.year_id = c.s_class_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id";
+			$sql = "SELECT a.*, b.dept_name,c.s_class_name,d.div_name,e.batch_name FROM student as a JOIN department as b ON a.dept_id = b.dept_id JOIN student_class as c ON a.year_id = c.s_class_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id ORDER BY a.prn_no;";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();
@@ -325,6 +337,18 @@ class Faculty extends Database {
 		}
 	}
 
+	public function updateOneStudent($data){
+		try{
+			$con = $this->connect();
+			$sql = "UPDATE student SET first_name = ?, middle_name = ?, last_name = ?, roll_no = ?, dept_id = ?, year_id = ?, batch_id = ?, div_id = ? WHERE prn_no = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
 	/*
 	#	This function will delete the student based on $prn_no.
 	#	@params $prn_no
@@ -332,9 +356,14 @@ class Faculty extends Database {
 	*/
 	public function deleteStudentById($prn_no){
 		try{
-			$sql = "DELETE FROM student WHERE prn_no = ?;";
-			$stmt = $this->connect()->prepare($sql);
-			$stmt->execute([$prn_no]);
+			$con = $this->connect();
+			$sql = "SET FOREIGN_KEY_CHECKS = 0;";
+			$stmt = $con->prepare($sql);
+			$stmt->execute();
+			$sql = "DELETE FROM student WHERE prn_no = CAST(? AS UNSIGNED INTEGER); SET FOREIGN_KEY_CHECKS = 1;";
+			$stmt = $con->prepare($sql);
+			$result = $stmt->execute($prn_no);
+			return $result;
 		}catch(PDOException $e){
 			return array("e" => $e->getMessage());
 		}
@@ -461,6 +490,7 @@ class Faculty extends Database {
 	}
 
 
+
 	/*
 	#	Function will get all the semester.
 	#	@params 
@@ -541,7 +571,7 @@ class Faculty extends Database {
 			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id WHERE course_id = ?";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($id);
-			return $stmt->fetchAll();
+			return $stmt->fetch();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -572,18 +602,65 @@ class Faculty extends Database {
 		}
 	}
 
-	public function insertOneClass($d1,$d2,$d3){
+	public function insertOneClass($data){
 		try{
 			$con = $this->connect();
 			$sql = "SELECT course_id FROM courses WHERE course_id = ?";
 			$stmt = $con->prepare($sql);
-			if($stmt->execute([$d2])){
-				$sql = "INSERT INTO class(faculty_id, course_id, dept_id, s_class_id, sem_id, academic_id) VALUES(?,?,(SELECT dept_id FROM courses WHERE course_id = $d2),(SELECT s_class_id FROM courses WHERE course_id = $d2),(SELECT sem_id FROM courses WHERE course_id = $d2),?)";
+			if($stmt->execute([$data[1]])){
+				$sql = "INSERT INTO class(faculty_id, course_id, dept_id, s_class_id, sem_id, academic_id) VALUES(?,?,?,?,?,?);";
 				$stmt = $con->prepare($sql);
-				if($stmt->execute([$d1,$d2,$d3])) return true;
-			}else{
-				return false;
+				return $stmt->execute($data);
 			}
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getAllClass(){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute()){
+				if($stmt->rowCount() > 0){
+					return $stmt->fetch();
+				}else{
+					return false;
+				}
+			}
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getClassById($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id WHERE a.faculty_id = ? AND a.course_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)){
+				if($stmt->rowCount() > 0){
+					return $stmt->fetch();
+				}else{
+					return false;
+				}
+			}
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function classExists($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT faculty_id, course_id FROM class WHERE faculty_id = ? AND course_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+			return false;
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -601,6 +678,50 @@ class Faculty extends Database {
 			return array("e" => $e->getMessage());
 		}
 	}
+
+	public function deleteClassById($data){
+		try{
+			$sql = "DELETE FROM class WHERE class_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			return $stmt->execute($data);
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getClassYearByCourse($data){
+
+	}
+
+	
+	
+
+	public function updateCourse($data){
+		try{
+			$con = $this->connect();
+			$sql = "UPDATE courses SET course_id = ?, course_name = ?, dept_id = ?, s_class_id = ?, sem_id = ? WHERE course_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function deleteCourseById($data){
+		try{
+			$con = $this->connect();
+			$sql = "DELETE FROM courses WHERE course_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	
 
 	public function getClassByStaff($data){
 		try{

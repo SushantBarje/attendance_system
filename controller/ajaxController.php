@@ -25,11 +25,11 @@ if($req == "addAcademicYear"){
 }else if ($req == "addHod"){
     $r = $faculty->addOneHod();
     die($r);
+}else if($req == "editHod"){
+    $r = $faculty->editHod();
+    die($r);
 }else if($req == "delHod"){
     $r = $faculty->removeHod();
-    die($r);
-}else if($req == "hodDetails"){
-    $r = $faculty->getAjaxHodDetailsById();
     die($r);
 }else if($req == "getSem"){
     $r = $faculty->getSemesterByClassYear();
@@ -37,8 +37,23 @@ if($req == "addAcademicYear"){
 }else if($req == "addCourse"){
     $r = $faculty->addCourse();
     die($r);
+}else if($req == "editCourse"){
+    $r = $faculty->editCourseById();
+    die($r);
+}else if($req == "delCourse"){
+    $r = $faculty->removeCourse();
+    die($r);
 }else if($req == "addStudent"){
     $r = $faculty->addStudent();
+    die($r);
+}else if($req == "editStudent"){
+    $r = $faculty->editStudent();
+    die($r);
+}else if($req == "delStudent"){
+    $r = $faculty->removeStudent();
+    die($r);
+}else if($req == "add_bulk_student"){
+    $r = $faculty->saveBulkStudent();
     die($r);
 }else if($req == "addStaff"){
     $r = $faculty->addStaff();
@@ -46,14 +61,14 @@ if($req == "addAcademicYear"){
 }else if($req == "addClass"){
     $r = $faculty->addClass();
     die($r);
+}else if($req == "delClass"){
+    $r = $faculty->removeClass();
+    die($r);
 }else if($req == "attendanceSheet"){
     $r = $faculty->getStudentByClass();
     die($r);
 }else if($req == "save_attend"){
     $r = $faculty->saveAttendance();
-    die($r);
-}else if($req == "add_bulk_student"){
-    $r = $faculty->saveBulkStudent();
     die($r);
 }else if($req == "report_acd_attend"){
     //$r = $faculty->reportAcademicWise();
