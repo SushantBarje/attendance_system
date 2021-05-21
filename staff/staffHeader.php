@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Dashbord</title>
     <link rel="stylesheet" href="../CSS/style.css">
-
     <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
     <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/font-awesome-line-awesome/css/all.min.css">
 
@@ -85,7 +84,7 @@
                             <button onclick="myFunction()" class="dropbtn">Admin</button>
                             <div id="myDropdown" class="dropdown-content">
 
-                                <a href="../login.php"><i class="fa fa-fw fa-user"></i>Logout</a>
+                                <a href="../logout.php"><i class="fa fa-fw fa-user"></i>Logout</a>
 
                             </div>
                     </small>

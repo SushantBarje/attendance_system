@@ -352,7 +352,7 @@ function inputHodPlaceholder(){
         $("#edit-fname").val(fname);
         $("#edit-lname").val(lname);
         $("#edit-dept").val(dept_name);
-    })
+    });
 }
 
 function processEditHod(){

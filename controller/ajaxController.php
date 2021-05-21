@@ -58,6 +58,12 @@ if($req == "addAcademicYear"){
 }else if($req == "addStaff"){
     $r = $faculty->addStaff();
     die($r);
+}else if($req == "editStaff"){
+    $r = $faculty->editStaff();
+    die($r);
+}else if($req == "delStaff"){
+    $r = $faculty->removeStaff();
+    die($r);
 }else if($req == "addClass"){
     $r = $faculty->addClass();
     die($r);

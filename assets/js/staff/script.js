@@ -22,6 +22,27 @@ function processAttendanceSheet(){
         
         //id = $(this).val();
         console.log(id);
+        ajaxAttendanceList(id);
+    });
+
+    // $("#select-acd").on("change",function(){
+    //     var data = {}
+    //     id = $(this).find(":selected").data('class');
+    //     var year = $("#select-acd").val();
+    //     if(id == ' '){
+    //         $("#attendance-table tbody").html(" ");
+    //         alert("Select Class!");
+    //         return;
+    //     }
+    //     if(year == ' '){
+    //         $("#selec-class").val(" ");
+    //         alert("Selec Academic Year");
+    //         return;
+    //     }
+    // })
+
+
+    function ajaxAttendanceList(id){
         $.ajax({
             url : "../controller/ajaxController.php?action=attendanceSheet",
             type : "post",
@@ -41,7 +62,7 @@ function processAttendanceSheet(){
                 $('#attendance-table tbody').html(html);
             }
         })
-    })
+    }
 }
 
 

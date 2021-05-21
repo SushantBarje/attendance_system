@@ -1,16 +1,24 @@
 $(document).ready(function(){
     $('#student-table').DataTable();
     $('#class-table').DataTable();
+    $('#course-table').DataTable();
+    $('#staff-table').DataTable();
     processOnChangeClass();
     processAddStudent();
     inputStudentPlaceholder();
     processEditStudent();
     processDeleteStudent()
     processAddStaff();
+    inputStaffPlaceholder();
+    processEditStaff();
+    processDeleteStaff();
     processAddClass();
     processDeleteClass();
     processAddBulkStudent();
     processAddCourse();
+    inputCoursePlaceholder();
+    processEditCourse();
+    processDeleteCourse();
 });
 
 function processOnChangeClass(){
@@ -287,16 +295,15 @@ function processAddStaff(){
                         }else{
                             for(var i = 0; i < res.data.length; i++){
                                 html += '<tr>\
-                                <td>'+res.data[i].faculty_id+'</td>\
-                                <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
-                                <td>'+res.data[i].dept_name+'</td>\
+                                <td class="faculty-id">'+res.data[i].faculty_id+'</td>\
+                                <td class="faculty-name">'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
                                 <td>\
-                                    <button type="button" class="btn btn-success" id="view-btn" data-control="'+res.data[i].faculty_id+'" data-toggle="modal" data-target="#viewModal">Edit</button>\
-                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].faculty_id+'">Delete</button>\
+                                    <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].faculty_id+'" data-toggle="modal" data-target="#editStaffModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                    <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].faculty_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
                                 </td>\
                             </tr>'
                             }
-                            $('#staff-table tbody').html(html);
+                            $.when($('#staff-table tbody').html(html)).then(alert("Staff successfully Added..."));
                         }
                         
                         break;     
@@ -305,6 +312,125 @@ function processAddStaff(){
         })
     })
 }
+
+function inputStaffPlaceholder(){
+    $("#staff-table").on("click", "#edit-btn",function(e){
+        var faculty_id = $(this).closest("tr").find('.faculty-id').text();
+        var fname = $(this).closest("tr").find(".faculty-name").text().split(" ")[1];
+        var lname = $(this).closest("tr").find(".faculty-name").text().split(" ")[0];
+        $("#edit-faculty-id").val(faculty_id);
+        $("#edit-fname").val(fname);
+        $("#edit-lname").val(lname);
+    });
+}
+
+function processEditStaff(){
+    $("#edit-staff-form").on("submit", function(e){
+        e.preventDefault();
+        var data = {};
+        $.when(
+            $("#edit-staff-form input").each(function(k,v){
+                data[$(v).attr("name")] = $(v).val();
+            })
+        ).then(() => {
+            console.log(data);
+            $('#editStaffModal #add-staff').trigger("reset");
+            $('#editStaffModal').modal('hide');
+            $.ajax({
+            url : '../controller/ajaxController.php?action=editStaff',
+            type : 'post',
+            data : data,
+            dataType : 'json',
+            success : function(res) {
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please Fill all the fields");
+                        break;
+                    case "notexists":
+                        alert("Staff not found");
+                        break;
+                    case "notinsert":
+                        alert("Data Not Inserted");
+                        break;
+                    case "none":
+                        var html = "";
+                        console.log(res.data.length);
+                        if(res.data.length < 1) {
+                            $('#staff-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                        }else{
+                            
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<tr>\
+                                <td class="faculty-id">'+res.data[i].faculty_id+'</td>\
+                                <td class="faculty-name">'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                <td>\
+                                    <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].faculty_id+'" data-toggle="modal" data-target="#editStaffModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                    <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].faculty_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
+                                </td>\
+                            </tr>'
+                            }
+                            $.when($('#staff-table tbody').html(html)).then(alert("Staff successfully edited..."));
+                            
+                        }
+                        break;     
+                    }
+                }
+            })
+        })
+    })
+}
+
+function processDeleteStaff(){
+    $('#staff-table').on("click","#del-btn",function(){
+        if(confirm("Are you sure you want to delete ?")){
+            var id;
+            id = $(this).attr("data-control");
+            console.log(id);
+            var data = {};
+            data['id'] = id;
+            console.log(data);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=delStaff",
+                type : "post",
+                data : data,
+                dataType : 'json',
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please Fill all the fields");
+                            break;
+                        case "notdelete":
+                            alert("Data Not Deleted");
+                            break;
+                        case "none":
+                            console.log(res.data.length);
+                            if(res.data.length < 1) {
+                                $('#staff-table tbody').html("<tr><td colspan='4'>Nothing Found</td></tr>");
+                            }else{
+                                var html = " ";
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr>\
+                                    <td class="faculty-id">'+res.data[i].faculty_id+'</td>\
+                                    <td class="faculty-name">'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                    <td>\
+                                        <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].faculty_id+'" data-toggle="modal" data-target="#editStaffModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].faculty_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
+                                    </td>\
+                                </tr>'
+                                }
+                                $.when($('#staff-table tbody').html(html)).then(alert("Staff successfully Deleted..."));
+                                
+                            }
+                            break;     
+                    }
+                }
+            })
+        }
+    })
+}
+
 
 
 function processAddClass(){
@@ -317,6 +443,8 @@ function processAddClass(){
             data[$("#add-class #courses_s").attr("name")] = $("#courses_s").val(),
         ).then(() => {
             console.log(data);
+            $('#manageClassModal #add-class').trigger("reset");
+            $('#manageClassModal').modal('hide');
             $.ajax({
                 url : "../controller/ajaxController.php?action=addClass",
                 type : "post",
@@ -351,7 +479,11 @@ function processAddClass(){
                                     </td>\
                                 </tr>'
                                 }
-                                $('#class-table tbody').html(html);
+                                $.when(
+                                    $('#class-table tbody').html(html)
+                                ).then(
+                                    alert("Class Added!")
+                                ) 
                             }
                             break;  
                     }   
@@ -370,6 +502,8 @@ function processDeleteClass(){
                 data['id'] = $(this).attr("data-control")
             ).then(() => {
                 console.log(data);
+                $('#addClassModal #add-staff').trigger("reset");
+                $('#addClassModal').modal('hide');
                 $.ajax({
                     url : "../controller/ajaxController.php?action=delClass",
                     type : "post",
@@ -402,6 +536,7 @@ function processDeleteClass(){
                                                 </tr>'
                                     }
                                     $('#class-table tbody').html(html);
+                                    alert("Class Deleted!");
                                 }
                                 
                                 break;     
@@ -472,14 +607,13 @@ function processAddCourse(){
                         }else{
                             for(var i = 0; i < res.data.length; i++){
                                 html += '<tr>\
-                                <td>'+res.data[i].course_id+'</td>\
-                                <td>'+res.data[i].course_name+'</td>\
-                                <td>'+res.data[i].dept_name+'</td>\
-                                <td>'+res.data[i].s_class_name+'</td>\
-                                <td>'+res.data[i].sem_name+'</td>\
+                                <td class="course-id">'+res.data[i].course_id+'</td>\
+                                <td class="course-name">'+res.data[i].course_name+'</td>\
+                                <td class="s-class-name" id="'+res.data[i].s_class_id+'">'+res.data[i].s_class_name+'</td>\
+                                <td class="sem-name" id="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</td>\
                                 <td>\
-                                    <button type="button" class="btn btn-success" id="view-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#viewModal">View Details</button>\
-                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].course_id+'">Delete</button>\
+                                    <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                    <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].course_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
                                 </td>\
                             </tr>'
                             }
@@ -491,5 +625,159 @@ function processAddCourse(){
                 }
             }
         })
+    })
+}
+
+function inputCoursePlaceholder(){
+    $("#course-table").on("click","#edit-btn",function(){
+        var course_id = $(this).closest("tr").find('.course-id').text();
+        var course_name = $(this).closest("tr").find('.course-name').text();
+        var s_class_name = $(this).closest("tr").find('.s-class-name').attr("id");
+        var sem_name = $(this).closest("tr").find('.sem-name').attr("id");
+        $("#courseEditModal .c-id").val(course_id);
+        $("#courseEditModal .c-name").val(course_name);
+        $("#courseEditModal .c-y").val(s_class_name);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=getSem",
+            type : "post",
+            data : {data : s_class_name},
+            dataType : "json",
+            success : function(res){
+                console.log(res);
+                if(res.data.length > 0){
+                    $(".s-sem").prop("disabled",false);
+                    var html = "";
+                    for(var i = 0; i < res.data.length; i++){
+                        html += '<option value="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</option>';
+                    }
+                    $('.s-sem').html(html);
+                }
+            }
+        })
+        $("#courseEditModal .s-sem").val(sem_name);
+    })
+}
+
+function processEditCourse(){
+    $('#edit-course').on("submit",function(e){
+    e.preventDefault();
+    var data = {};
+        $.when(
+            data[$("#edit-course .c-id").attr("name")] = $("#edit-course input[name=edit_course_id]").val(),
+            data[$("#edit-course .c-name").attr("name")] = $("#edit-course input[name=edit_course_name]").val(),
+            data[$("#edit-course .c-y").attr("name")] = $("#edit-course select[name=edit_course_class]").val(),
+            data[$("#edit-course .s-sem").attr("name")] = $("#edit-course select[name=edit_course_sem]").val(),
+            $('#courseEditModal #edit-course').trigger("reset"),
+            $('#courseEditModal').modal('hide'),
+        ).then(
+            console.log(data),
+            $.ajax({
+                url : '../controller/ajaxController.php?action=editCourse',
+                type : 'post',
+                data : data,
+                dataType : 'json',
+                success : function(res) {
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please Fill all the fields");
+                            break;
+                        case "notexists":
+                            alert("Course Not Exists");
+                            break;
+                        case "notinsert":
+                            alert("Data Not Inserted");
+                            break;
+                        case "none":
+                            var html = "";
+                            console.log(res.data.length);
+                            if(res.data.length < 1) {
+                                $('#course-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            }else{
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr>\
+                                    <td class="course-id">'+res.data[i].course_id+'</td>\
+                                    <td class="course-name">'+res.data[i].course_name+'</td>\
+                                    <td class="s-class-name" id="'+res.data[i].s_class_id+'">'+res.data[i].s_class_name+'</td>\
+                                    <td class="sem-name" id="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</td>\
+                                    <td>\
+                                        <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].course_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
+                                    </td>\
+                                </tr>'
+                                }
+                                $.when(
+                                    $('#course-table tbody').html(html)
+                                ).then(
+                                    alert("Courses successfully edited...")
+                                )
+                                
+                                
+                            }
+                            break;     
+                    }
+                },
+                error : function(err){
+                    console.log(err);
+                }
+            })
+        )    
+    })
+}
+
+function processDeleteCourse(){
+    $('#course-table').on("click","#del-btn",function(){
+        if(confirm("Are you sure you want to delete ?")){
+            var id;
+            id = $(this).attr("data-control");
+            console.log(id);
+            var data = {};
+            data['id'] = id;
+            console.log(data);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=delCourse",
+                type : "post",
+                data : data,
+                dataType : 'json',
+                success : function(res) {
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please Fill all the fields");
+                            break;
+                        case "notexists":
+                            alert("Course Not Exists");
+                            break;
+                        case "notinsert":
+                            alert("Data Not Inserted");
+                            break;
+                        case "none":
+                            var html = "";
+                            console.log(res.data.length);
+                            if(res.data.length < 1) {
+                                $('#course-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            }else{
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr>\
+                                    <td class="course-id">'+res.data[i].course_id+'</td>\
+                                    <td class="course-name">'+res.data[i].course_name+'</td>\
+                                    <td class="s-class-name" id="'+res.data[i].s_class_id+'">'+res.data[i].s_class_name+'</td>\
+                                    <td class="sem-name" id="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</td>\
+                                    <td>\
+                                        <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].course_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
+                                    </td>\
+                                </tr>'
+                                }
+                                $.when($('#course-table tbody').html(html)).then(alert("Course successfully Deleted..."))
+                            }
+                            break;     
+                    }
+                },
+                error : function(err){
+                    console.log(err);
+                }
+            })
+        }
     })
 }

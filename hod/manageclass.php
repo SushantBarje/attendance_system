@@ -108,7 +108,7 @@
 
         </div>
 
-        <table id="class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%"">
+        <table id="class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
             <thead>
                 <tr>
                     <th>Class ID</th>
