@@ -681,7 +681,8 @@ class Faculty extends Database {
 
 	public function deleteClassById($data){
 		try{
-			$sql = "DELETE FROM class WHERE class_id = ?";
+
+			$sql = "SET FOREIGN_KEY_CHECKS=0; DELETE FROM class WHERE class_id = ?;SET FOREIGN_KEY_CHECKS=1;";
 			$stmt = $this->connect()->prepare($sql);
 			return $stmt->execute($data);
 		}
@@ -712,7 +713,7 @@ class Faculty extends Database {
 	public function deleteCourseById($data){
 		try{
 			$con = $this->connect();
-			$sql = "DELETE FROM courses WHERE course_id = ?";
+			$sql = "SET FOREIGN_KEY_CHECKS=0; DELETE FROM courses WHERE course_id = ?; SET FOREIGN_KEY_CHECKS=1";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return true;
 		}

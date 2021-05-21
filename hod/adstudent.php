@@ -17,7 +17,6 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../CSS/tables.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -176,7 +175,7 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table id="student-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%"">
+            <table id="student-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
                 <thead>
                     <tr border="4px">
                         <th>PRN</th>
@@ -192,7 +191,6 @@
                 <tbody>
                     <?php 
                         $data = $user->getStudentByDept([$_SESSION['dept']]);
-                        if(!$data) die("<tr><td colspan='8'>Nothing Found</td></tr>");
                         foreach($data as $d){
                             echo '<tr>
                                     <td class="edit-prn">'.$d['prn_no'].'</td>

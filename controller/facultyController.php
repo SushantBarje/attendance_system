@@ -232,7 +232,7 @@ class FacultyController extends Faculty {
         $this->sem = (int)$this->verifyInput($_POST['edit_course_sem']);
         $result = $this->updateCourse([$this->course_id, $this->course_name, $this->dept, $this->class, $this->sem, $this->course_id]);
         if($result){ 
-            $getCourse = $this->getCourses();
+            $getCourse = $_SESSION['role_id'] === 0 ? $this->getCourses() : $this->getCoursesByDept([$_SESSION['dept']]);
         }
         else {
             return json_encode(array("error" => "notinsert"));
@@ -246,7 +246,7 @@ class FacultyController extends Faculty {
         if(!$this->getCourseById([$this->course_id])) return json_encode(array("error" => "notexists"));
         $result = $this->deleteCourseById([$this->course_id]);
         if($result){ 
-            $getCourse = $this->getCourses();
+            $getCourse = $_SESSION['role_id'] === 0 ? $this->getCourses() : $this->getCoursesByDept([$_SESSION['dept']]);
         }
         else {
             return json_encode(array("error" => "notinsert"));
@@ -401,6 +401,36 @@ class FacultyController extends Faculty {
         return json_encode(array("error" => "none","data" => $getStaff));
     }
 
+    public function editStaff(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->faculty_id = $this->verifyInput($_POST['faculty_id']);
+        if(!$this->getFacultyById([$this->faculty_id])) return json_encode(array("error" => "notexists"));
+        $this->first_name = $this->verifyInput($_POST['fname']);
+        $this->last_name = $this->verifyInput($_POST['lname']);
+        $this->role = 2;
+        $this->dept_id = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        $result = $this->updateOneFaculty([$this->first_name, $this->last_name, $this->dept_id, $this->faculty_id]);
+        if($result){ 
+            $getStaff = $_SESSION['role_id'] === 0 ? $this->getAllFaculty() : $this->getFacultyByDept([$_SESSION['dept']]);
+        }
+        else {
+            return json_encode(array("error" => "notinsert"));
+        }
+        return json_encode(array("error" => "none","data" => $getStaff));
+    }
+
+    public function removeStaff(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $id = (int)$this->verifyInput($_POST['id']);
+        $result = $this->deleteFacultyById([$id]);
+        if($result){ 
+            $getStaff = $_SESSION['role_id'] === 0 ? $this->getFacultyByRole([2]) : $this->getFacultyByDept([$_SESSION['dept']]);
+        }
+        else {
+            return json_encode(array("error" => "notdelete"));
+        }
+        return json_encode(array("error" => "none","data" => $getStaff));
+    }
 
     public function addClass(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
@@ -426,7 +456,7 @@ class FacultyController extends Faculty {
 
     public function removeClass(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
-        $this->class_id = $this->verifyInput($_POST['id']);
+        $this->class_id = (int)$this->verifyInput($_POST['id']);
         //if(!$this->getStudentById([$this->class_id])) return json_encode(array("error" => "notexists"));
         $result = $this->deleteClassById([$this->class_id]);
         if($result){ 
