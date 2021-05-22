@@ -194,6 +194,8 @@ main {
     color: #fff;
 }
 
+
+
 @media only screen and (max-width:1200px) {
     .sidebar {
         width: 70px;
