@@ -1,0 +1,26 @@
+/* #att #test{
+    height: 50px;
+    width: 200px;
+    display: grid;
+    grid-template-columns: repeat(3, 12px);
+    grid-template-rows: repeat(3, auto);
+    border: 1px solid black;
+    grid-auto-flow: column;
+} */
+
+.grid-item{
+    display: flex;
+    height : 40px;
+    width: 150px;
+    border: 1px solid black;
+    margin: 1px;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.grid-item button{
+    position : absolute;
+    right: 0;
+}

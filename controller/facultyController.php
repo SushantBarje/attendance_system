@@ -451,6 +451,7 @@ class FacultyController extends Faculty {
     public function getStudentByClass(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $this->class_id = $this->verifyInput($_POST['data']);
+        $_SESSION['class_id'] = $this->class_id;
         return json_encode($this->selectStudentByDeptAndClassForAttend([$_SESSION['dept'],$this->class_id]));
     }
 
