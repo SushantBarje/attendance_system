@@ -78,6 +78,7 @@ function processAttendanceSheet(){
                 $("#attend-list").removeAttr("hidden");
                 $("#save-btn").removeAttr("hidden");
                 var html = "";
+                if(res.length < 0) $('#attend-list').html('<div>Nothing Found<div>');
                 for(var i = 0; i < res.length; i++){
                     html += '<div class="grid-item m-2 mark-attend">\
                                 <input type="hidden" name="attend['+res[i].prn_no+']" value="1" data-id="'+res[i].prn_no+'"/>\

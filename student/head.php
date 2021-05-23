@@ -16,7 +16,7 @@
                         <button onclick="myFunction()" class="dropbtn"><?php echo $_SESSION['first_name']." ".$_SESSION['last_name'];?></button>
                         <div id="myDropdown" class="dropdown-content">
                             <a href="#"><i class="fa fa-fw fa-user"></i> Login</a>
-                          <a href="#"><i class="fa fa-fw fa-user"></i>Logout</a>
+                            <a href="../logout.php"><i class="fa fa-fw fa-user"></i>Logout</a>
                           <a href="#"><i class="fa fa-fw fa-envelope"></i> Contact</a>
                         </div>
                    </small>

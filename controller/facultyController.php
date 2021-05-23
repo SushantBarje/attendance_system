@@ -296,8 +296,9 @@ class FacultyController extends Faculty {
 
     public function editStudent(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
-        $this->prn_no = (float)$this->verifyInput($_POST['prn']);
-        if(!$this->getStudentById([$this->prn_no])) return json_encode(array("error" => "notexists"));
+        $this->prn_no = $this->verifyInput($_POST['prn']);
+        $result = $this->getStudentById([$this->prn_no]);
+        if(!$result) return json_encode(array("error" => "notexists"));
         $this->s_first_name = $this->verifyInput($_POST['fname']);
         $this->s_middle_name = $this->verifyInput($_POST['mname']);
         $this->s_last_name = $this->verifyInput($_POST['lname']);   
@@ -351,6 +352,25 @@ class FacultyController extends Faculty {
             $spreadSheetAry = $excelSheet->toArray();
             $sheetCount = count($spreadSheetAry);
 
+
+            function hasDuplicatedValues($excelSheet, $column, $ignoreEmptyCells = false) {
+                $cells = array();
+                foreach ($excelSheet->getRowIterator() as $row) {
+                    $cell = $excelSheet->getCell($column . $row->getRowIndex())->getValue();
+                    //var_dump($ignoreEmptyCells);
+                    //var_dump(empty($cell));
+                    if (($ignoreEmptyCells == false) && (empty($cell) == false)) {
+                        $cells[] = $cell;
+                    }
+                }
+                //var_dump($cells);
+                //var_dump(array_unique($cells));
+                //echo count(array_unique($cells)).'<br>';
+                //echo count($cells).'<br>';
+                return count(array_unique($cells)) < count($cells);
+            }
+            if(hasDuplicatedValues($excelSheet, 'A')) return json_encode(array("error" => "duplicateRoll"));
+            if(hasDuplicatedValues($excelSheet, 'C')) return json_encode(array("error" => "duplicatePrn"));
             for ($i = 0; $i <= $sheetCount; $i++) {
                 
                 //echo $spreadSheetAry[$i][0]." ".$last_name." ".$spreadSheetAry[$i][2]." ".$spreadSheetAry[$i][3];
@@ -467,6 +487,24 @@ class FacultyController extends Faculty {
             return json_encode(array("error" => "notinsert"));
         }
         return json_encode(array("error" => "none","data" => $getdata));
+    }
+
+    public function addPracticalClass(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->acd_year = $this->verifyInput($_POST['acd_year']);
+        $this->faculty_id = $this->verifyInput($_POST['faculty_s']);
+        $this->course_id = (int)$this->verifyInput($_POST['courses']);
+        $this->div_id = (int)$this->verifyInput($_POST['div']);
+        $this->batch_ar = (array)$this->verifyInput($_POST['batches']);
+        $this->dept = isset($_POST['dept']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        $result = true;
+        foreach($this->courses_ar as $course){
+            $c = $this->getCourseById([$course]);
+            $result = $this->insertOneClass([$this->faculty_id, $course, $this->dept, (int)$c["s_class_id"], (int)$c["sem_id"], $this->acd_year]);
+        }
+        if(!$result) return json_encode(array("error" => "notinsert"));
+        $getclass = $this->getClassByDept([$_SESSION['dept']]);
+        return json_encode(array("error" => "none", "data" => $getclass));
     }
 
     public function saveAttendance(){

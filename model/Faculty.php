@@ -263,7 +263,7 @@ class Faculty extends Database {
 	*/
 	public function getStudentById($prn_no) {
 		try{
-			$sql = "SELECT a.*, b.dept_name,c.s_class_name,d.div_name,e.batch_name FROM student as a JOIN department as b ON a.dept_id = b.dept_id JOIN student_class as c ON a.year_id = c.s_class_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id WHERE a.prn_no = ?";
+			$sql = "SELECT a.*, b.dept_name,c.s_class_name,d.div_name,e.batch_name FROM student as a JOIN department as b ON a.dept_id = b.dept_id JOIN student_class as c ON a.year_id = c.s_class_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id WHERE a.prn_no  = CAST(? AS UNSIGNED INTEGER)";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($prn_no);
 			return $stmt->fetch();
@@ -340,7 +340,7 @@ class Faculty extends Database {
 	public function updateOneStudent($data){
 		try{
 			$con = $this->connect();
-			$sql = "UPDATE student SET first_name = ?, middle_name = ?, last_name = ?, roll_no = ?, dept_id = ?, year_id = ?, batch_id = ?, div_id = ? WHERE prn_no = ?;";
+			$sql = "UPDATE student SET first_name = ?, middle_name = ?, last_name = ?, roll_no = ?, dept_id = ?, year_id = ?, batch_id = ?, div_id = ? WHERE prn_no = CAST(? AS UNSIGNED INTEGER);";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return true;
 		}
