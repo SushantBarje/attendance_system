@@ -78,6 +78,12 @@ function processAddStudent(){
                     case "notinsert":
                         alert("Data Not Inserted");
                         break;
+                    case "duplicateRoll":
+                        alert("Duplicate Rollno Found! Please Check File again");
+                        break;
+                    case "duplicatePrn":
+                        alert("Duplicate PRN Found! Please Check File again");
+                        break;   
                     case "none":
                         var html = "";
                         console.log(res.data.length);
@@ -106,13 +112,6 @@ function processAddStudent(){
                 }
             }
         })
-    
-    
-    
-    
-    
-    
-    
     })
 }
 
@@ -190,11 +189,7 @@ function processEditStudent(){
                                                 <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].prn_no+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
                                             </td>\
                                         </tr>';
-                                }
-                                $("#student-table").DataTable({ destroy : true });
-                                $('#student-table tbody').html(html);
-                                $("#student-table").DataTable();
-                                
+                                }                                
                         }     
                     }
                 },
@@ -779,5 +774,68 @@ function processDeleteCourse(){
                 }
             })
         }
+    })
+}
+
+function addPractClass(){
+    $("#add-pract-class").on("submit", function(e){
+        e.preventDefault();
+        var data = {};
+        $.when(
+            data[$("#add-pract-class #acd_year").attr("name")] = $("#add-class #acd_year").val(),
+            data[$("#add-pract-class #faculty_s").attr("name")] = $("#add-class #faculty_s").val(),
+            data[$("#add-pract-class #courses_s").attr("name")] = $("#courses_s").val(),
+            data[$("#add-pract-class #div_s").attr("name")] = $('#div_s').val(),
+            data[$("#add-pract-class #batch_s").attr("name")] = $('#batch_s').val(),
+        ).then(() => {
+            console.log(data);
+            $('#managePractClassModal #add-class').trigger("reset");
+            $('#managePractClassModal').modal('hide');
+            $.ajax({
+                url : "../controller/ajaxController.php?action=addPractClass",
+                type : "post",
+                data : data,
+                dataType : 'json',
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please Fill all the fields");
+                            break;
+                        case "exists":
+                            alert("HOD already Exists");
+                            break;
+                        case "notinsert":
+                            alert("Data Not Inserted");
+                            break;
+                        case "none":
+                            var html = "";
+                            console.log(res.data.length);
+                            if(res.data.length < 1) {
+                                $('#pract-class-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            }else{
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr>\
+                                    <td>'+res.data[i].class_id+'</td>\
+                                    <td>'+res.data[i].course_name+'</td>\
+                                    <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                    <td>'+res.data[i].s_class_name+'</td>\
+                                    <td>'+res.data[i].batch_name+'</td>\
+                                    <td>\
+                                        <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                    </td>\
+                                </tr>'
+                                }
+                                $.when(
+                                    $('#pract-class-table tbody').html(html)
+                                ).then(
+                                    alert("Class Added!")
+                                ) 
+                            }
+                            break;  
+                    }   
+                }
+            })
+        })   
     })
 }

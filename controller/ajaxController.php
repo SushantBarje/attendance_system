@@ -70,6 +70,9 @@ if($req == "addAcademicYear"){
 }else if($req == "delClass"){
     $r = $faculty->removeClass();
     die($r);
+}else if($req == "addPractClass"){
+    $r = $faculty->addPracticalClass();
+    die($r);
 }else if($req == "attendanceSheet"){
     $r = $faculty->getStudentByClass();
     die($r);
