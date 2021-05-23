@@ -78,6 +78,12 @@ function processAddStudent(){
                     case "notinsert":
                         alert("Data Not Inserted");
                         break;
+                    case "duplicateRoll":
+                        alert("Duplicate Rollno Found! Please Check File again");
+                        break;
+                    case "duplicatePrn":
+                        alert("Duplicate PRN Found! Please Check File again");
+                        break;   
                     case "none":
                         var html = "";
                         console.log(res.data.length);
@@ -106,13 +112,6 @@ function processAddStudent(){
                 }
             }
         })
-    
-    
-    
-    
-    
-    
-    
     })
 }
 
@@ -190,11 +189,7 @@ function processEditStudent(){
                                                 <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].prn_no+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
                                             </td>\
                                         </tr>';
-                                }
-                                $("#student-table").DataTable({ destroy : true });
-                                $('#student-table tbody').html(html);
-                                $("#student-table").DataTable();
-                                
+                                }                                
                         }     
                     }
                 },

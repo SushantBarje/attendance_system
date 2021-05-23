@@ -9,6 +9,12 @@
     }
     if(isset($_REQUEST['upload'])){
         $result = $user->saveBulkStudent();
+        if($result['error'] == "duplicateRoll") echo '<script> alert("Duplicate Rollno Found! Please Check File again")</script>';
+        else if($result['error'] == "duplicatePrn") echo '<script> alert("Duplicate PRN Number Found! Please Check File again")</script>';
+        else if($result['error'] == "type")echo '<script>alert("Please Upload excel format file!")</script>';
+        else if($result['error'] == "none"){
+            echo '<script>alert("Student Added! '.$result['duplicate'].' Duplicates Value Found...")</script>';
+        }
     }
 ?>
 

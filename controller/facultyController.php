@@ -352,7 +352,6 @@ class FacultyController extends Faculty {
             $spreadSheetAry = $excelSheet->toArray();
             $sheetCount = count($spreadSheetAry);
 
-
             function hasDuplicatedValues($excelSheet, $column, $ignoreEmptyCells = false) {
                 $cells = array();
                 foreach ($excelSheet->getRowIterator() as $row) {
@@ -369,10 +368,10 @@ class FacultyController extends Faculty {
                 //echo count($cells).'<br>';
                 return count(array_unique($cells)) < count($cells);
             }
-            if(hasDuplicatedValues($excelSheet, 'A')) return json_encode(array("error" => "duplicateRoll"));
-            if(hasDuplicatedValues($excelSheet, 'C')) return json_encode(array("error" => "duplicatePrn"));
+            if(hasDuplicatedValues($excelSheet, 'A')) return array("error" => "duplicateRoll");
+            if(hasDuplicatedValues($excelSheet, 'C')) return array("error" => "duplicatePrn");
+            $count = 0;
             for ($i = 0; $i <= $sheetCount; $i++) {
-                
                 //echo $spreadSheetAry[$i][0]." ".$last_name." ".$spreadSheetAry[$i][2]." ".$spreadSheetAry[$i][3];
                 $roll_no = "";
                 if (isset($spreadSheetAry[$i][0])) {
@@ -381,6 +380,7 @@ class FacultyController extends Faculty {
                 $first_name = $last_name = $middle_name = "";
                 if (isset($spreadSheetAry[$i][1])) {
                     list($last_name, $first_name, $middle_name) = explode(" ",$spreadSheetAry[$i][1]);
+                    if(empty($last_name)) $last_name = " ";
                 }
 
                 $prn_no = "";
@@ -392,15 +392,23 @@ class FacultyController extends Faculty {
                 if (isset($spreadSheetAry[$i][3])) {
                     $batch = $this->verifyInput($spreadSheetAry[$i][3]);
                 }
+                
+                $dup = [];
                 if (!empty($prn_no) || !empty($first_name) || !empty($middle_name) || !empty($last_name) || !empty($roll_no) || !empty($batch)) {
-                    $result = $this->insertOneStudent([$prn_no, $first_name, $middle_name, $last_name, $roll_no, $_SESSION['dept'], $this->class, $batch, $this->div_id]);
-                    if(!$result) return json_encode(array("error" => "notinsert"));
+                    if(!$this->getStudentById([$prn_no])){
+                        $result = $this->insertOneStudent([$prn_no, $first_name, $middle_name, $last_name, $roll_no, $_SESSION['dept'], $this->class, $batch, $this->div_id]);
+                    }else{
+                        $count++;
+                        $dup[] = $prn_no;
+                    }
+                    //if(!$result) return json_encode(array("error" => "notinsert"));
                 }
             }
+            return array("error" => "none", "duplicate" => $count, "values" => $dup);
         } else {
-            return json_encode(array("error" => "type"));
+            return array("error" => "type");
         }
-        return json_encode(array("error" => "none"));
+        
     }
 
     public function addStaff(){
