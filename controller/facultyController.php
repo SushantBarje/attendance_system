@@ -521,15 +521,14 @@ class FacultyController extends Faculty {
         $this->attend = $this->verifyInput($_POST['attend']);
         $this->year = $this->verifyInput($_POST['academic_year']);
         date_default_timezone_set('Asia/Kolkata');
-        $timestamp = date("Y-m-d H:i:s");
+        $timestamp = date("Y-m-d H:i:s", strtotime($this->verifyInput($_POST['datetime'])));
         $this->time = $timestamp;
         $result = $this->insertAttendanceList([(int)$this->class,$this->time,(int)$this->year]);
         if($result){
             foreach((array)$this->attend as $key => $value){
-                $r = $this->insertStudentAttendance([(int)$result,(int)$key,(int)$value]);
+                $r = $this->insertStudentAttendance([(int)$result,(int)$key,(int)$value,$this->time]);
                 if(!$r) return json_encode(array("error" => "notinsert"));
             }
-            
         }else{
             return json_encode(array("error" => "notinsert"));
         }

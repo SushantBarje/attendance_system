@@ -30,7 +30,7 @@
         
         <form class="form" method="post" id="check-attend">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                     <label for="email" class="mr-sm-2">Select Academic Year: </label>
                     <select id="select-acd" name="academic_year" class="form-control form-control-sm mr-3"> 
                         <option value=" "> </option>
@@ -43,7 +43,7 @@
                         ?>  
                     </select>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                     <label for="email" class="mr-sm-2">Select Class:</label>
                     <select id="select-class" name="class" class="form-control form-control-sm"> 
                         <option value=" " data-class=" "> </option>
@@ -55,6 +55,10 @@
                             }
                         ?>  
                     </select>
+                </div>
+                <div class="col-sm-4">
+                    <label for="email" class="mr-sm-2">Select Date and Time:</label>
+                    <input type="datetime-local" class="form-control form-control-sm" id="datetime" max="" name="date-time">
                 </div>
             </div>
             

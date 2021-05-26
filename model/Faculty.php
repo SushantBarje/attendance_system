@@ -764,7 +764,7 @@ class Faculty extends Database {
 	public function insertStudentAttendance($data){
 		try{
 			$con = $this->connect();
-			$sql = "INSERT INTO attendance(attendance_id,student_id, status) VALUES(?,?,?)";
+			$sql = "INSERT INTO attendance(attendance_id,student_id, status, date_time) VALUES(?,?,?,?)";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return true;
 		}

@@ -1,4 +1,15 @@
 $(document).ready(function(){
+    // var now = new Date(),
+    // maxDate = now.toISOString().substring(0,10);
+    // $('#datetime').prop('max', maxDate);
+    function setValue(element, date) {
+        var isoString = date.toISOString()
+        element.value = isoString.substring(0, (isoString.indexOf("T")|0) + 6|0);
+        console.log(element.value);
+        $('#datetime').prop('max', element.value);
+    }
+    var v = setValue($("#datetime"),new Date());
+    
     processAttendanceSheet();
     processMarkAttendance();
     processSubmitAttendance();
@@ -10,20 +21,26 @@ function processAttendanceSheet(){
         id = $(this).find(":selected").data('class');
         var name = $(this).find(":selected").text();
         var year = $("#select-acd").val();
-        if(id == ' '){
+        var datetime = $('#datetime').val();
+        if(!id){
             $("#attendance-table tbody").html(" ");
             alert("Select Class!");
-            return;
+            return false;
         }
-        if(year == ' '){
-            $("#selec-class").val(" ");
+        else if(!year){
+            $("#select-class").val(" ");
             alert("Selec Academic Year");
-            return;
+            return false;
         }
-        
+        else if(!datetime){
+            alert("Select Date and Time");
+            return false;
+        }else{
+            console.log(id);
+            ajaxAttendanceList(id,year,name,datetime);
+        }
         //id = $(this).val();
-        console.log(id);
-        ajaxAttendanceList(id,year,name);
+        
     });
 
     // $("#select-acd").on("change",function(){
@@ -66,12 +83,12 @@ function processAttendanceSheet(){
     //     })
     // }
 
-    function ajaxAttendanceList(id,year,name){
+    function ajaxAttendanceList(id,year,name,datetime){
         console.log(id);
         $.ajax({
             url : "../controller/ajaxController.php?action=attendanceSheet",
             type : "post",
-            data : {data : id, year : year},
+            data : {data : id, year : year, datetime : datetime},
             dataType : 'json',
             success : function(res){
                 console.log(res);
@@ -88,7 +105,7 @@ function processAttendanceSheet(){
                 }
                 $('#attend-list').html(html);
                 $('#class-header').html('<h5><b>Course:- </b>'+name+'</h5>');
-                var d = new Date();
+                var d = new Date(datetime);
                 var strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
                 $('#date-header').html('<h6><b>Date:- </b>'+strDate+'</h6>')
             }
