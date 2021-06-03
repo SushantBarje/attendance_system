@@ -3,6 +3,7 @@ $(document).ready(function(){
     $('#class-table').DataTable();
     $('#course-table').DataTable();
     $('#staff-table').DataTable();
+    $('#pract-class-table').DataTable();
     processOnChangeClass();
     processAddStudent();
     inputStudentPlaceholder();
@@ -19,6 +20,7 @@ $(document).ready(function(){
     inputCoursePlaceholder();
     processEditCourse();
     processDeleteCourse();
+    processAddPractClass()
 });
 
 function processOnChangeClass(){
@@ -777,22 +779,22 @@ function processDeleteCourse(){
     })
 }
 
-function addPractClass(){
+function processAddPractClass(){
     $("#add-pract-class").on("submit", function(e){
         e.preventDefault();
         var data = {};
         $.when(
-            data[$("#add-pract-class #acd_year").attr("name")] = $("#add-class #acd_year").val(),
-            data[$("#add-pract-class #faculty_s").attr("name")] = $("#add-class #faculty_s").val(),
-            data[$("#add-pract-class #courses_s").attr("name")] = $("#courses_s").val(),
-            data[$("#add-pract-class #div_s").attr("name")] = $('#div_s').val(),
-            data[$("#add-pract-class #batch_s").attr("name")] = $('#batch_s').val(),
+            data[$("#add-pract-class #acd_year").attr("name")] = $("#add-pract-class #acd_year").val(),
+            data[$("#add-pract-class #faculty_s").attr("name")] = $("#add-pract-class #faculty_s").val(),
+            data[$("#add-pract-class #courses_s").attr("name")] = $("#add-pract-class #courses_s").val(),
+            data[$("#add-pract-class #div_s").attr("name")] = $('#add-pract-class #div_s').val(),
+            data[$("#add-pract-class #batch_s").attr("name")] = $('#add-pract-class #batch_s').val(),
         ).then(() => {
             console.log(data);
             $('#managePractClassModal #add-class').trigger("reset");
             $('#managePractClassModal').modal('hide');
             $.ajax({
-                url : "../controller/ajaxController.php?action=addPractClass",
+                url : "../controller/ajaxController.php?action=add_pract_class",
                 type : "post",
                 data : data,
                 dataType : 'json',
@@ -803,7 +805,7 @@ function addPractClass(){
                             alert("Please Fill all the fields");
                             break;
                         case "exists":
-                            alert("HOD already Exists");
+                            alert("Practical already Exists");
                             break;
                         case "notinsert":
                             alert("Data Not Inserted");

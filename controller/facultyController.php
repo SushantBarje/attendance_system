@@ -462,14 +462,14 @@ class FacultyController extends Faculty {
 
     public function addClass(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
-        $this->acd_year = $this->verifyInput($_POST['acd_year']);
-        $this->faculty_id = $this->verifyInput($_POST['faculty_s']);
+        $this->acd_year = (int)$this->verifyInput($_POST['acd_year']);
+        $this->faculty_id = (int)$this->verifyInput($_POST['faculty_s']);
         $this->courses_ar = (array)$this->verifyInput($_POST['courses']);
         $this->dept = isset($_POST['dept']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
         $result = true;
         foreach($this->courses_ar as $course){
             $c = $this->getCourseById([$course]);
-            $result = $this->insertOneClass([$this->faculty_id, $course, $this->dept, (int)$c["s_class_id"], (int)$c["sem_id"], $this->acd_year]);
+            $result = $this->insertOneClass([$this->faculty_id, (int)$course, (int)$this->dept, (int)$c["s_class_id"], (int)$c["sem_id"], $this->acd_year]);
         }
         if(!$result) return json_encode(array("error" => "notinsert"));
         $getclass = $this->getClassByDept([$_SESSION['dept']]);
@@ -505,59 +505,102 @@ class FacultyController extends Faculty {
         $this->div_id = (int)$this->verifyInput($_POST['div']);
         $this->batch_ar = (array)$this->verifyInput($_POST['batches']);
         $this->dept = isset($_POST['dept']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
-        $result = true;
-        foreach($this->courses_ar as $course){
-            $c = $this->getCourseById([$course]);
-            $result = $this->insertOneClass([$this->faculty_id, $course, $this->dept, (int)$c["s_class_id"], (int)$c["sem_id"], $this->acd_year]);
+        $c = $p = [];
+        foreach($this->batch_ar as $batch){
+            if($this->getPractClass([(int)$this->faculty_id, (int)$this->course_id, (int)$this->div_id ,(int)$this->dept, (int)$batch, (int)$this->acd_year]))
+            { 
+                $p[] = $batch;
+                continue;
+            }
+            else
+            {
+                $result = $this->insertOnePractClass([(int)$this->faculty_id, (int)$this->course_id, (int)$this->div_id ,(int)$this->dept, (int)$batch, (int)$this->acd_year]);
+                if(!$result) $c[] = $batch;
+            }
         }
-        if(!$result) return json_encode(array("error" => "notinsert"));
-        $getclass = $this->getClassByDept([$_SESSION['dept']]);
+        if(count($p) > 0) return json_encode(array("error" => "already", "count" => $p));
+        if(count($c) > 0) return json_encode(array("error" => "notinsert", "count" => $c));
+        else $getclass = $this->getPractClassByDept([$_SESSION['dept']]);
         return json_encode(array("error" => "none", "data" => $getclass));
     }
 
+    public function getAcademicClass(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->class = $this->verifyInput($_POST['data']);
+        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['data']) : $_SESSION['dept'];
+        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        $getclass = $this->getClassByAcademicYear([$this->class, $this->dept, $this->faculty_id]);
+        if(!$getclass) return json_encode(array("error" => "notexist"));
+        else return json_encode(array("error" => "none", "data" => $getclass));
+    }
+
     public function saveAttendance(){
-        $this->checkEmpty();
+        if($this->checkEmpty()) return array("error" => "empty");
         $this->class = $this->verifyInput($_POST['class']);
         $this->attend = $this->verifyInput($_POST['attend']);
         $this->year = $this->verifyInput($_POST['academic_year']);
-        date_default_timezone_set('Asia/Kolkata');
-        $timestamp = date("Y-m-d H:i:s", strtotime($this->verifyInput($_POST['datetime'])));
-        $this->time = $timestamp;
-        $result = $this->insertAttendanceList([(int)$this->class,$this->time,(int)$this->year]);
-        if($result){
+        date_default_timezone_set("Asia/Kolkata");
+        $date = $this->verifyInput($_POST['date']);
+        $time = $this->verifyInput($_POST['time']);
+        $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
+        $this->attend = $this->verifyInput($_POST['attend']);
+        $result = $this->getTheoryAttendance([(int)$this->class,$timestamp]);
+        if(count($result) == 0){
+            $c = 0;
             foreach((array)$this->attend as $key => $value){
-                $r = $this->insertStudentAttendance([(int)$result,(int)$key,(int)$value,$this->time]);
-                if(!$r) return json_encode(array("error" => "notinsert"));
+               $this->insertStudentAttendance([(int)$this->class, $key,(int)$value,$timestamp]);
+               $c++;
+            }
+            if($c == sizeof($this->attend)){
+                $r = $this->updateNoOfLect([(int)$this->class]);
+                if(!$r){
+                    return array("error" => "count");
+                }
             }
         }else{
-            return json_encode(array("error" => "notinsert"));
+            return array("error" => "already");
         }
-        return json_encode(array("error" => "none"));
+        return array("error" => "none");
     }
 
-    public function viewAdminReport(){
-        $sql_query = "";
-        $data = [];
-        if(!empty($_POST['academic_year'])){
-            $sql_query .= "academic_year = ?";
-            $data[] = $this->verifyInput($_POST['academic_year']);
-        }
-        if(!empty($_POST['deptartment'])){
-            $sql_query .= "AND dept_id = ?";
-            $data[] = $this->verifyInput($_POST['deptartment']);
-        }
-        if(!empty($_POST['classyear'])){
-            $sql_query .= "AND s_class_id = ?";
-            $data[] = $this->verifyInput($_POST['classyear']);
-        }
-        if(!empty($_POST['start_date'])){
-            $sql_query .= "AND DATE(date_time)) BETWEEN ? AND ?";
-            $data[] = $this->verifyInput($_POST['start_date']);
-        }
-        if(!empty($_POST['end_date'])){
-            $sql_query .= "<= date_time = ?";
-            $data[] = $this->verifyInput($_POST['end_date']);
-        }
+    public function viewStaffReport(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->acd_year = $this->verifyInput($_POST['academic_year']);
+        $this->class = $this->verifyInput($_POST['class']);
+        if(strtotime($_POST['from-date']) > strtotime($_POST['till-date'])) return json_encode(array("error" => "date"));
+        $fromdate = $this->verifyInput($_POST['from-date']);
+        $fromdate = date('Y-m-d', strtotime("$fromdate"));
+        $tilldate = $this->verifyInput($_POST['till-date']);
+        $tilldate = date('Y-m-d', strtotime("$tilldate")); 
+        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        $result = $this->findClassByAcademicYearAndFaculty([(int)$this->acd_year,(int)$this->faculty_id,(int)$this->class,$fromdate,$tilldate]);
+        if(!$result) return json_encode(array("error" => "notexists"));
+        $result = $this->getStaffReport([(int)$this->class,$fromdate,$tilldate]);
+        $getTotal = $this->getStaffReportTotal([(int)$this->class,$fromdate,$tilldate]);
+        return json_encode(array("error" => "none","data" => $result,"total" => $getTotal));
+
+        // $sql_query = "";
+        // $data = [];
+        // if(!empty($_POST['academic_year'])){
+        //     $sql_query .= "academic_year = ?";
+        //     $data[] = $this->verifyInput($_POST['academic_year']);
+        // }
+        // if(!empty($_POST['deptartment'])){
+        //     $sql_query .= "AND dept_id = ?";
+        //     $data[] = $this->verifyInput($_POST['deptartment']);
+        // }
+        // if(!empty($_POST['classyear'])){
+        //     $sql_query .= "AND s_class_id = ?";
+        //     $data[] = $this->verifyInput($_POST['classyear']);
+        // }
+        // if(!empty($_POST['start_date'])){
+        //     $sql_query .= "AND DATE(date_time)) BETWEEN ? AND ?";
+        //     $data[] = $this->verifyInput($_POST['start_date']);
+        // }
+        // if(!empty($_POST['end_date'])){
+        //     $sql_query .= "<= date_time = ?";
+        //     $data[] = $this->verifyInput($_POST['end_date']);
+        // }
 
         //$result = $this->getAdminReport($sql_query,[$data]);
     }
