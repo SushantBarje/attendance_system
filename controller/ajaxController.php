@@ -6,9 +6,11 @@ $faculty = new FacultyController();
 
 ob_start();
 $req = $_GET['action'];
-
 if($req == "addAcademicYear"){
     $r =  $faculty->addAcadYear();
+    die($r);
+}else if($req == "staff_report"){
+    $r = $faculty->viewStaffReport();
     die($r);
 }else if($req == "delAcademicYear"){
     $r = $faculty->removeAcademicYear();
@@ -70,8 +72,11 @@ if($req == "addAcademicYear"){
 }else if($req == "delClass"){
     $r = $faculty->removeClass();
     die($r);
-}else if($req == "addPractClass"){
+}else if($req == "add_pract_class"){
     $r = $faculty->addPracticalClass();
+    die($r);
+}else if($req == "get_acd_class"){
+    $r = $faculty->getAcademicClass();
     die($r);
 }else if($req == "attendanceSheet"){
     $r = $faculty->getStudentByClass();
@@ -84,9 +89,6 @@ if($req == "addAcademicYear"){
     //die($r);
 }else if($req == "addCourseDept"){
     $r = $faculty->addCourseByDept();
-    die($r);
-}else if($req == "admin_report"){
-    $r = $faculty->viewAdminReport();
     die($r);
 }
 ob_end_flush();

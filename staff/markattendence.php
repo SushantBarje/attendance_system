@@ -7,8 +7,19 @@
         echo '<script> alert("Invalid User")</script>';
         header('Location:../index.php');
     }
-?>
 
+    if(isset($_REQUEST['submit-attend'])){
+        unset($_POST['submit-attend']);
+        $result = $user->saveAttendance();
+        if($result['error'] == "none"){
+            echo '<script> alert("Attendance Submitted")</script>';
+        }else if($result['error'] == "already"){
+            echo '<script> alert("Attendance Already Taken...")</script>';
+        }else if($result['error'] == "empty"){
+            echo '<script> alert("Fill all details...")</script>';
+        }
+    }
+?>
 
 <!DOCTYPE html>
 <html>
@@ -21,7 +32,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="../assets/js/staff/script.js"></script>
+  
     <title>Mark Attendence</title>
 </head>
 <body>
@@ -31,8 +42,8 @@
         <form class="form" method="post" id="check-attend">
             <div class="row">
                 <div class="col-sm-4">
-                    <label for="email" class="mr-sm-2">Select Academic Year: </label>
-                    <select id="select-acd" name="academic_year" class="form-control form-control-sm mr-3"> 
+                    <label for="select-acd" class="mr-sm-2">Select Academic Year: </label>
+                    <select id="select-acd" name="academic_year" class="form-control form-control-sm mr-3 sheet-input-field"> 
                         <option value=" "> </option>
                         <?php 
                             $data = $user->getAcademicYear();
@@ -44,21 +55,26 @@
                     </select>
                 </div>
                 <div class="col-sm-4">
-                    <label for="email" class="mr-sm-2">Select Class:</label>
-                    <select id="select-class" name="class" class="form-control form-control-sm"> 
+                    <label for="class" class="mr-sm-2">Select Class:</label>
+                    <select id="select-class" name="class" class="form-control form-control-sm sheet-input-field" disabled> 
                         <option value=" " data-class=" "> </option>
-                        <?php 
+                        <!-- <?php 
                             $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
                             if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
                             foreach($data as $d){
                                 echo '<option value="'.$d['class_id'].'" data-class="'.$d['s_class_id'].'">'.$d['course_name'].'</option>';
                             }
-                        ?>  
+                        ?>   -->
                     </select>
                 </div>
-                <div class="col-sm-4">
-                    <label for="email" class="mr-sm-2">Select Date and Time:</label>
-                    <input type="datetime-local" class="form-control form-control-sm" id="datetime" max="" name="date-time">
+                <?php date_default_timezone_set("Asia/Kolkata");?>
+                <div class="col-sm-2">
+                    <label for="date" class="mr-sm-2">Select Date</label>
+                    <input type="date" class="form-control form-control-sm sheet-input-field" id="date" max="<?php echo date("Y-m-d") ?>" name="date">
+                </div>
+                <div class="col-sm-2">
+                    <label for="time" class="mr-sm-2">Select Time</label>
+                    <input type="time" class="form-control form-control-sm sheet-input-field" id="time" name="time">
                 </div>
             </div>
             
@@ -81,7 +97,7 @@
                     <div class="col">
                         <div class="row mt-5 offset-0">
                             <div class="col-4">
-                                <button class="btn btn-primary ml-5" id="save-btn" type="submit" hidden>Save</button>
+                                <button class="btn btn-primary ml-5" id="save-btn" type="submit" name="submit-attend" hidden>Save</button>
                             </div>
                             <div class="col-4" id="class-header">
                                 
@@ -91,7 +107,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="d-flex justify-content-center flex-wrap mt-2"  id="attend-list" hidden>
+                            <div class="d-flex justify-content-center flex-wrap mt-2" id="attend-list" hidden>
                                 <?php 
                                     // $data = $user->getStudentByDept([$_SESSION['dept']]);
                                     // foreach($data as $d){
@@ -138,6 +154,8 @@
             </tbody>
         </table> -->
     </main>
+
+    <script src="../assets/js/staff/script.js"></script>
 </body>
 
 </html>

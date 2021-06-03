@@ -9,9 +9,9 @@ class Database {
 	private $host = "localhost";
 	private $user = "root";
 	private $password = "";
-	private $database_name = "attandance_system";
+	private $database_name = "attend_sys";
 
-	protected function connect() {
+	public function connect() {
 		try {
 			$config = "mysql:host=" . $this->host.";dbname=" . $this->database_name;
 			$pdo = new PDO($config, $this->user, $this->password);

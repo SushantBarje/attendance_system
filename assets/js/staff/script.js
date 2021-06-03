@@ -2,46 +2,65 @@ $(document).ready(function(){
     // var now = new Date(),
     // maxDate = now.toISOString().substring(0,10);
     // $('#datetime').prop('max', maxDate);
-    function setValue(element, date) {
-        var isoString = date.toISOString()
-        element.value = isoString.substring(0, (isoString.indexOf("T")|0) + 6|0);
-        console.log(element.value);
-        $('#datetime').prop('max', element.value);
-    }
-    var v = setValue($("#datetime"),new Date());
-    
+
+    getClassAcademic();
     processAttendanceSheet();
     processMarkAttendance();
-    processSubmitAttendance();
+    generateStaffReport();
+    //processSubmitAttendance();
 });
 
+function getClassAcademic(){
+    $("#select-acd").on("change", function(){
+        var id = $(this).val();
+        console.log(id);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_acd_class",
+            type : "POST",
+            data : {'data' : id},
+            dataType : "JSON",
+            success : function(res){
+                console.log(res);
+                switch(res.error){
+                    case "notexist": 
+                        $("#select-class").val(" ");
+                        $("#select-class").prop("disabled",true);
+                        alert("No Class Found");
+                        break;
+                    case "none":
+                        if(res.data.length > 0){
+                            $("#select-class").prop("disabled",false);
+                            var html = '<option value=" "> </option>';
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
+                            }
+                            $('#select-class').html(html);
+                        }
+                        break;
+                }
+            }
+        })
+    })
+}
+
 function processAttendanceSheet(){
-    $("#select-class").on("change",function(){
-        var data = {}
-        id = $(this).find(":selected").data('class');
-        var name = $(this).find(":selected").text();
-        var year = $("#select-acd").val();
-        var datetime = $('#datetime').val();
-        if(!id){
-            $("#attendance-table tbody").html(" ");
-            alert("Select Class!");
+        $(".sheet-input-field").on("change" ,function(){
+            console.log($(this).val());
+            if($("#check-attend #select-acd").val() != " " && $("#check-attend #select-class").val() != " " && $("#check-attend #date").val() != "" && $("#check-attend #time").val() != ""){
+                var id = $("#check-attend #select-class").find(':selected').data('class');
+                var name = $("#check-attend #select-class").text();
+                var year = $("#check-attend #select-acd").val();
+                var date = $('#check-attend #date').val();
+                var time = $("#check-attend #time").val();
+                console.log(name,year,date,time);
+                ajaxAttendanceList(id,year,name,date,time);
+                
+            }else{
+                console.log("empty");
+            }
+            //id = $(this).val();
             return false;
-        }
-        else if(!year){
-            $("#select-class").val(" ");
-            alert("Selec Academic Year");
-            return false;
-        }
-        else if(!datetime){
-            alert("Select Date and Time");
-            return false;
-        }else{
-            console.log(id);
-            ajaxAttendanceList(id,year,name,datetime);
-        }
-        //id = $(this).val();
-        
-    });
+        });
 
     // $("#select-acd").on("change",function(){
     //     var data = {}
@@ -83,12 +102,12 @@ function processAttendanceSheet(){
     //     })
     // }
 
-    function ajaxAttendanceList(id,year,name,datetime){
+    function ajaxAttendanceList(id,year,name,date, time){
         console.log(id);
         $.ajax({
             url : "../controller/ajaxController.php?action=attendanceSheet",
             type : "post",
-            data : {data : id, year : year, datetime : datetime},
+            data : {data : id, year : year, date : date, time : time},
             dataType : 'json',
             success : function(res){
                 console.log(res);
@@ -105,7 +124,7 @@ function processAttendanceSheet(){
                 }
                 $('#attend-list').html(html);
                 $('#class-header').html('<h5><b>Course:- </b>'+name+'</h5>');
-                var d = new Date(datetime);
+                var d = new Date(date + 'T' + time);
                 var strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
                 $('#date-header').html('<h6><b>Date:- </b>'+strDate+'</h6>')
             }
@@ -133,21 +152,127 @@ function processMarkAttendance(){
     }); 
 }
 
-function processSubmitAttendance(){
-    $(document).on("submit","#check-attend",function(){
-        $.ajax({
-            url: '../controller/ajaxController.php?action=save_attend',
-            type: 'post',
-            data: $(this).serialize(),
-            dataType: 'json',
-            success: function(res){
-                console.log(res);
-                switch(res.error){
-                    case "none":
-                        alert("Attendence Submitted");
-                        break;
+// function processSubmitAttendance(){
+//     $("#check-attend").on("submit",function(e){
+//         e.preventDefault();
+//         var data = $(this).serialize();
+//         $.ajax({
+//             type: 'POST',
+//             url: '../controller/ajaxController.php?action=save_attend',
+//             data: {"data" : data},
+//             dataType: 'json',
+//             contentType: false,
+//             processData: false,
+//             success: function(res){
+//                 console.log(res);
+//                 switch(res.error){
+//                     case "none":
+//                         alert("Attendence Submitted");
+//                         break;
+//                 }
+//             },
+//             error : function(e){
+//                 console.log(e);
+//             }
+//         })
+    
+//     })
+// }
+
+
+function generateStaffReport(){
+    $("#get-report").on("click", function(){
+        var data = {};
+        $.when(
+            data[$("#report #select-acd").attr("name")] = $("#report #select-acd").val(),
+            data[$("#report #select-class").attr("name")] = $("#report #select-class").val(),
+            data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
+            data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
+        ).then(
+            getAjaxReport()
+        )
+        function getAjaxReport(){
+            console.log(data)
+            $.ajax({
+                url : "../controller/ajaxController.php?action=staff_report",
+                type : "post",
+                data : data,
+                dataType : "JSON",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Enter all Details...");
+                            break;
+                        case "notexists":
+                            if($.fn.dataTable.isDataTable("#staff-report")){
+                                $("#staff-report").DataTable().destroy();
+                                $("#staff-report thead tr").html(" ");
+                                $("#staff-report tbody").html(" ");
+                            }
+                            alert("NO attendance Found")
+                            break;
+                        case "date":
+                            alert("Please Enter Correct Date");
+                            break;
+                        case "none":
+                            if($.fn.dataTable.isDataTable("#staff-report")){
+                                $("#staff-report").DataTable().destroy();
+                                $("#staff-report thead tr").html(" ");
+                                $("#staff-report tbody").html(" ");
+                            }  
+                            var columns = Object.keys(res.data[0]);
+                            var datecolumns = columns.slice(3);
+                            var numCol = datecolumns.length;
+                            var th = "";
+                            th += "<th>Roll no.</th>";
+                            th += "<th>Student Name.</th>";
+                            for(var i = 0; i < numCol; i++){
+                                // if(columns[i] == "student_id") continue;
+                                th += "<th>"+datecolumns[i]+"</th>";
+                            } 
+                            th += "<th>Total</th>"; 
+                            th += "<th>Percentage</th>";
+                            var td = "";
+                            for(var i = 0; i < res.data.length; i++){
+                                td += "<tr>"
+                                td += "<td>"+res.data[i].roll_no+"</td>";
+                                td += "<td>"+res.data[i].student_name+"</td>";
+                                for(var j = 0; j < numCol; j++){
+                                    //if(columns[j] == "student_id") continue;
+                                    td += "<td>"+res.data[i][datecolumns[j]]+"</td>";
+                                } 
+                                td += "<td>"+res.total[i].total+"</td>";
+                                td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                td += "</tr>"
+                            }
+                            $("#staff-report thead tr").html(th);
+                            $("#staff-report tbody").html(td);
+                            var table = $("#staff-report").DataTable(
+                                {
+                                    scrollY:        "500px",
+                                    scrollX:        true,
+                                    scrollCollapse: true,
+                                    paging:         false,
+                                    autoWidth:  false,
+                                    fixedColumns:   {
+                                        leftColumns: 2,
+                                        rightColumns: 1
+                                    },
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        'copy', 'csv', 'excel', 'pdf', 'print'
+                                    ],
+                                }
+                            );
+                            break;
+                    }
+                    
+                },
+                error : function(e){
+                    console.log(e);
                 }
-            }
-        })
+            })
+        }
     })
 }
