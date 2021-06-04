@@ -183,11 +183,14 @@ function processMarkAttendance(){
 function generateStaffReport(){
     $("#get-report").on("click", function(){
         var data = {};
+        var title = "";
         $.when(
             data[$("#report #select-acd").attr("name")] = $("#report #select-acd").val(),
             data[$("#report #select-class").attr("name")] = $("#report #select-class").val(),
             data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
             data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
+            title = $("#report #select-class option:selected").text(),
+            academic_year = $("#report #select-acd option:selected").text(),
         ).then(
             getAjaxReport()
         )
@@ -202,6 +205,11 @@ function generateStaffReport(){
                     console.log(res);
                     switch(res.error){
                         case "empty":
+                            if($.fn.dataTable.isDataTable("#staff-report")){
+                                $("#staff-report").DataTable().destroy();
+                                $("#staff-report thead tr").html(" ");
+                                $("#staff-report tbody").html(" ");
+                            }
                             alert("Enter all Details...");
                             break;
                         case "notexists":
@@ -248,6 +256,7 @@ function generateStaffReport(){
                             }
                             $("#staff-report thead tr").html(th);
                             $("#staff-report tbody").html(td);
+                            
                             var table = $("#staff-report").DataTable(
                                 {
                                     scrollY:        "500px",
@@ -261,8 +270,13 @@ function generateStaffReport(){
                                     },
                                     dom: 'Bfrtip',
                                     buttons: [
-                                        'copy', 'csv', 'excel', 'pdf', 'print'
-                                    ],
+                                        {
+                                            extend: 'excel',
+                                            text : 'Export Excel',
+                                            title : title,
+                                            messageTop: title+" Attendance Academic Year "+academic_year,
+                                        }
+                                    ]
                                 }
                             );
                             break;

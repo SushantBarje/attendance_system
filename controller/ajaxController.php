@@ -76,7 +76,7 @@ if($req == "addAcademicYear"){
     $r = $faculty->addPracticalClass();
     die($r);
 }else if($req == "get_acd_class"){
-    $r = $faculty->getAcademicClass();
+    $r = $faculty->getClassForStaffAcademic();
     die($r);
 }else if($req == "attendanceSheet"){
     $r = $faculty->getStudentByClass();
@@ -89,6 +89,12 @@ if($req == "addAcademicYear"){
     //die($r);
 }else if($req == "addCourseDept"){
     $r = $faculty->addCourseByDept();
+    die($r);
+}else if($req == "get_hod_class"){
+    $r = $faculty->getClassForHodAcademic();
+    die($r);
+}else if($req == "hod_report"){
+    $r = $faculty->getHodReport();
     die($r);
 }
 ob_end_flush();
