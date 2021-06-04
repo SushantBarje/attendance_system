@@ -524,12 +524,23 @@ class FacultyController extends Faculty {
         return json_encode(array("error" => "none", "data" => $getclass));
     }
 
-    public function getAcademicClass(){
+    public function getClassForStaffAcademic(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $this->class = $this->verifyInput($_POST['data']);
-        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['data']) : $_SESSION['dept'];
+        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
         $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
         $getclass = $this->getClassByAcademicYear([$this->class, $this->dept, $this->faculty_id]);
+        if(!$getclass) return json_encode(array("error" => "notexist"));
+        else return json_encode(array("error" => "none", "data" => $getclass));
+    }
+
+    public function getClassForHodAcademic(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->year = $this->verifyInput($_POST['year']);
+        $this->acd_year = $this->verifyInput($_POST['acd']);
+        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        //$this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        $getclass = $this->getClassByAcademicAndClassYear([$this->acd_year, $this->year, $this->dept]);
         if(!$getclass) return json_encode(array("error" => "notexist"));
         else return json_encode(array("error" => "none", "data" => $getclass));
     }
@@ -610,6 +621,24 @@ class FacultyController extends Faculty {
     //     $this->acd_id = $this->verifyInput($_POST['data']);
         
     // }
+
+    public function getHodReport(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->acd_year = $this->verifyInput($_POST['academic_year']);
+        $this->class = $this->verifyInput($_POST['class']);
+        $this->year = $this->verifyInput($_POST['s_class_year']);
+        if(strtotime($_POST['from-date']) > strtotime($_POST['till-date'])) return json_encode(array("error" => "date"));
+        $fromdate = $this->verifyInput($_POST['from-date']);
+        $fromdate = date('Y-m-d', strtotime("$fromdate"));
+        $tilldate = $this->verifyInput($_POST['till-date']);
+        $tilldate = date('Y-m-d', strtotime("$tilldate")); 
+        //$this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        $result = $this->findClassByAcademicYearAndClassYear([(int)$this->acd_year,(int)$this->year,(int)$this->class,$fromdate,$tilldate]);
+        if(!$result) return json_encode(array("error" => "notexists"));
+        $result = $this->getStaffReport([(int)$this->class,$fromdate,$tilldate]);
+        $getTotal = $this->getStaffReportTotal([(int)$this->class,$fromdate,$tilldate]);
+        return json_encode(array("error" => "none","data" => $result,"total" => $getTotal));
+    }
     
 
     public function getFacultyId(){

@@ -904,4 +904,33 @@ class Faculty extends Database {
 			return array("e" => $e->getMessage());
 		}
 	}
+
+	public function getClassByAcademicAndClassYear($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.dept_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)){
+				if($stmt->rowCount() > 0){
+					return $stmt->fetchAll();
+				}else{
+					return false;
+				}
+			}
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function findClassByAcademicYearAndClassYear($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.class_id FROM attendance as a JOIN class as b ON a.class_id = b.class_id WHERE b.academic_id = ? AND b.s_class_id = ? AND a.class_id = ? AND DATE(a.date_time) BETWEEN(?) AND (?);";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
 };

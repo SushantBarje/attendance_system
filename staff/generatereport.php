@@ -7,7 +7,6 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
     echo '<script> alert("Invalid User")</script>';
     header('Location:../index.php');
 }
-
 ?>
 
 <!DOCTYPE html>

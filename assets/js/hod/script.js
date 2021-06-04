@@ -21,6 +21,7 @@ $(document).ready(function(){
     processEditCourse();
     processDeleteCourse();
     processAddPractClass()
+    processHodReport();
 });
 
 function processOnChangeClass(){
@@ -839,5 +840,153 @@ function processAddPractClass(){
                 }
             })
         })   
+    })
+}
+
+
+function processHodReport(){
+    $(document).on("change", "#select-year", function(e){
+        if($("#select-acd").val() != " " && $(this).val() != " "){
+            var year = $(this).val();
+            var acd = $("#select-acd option:selected").val();
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_hod_class",
+                type : "POST",
+                data : {'year' : year, 'acd' : acd},
+                dataType : "JSON",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "notexist": 
+                            // $("#select-class").val(" ");
+                            $("#select-class").prop("disabled",true);
+                            alert("No class found!");
+                            break;
+                        case "none":
+                            if(res.data.length > 0){
+                                $("#select-class").prop("disabled",false);
+                                var html = '<option> </option>';
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
+                                }
+                                $('#select-class').html(html);
+                            }
+                            break;
+                    }
+                }
+            })
+        }else{
+            if($(this).val() != " " && $("#select-acd option:selected").val() == " "){
+                alert("Please Select Academic Year");
+            }
+        }
+    })
+
+    $("#get-report").on("click", function(){
+        var data = {};
+        var title = "";
+        $.when(
+            data[$("#report #select-acd").attr("name")] = $("#report #select-acd").val(),
+            data[$("#report #select-year").attr("name")] = $("#report #select-year").val(),
+            data[$("#report #select-class").attr("name")] = $("#report #select-class").val(),
+            data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
+            data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
+            title = $("#report #select-class option:selected").text(),
+            academic_year = $("#report #select-acd option:selected").text(),
+        ).then(
+            getAjaxReport()
+        );
+        function getAjaxReport(){
+            $.ajax({
+                url : "../controller/ajaxController.php?action=hod_report",
+                type : "post",
+                data : data,
+                dataType : "JSON",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            if($.fn.dataTable.isDataTable("#hod-report")){
+                                $("#hod-report").DataTable().destroy();
+                                $("#hod-report thead tr").html(" ");
+                                $("#hod-report tbody").html(" ");
+                            }
+                            alert("Enter all Details...");
+                            break;
+                        case "notexists":
+                            if($.fn.dataTable.isDataTable("#hod-report")){
+                                $("#hod-report").DataTable().destroy();
+                                $("#hod-report thead tr").html(" ");
+                                $("#hod-report tbody").html(" ");
+                            }
+                            alert("NO attendance Found")
+                            break;
+                        case "date":
+                            alert("Please Enter Correct Date");
+                            break;
+                        case "none":
+                            if($.fn.dataTable.isDataTable("#hod-report")){
+                                $("#hod-report").DataTable().destroy();
+                                $("#hod-report thead tr").html(" ");
+                                $("#hod-report tbody").html(" ");
+                            }  
+                            var columns = Object.keys(res.data[0]);
+                            var datecolumns = columns.slice(3);
+                            var numCol = datecolumns.length;
+                            var th = "";
+                            th += "<th>Roll no.</th>";
+                            th += "<th>Student Name.</th>";
+                            for(var i = 0; i < numCol; i++){
+                                // if(columns[i] == "student_id") continue;
+                                th += "<th>"+datecolumns[i]+"</th>";
+                            } 
+                            th += "<th>Total</th>";
+                            th += "<th>Percentage</th>";
+                            var td = "";
+                            for(var i = 0; i < res.data.length; i++){
+                                td += "<tr>"
+                                td += "<td>"+res.data[i].roll_no+"</td>";
+                                td += "<td>"+res.data[i].student_name+"</td>";
+                                for(var j = 0; j < numCol; j++){
+                                    //if(columns[j] == "student_id") continue;
+                                    td += "<td>"+res.data[i][datecolumns[j]]+"</td>";
+                                } 
+                                td += "<td>"+res.total[i].total+"</td>";
+                                td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                td += "</tr>"
+                            }
+                            $("#hod-report thead tr").html(th);
+                            $("#hod-report tbody").html(td);
+                            
+                            var table = $("#hod-report").DataTable(
+                                {
+                                    scrollY:        "500px",
+                                    scrollX:        true,
+                                    scrollCollapse: true,
+                                    paging:         false,
+                                    autoWidth:  false,
+                                    fixedColumns:   {
+                                        leftColumns: 2,
+                                        rightColumns: 1
+                                    },
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        {
+                                            extend: 'excel',
+                                            text : 'Export Excel',
+                                            title : title,
+                                            messageTop: title+" Attendance Academic Year "+academic_year,
+                                        }
+                                    ]
+                                }
+                            );
+                            break;
+                    }
+                },
+                error : function(e){
+                    console.log(e);
+                }
+            })
+        }
     })
 }
