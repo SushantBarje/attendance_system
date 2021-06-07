@@ -17,6 +17,8 @@
             echo '<script> alert("Attendance Already Taken...")</script>';
         }else if($result['error'] == "empty"){
             echo '<script> alert("Fill all details...")</script>';
+        }else if($result['error'] == "update"){
+            echo '<script> alert("Attendance Updated...")</script>';
         }
     }
 ?>
@@ -38,11 +40,11 @@
 <body>
 <?php   include "staffHeader.php" ?>
     <main>
-        
-        <form class="form" method="post" id="check-attend">
+        <h2 class="head">Take Attendance</h2>
+        <form class="form mt-3" method="post" id="check-attend">
             <div class="row">
-                <div class="col-sm-4">
-                    <label for="select-acd" class="mr-sm-2">Select Academic Year: </label>
+                <div class="col-sm-2">
+                    <label for="select-acd" class="mr-sm-2">Academic Year: </label>
                     <select id="select-acd" name="academic_year" class="form-control form-control-sm mr-3 sheet-input-field"> 
                         <option value=" "> </option>
                         <?php 
@@ -54,8 +56,34 @@
                         ?>  
                     </select>
                 </div>
-                <div class="col-sm-4">
-                    <label for="class" class="mr-sm-2">Select Class:</label>
+                <div class="col-sm-2">
+                    <label for="select-year" class="mr-sm-2">Year: </label>
+                    <select id="select-year" name="year_id" class="form-control form-control-sm mr-3 sheet-input-field"> 
+                        <option value=" "> </option>
+                        <?php 
+                            $data = $user->getYearBelongsDept([$_SESSION['dept']]);
+                            if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                            foreach($data as $d){
+                                echo '<option value="'.$d['year_id'].'" >'.$d['s_class_name'].'</option>';
+                            }
+                        ?>  
+                    </select>
+                </div>
+                <div class="col-sm-1">
+                    <label for="select-div" class="mr-sm-2">Division: </label>
+                    <select id="select-div" name="div_id" class="form-control form-control-sm mr-3 sheet-input-field"> 
+                        <option value=" "> </option>
+                        <?php 
+                            $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                            if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                            foreach($data as $d){
+                                echo '<option value="'.$d['div_id'].'" >'.$d['div_name'].'</option>';
+                            }
+                        ?>  
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <label for="class" class="mr-sm-2">Class:</label>
                     <select id="select-class" name="class" class="form-control form-control-sm sheet-input-field" disabled> 
                         <option value=" " data-class=" "> </option>
                         <!-- <?php 
@@ -69,11 +97,11 @@
                 </div>
                 <?php date_default_timezone_set("Asia/Kolkata");?>
                 <div class="col-sm-2">
-                    <label for="date" class="mr-sm-2">Select Date</label>
+                    <label for="date" class="mr-sm-2">Date</label>
                     <input type="date" class="form-control form-control-sm sheet-input-field" id="date" max="<?php echo date("Y-m-d") ?>" name="date">
                 </div>
                 <div class="col-sm-2">
-                    <label for="time" class="mr-sm-2">Select Time</label>
+                    <label for="time" class="mr-sm-2">Time</label>
                     <input type="time" class="form-control form-control-sm sheet-input-field" id="time" name="time">
                 </div>
             </div>
@@ -96,13 +124,13 @@
                 <div class="container">
                     <div class="col">
                         <div class="row mt-5 offset-0">
-                            <div class="col-4">
+                            <div class="col-sm-2">
                                 <button class="btn btn-primary ml-5" id="save-btn" type="submit" name="submit-attend" hidden>Save</button>
                             </div>
-                            <div class="col-4" id="class-header">
+                            <div class="col-sm-6 offset-1" id="class-header">
                                 
                             </div>
-                            <div class="col-4" id="date-header">
+                            <div class="col-sm-3" id="date-header">
                                 
                             </div>
                         </div>

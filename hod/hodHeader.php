@@ -18,7 +18,7 @@
         <div class="sidebar-menu">
             <ul>
                 <li>
-                    <a href="header.php" class="active"><span class="fa fa-fw fa-home"></span>
+                    <a href="home.php" class="active"><span class="fa fa-fw fa-home"></span>
                         <span>Home</span></a>
                 </li>
 
@@ -77,9 +77,8 @@
             </h2>
 
             <div class="user-wrapper">
-                <img src="../img/2.jpg" width="30px" height="30px" alt="">
                 <div>
-                    <h4>vishal phule</h4>
+                    <h4><?php echo $_SESSION['first_name'].' '.$_SESSION['last_name']?></h4>
                     <small>
 
                         <div class="dropdown">

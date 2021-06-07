@@ -1,3 +1,14 @@
+<?php
+    namespace app\staff;
+    require_once __DIR__ . '\..\vendor\autoload.php';
+    use app\controller\FacultyController;
+    $user = new FacultyController();
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 2){
+        echo '<script> alert("Invalid User")</script>';
+        header('Location:../index.php');
+    }
+?>
+
 <!DOCTYPE html>
 <html>
 

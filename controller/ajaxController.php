@@ -79,23 +79,35 @@ if($req == "addAcademicYear"){
     $r = $faculty->getClassForStaffAcademic();
     die($r);
 }else if($req == "attendanceSheet"){
-    $r = $faculty->getStudentByClass();
+    $r = $faculty->showStudentByClassForAttendance();
     die($r);
 }else if($req == "save_attend"){
     $r = $faculty->saveAttendance();
     die($r);
-}else if($req == "report_acd_attend"){
-    //$r = $faculty->reportAcademicWise();
-    //die($r);
 }else if($req == "addCourseDept"){
     $r = $faculty->addCourseByDept();
-    die($r);
-}else if($req == "get_hod_class"){
-    $r = $faculty->getClassForHodAcademic();
     die($r);
 }else if($req == "hod_report"){
     $r = $faculty->getHodReport();
     die($r);
+}else if($req == "get_faculty_dept_wise"){
+    $r = $faculty->showFacultyByDept();
+    die($r);
+}else if($req == "get_year_belong_dept"){
+    $r = $faculty->showYearBelongsDept();
+    die($r);
+}else if($req == "get_class_div_wise"){
+    $r = $faculty->showClassByDiv();
+    die($r);
+}else if($req == "get_div_belongs_dept"){
+    $r = $faculty->showDivBelongsDept();
+    die($r);
+}else if($req == "admin_report"){
+    $r = $faculty->showAdminReport();
+    die($r);
+}else if($req == "get_attend_details_class"){
+  $r = $faculty->showAttendTakenClass();
+  die($r);
 }
 ob_end_flush();
 ?>

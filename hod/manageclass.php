@@ -24,6 +24,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
     <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> 
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
+    <script defer src="../assets/fontawesome/js/brands.js"></script>
+    <script defer src="../assets/fontawesome/js/solid.js"></script>
+    <script defer src="../assets/fontawesome/js/fontawesome.js"></script>
     <script src="../assets/js/hod/script.js"></script>
     <title>Manage Classes</title>
 </head>
@@ -54,7 +58,7 @@
 
                             <!-- Modal body -->
                             <div class="modal-body">
-                                <form id="add-class">
+                                <form id="add-class-form">
                                     <div class="form-group">
                                         <label for="acd_year">Academic Year</label>
                                         <select name="acd_year" id="acd_year" class="form-control form-control-sm">
@@ -77,9 +81,62 @@
                                                 foreach($data as $d){
                                                     echo '<option value="'.$d['faculty_id'].'">'.$d['first_name'].' '.$d['last_name'].'</option>';
                                                 }
+                                                echo '<option value="other">Select From Other Department</option>';
                                             ?>
                                         </select>
                                     </div>
+                                    <div class="row">
+                                        <div class="form-group col-sm-6" id="foreign-select-dept" hidden="true">
+                                            <label for="dept_s">Select Department</label>
+                                            <select name="dept_id" class="form-control form-control-sm" id="foreign_dept_s">
+                                                <option value=" "> </option>
+                                                <?php 
+                                                    $data = $user->getDepartment();
+                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                                    foreach($data as $d){
+                                                        echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-sm-6" id="foreign-select-faculty" hidden="true">
+                                            <label for="dept_s">Select Other Faculty</label>
+                                            <select name="faculty_s" class="form-control form-control-sm" id="foreign_faculty_s">
+                                                <option value=" "> </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <!-- <div class="form-group col-sm-12" id="foreign-select-dept">
+                                            <label for="dept_s">Select Division</label>
+                                            <select name="dept_id" class="form-control form-control-sm" id="foreign_dept_s">
+                                                <option value=" "> </option>
+                                                <?php 
+                                                    // $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                                                    // if(!$data) {
+                                                    //     echo '<option value="'.' '.'">Nothing Found</option>';
+                                                    // }else{
+                                                    //     foreach($data as $d){
+                                                    //         echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
+                                                    //     }
+                                                    // }
+                                                ?>
+                                            </select>
+                                        </div> -->
+                                        <div class="form-group col-sm-12" id="select-div">
+                                            <label for="div_s">Select Division</label>
+                                            <select class="form-control selectpicker " name="div_id[]" id="div_s" multiple data-live-search="true">
+                                                <?php 
+                                                    $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                                    foreach($data as $d){
+                                                        echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="form-group">
                                         <label for="courses_s">Select Courses</label>
                                         <select class="form-control selectpicker " name="courses[]" id="courses_s" multiple data-live-search="true">
@@ -95,7 +152,7 @@
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
 
-                                        <button type="submit" class="btn btn-success">ADD</button>
+                                        <button type="button" id="add-class" class="btn btn-success">ADD</button>
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                     </div>
                                     <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
@@ -111,28 +168,29 @@
         <table id="class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
             <thead>
                 <tr>
-                    <th colspan="5">Theroy</th>
+                    <th colspan="6">Theroy</th>
                 </tr>
                 <tr>
                     <th>Class ID</th>
                     <th>Course Name</th>
                     <th>Faculty</th>
                     <th>Class</th>
+                    <th>Div</th>
                     <th> </th>
                 </tr>
             </thead>
             <tbody>
                 <?php 
                     $data = $user->getClassByDept([$_SESSION['dept']]);
-                    if(!$data) echo "<tr><td>Nothing Found</td</tr>";
                     foreach($data as $d){
                         echo '<tr>
                                 <td>'.$d['class_id'].'</td>
                                 <td>'.$d['course_name'].'</td>
                                 <td>'.$d['first_name'].' '.$d['last_name'].'</td>
                                 <td>'.$d['s_class_name'].'</td>
+                                <td>'.$d['div_name'].'</td>
                                 <td>
-                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['class_id'].'">Delete</button>
+                                    <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['class_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
                                 </td>        
                             </tr>';
                     }
@@ -256,7 +314,6 @@
             <tbody>
                 <?php 
                     $data = $user->getClassByDept([$_SESSION['dept']]);
-                    if(!$data) echo "<tr><td>Nothing Found</td</tr>";
                     foreach($data as $d){
                         echo '<tr>
                                 <td>'.$d['class_id'].'</td>

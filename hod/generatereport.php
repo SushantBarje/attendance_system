@@ -41,12 +41,13 @@
 <body>
 <?php   include "hodHeader.php" ?>
     <main>
+        <h2 class="head">Report</h2>
         <form id="report">
-            <div class="row">
+            <div class="row mt-3">
                 <div class="form-group col-sm-2">
                     <label for="acd-year">Academic Year</label>
-                    <select class="form-control form-control-sm" name="academic_year" id="select-acd">
-                        <option> </option>
+                    <select class="form-control form-control-sm report-select-input" name="academic_year" id="select-acd">
+                        <option value=" "> </option>
                         <?php 
                             $data = $user->getAcademicYear();
                             if(!$data) echo '<option value=" ">Nothing Found</option>';
@@ -56,27 +57,41 @@
                         ?>
                     </select>
                 </div>
-                <div class="form-group col-sm-3">
+                <div class="form-group col-sm-2">
                     <label for="select-year">Select Year :</label>
-                    <select class="form-control form-control-sm" name="s_class_year" id="select-year">
+                    <select class="form-control form-control-sm report-select-input" name="s_class_year" id="select-year">
                         <option value=" "> </option>
                         <?php 
-                            $data = $user->getClassYear();
-                            if(!$data) echo '<option value=" ">Nothing Found</option>';
+                            $data = $user->getYearBelongsDept([$_SESSION['dept']]);
+                            if(!$data) die("<option>Department Not Available</option>");
                             foreach($data as $d){
-                                echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                echo '<option value="'.$d['year_id'].'">'.$d['s_class_name'].'</option>';
+                            }
+                        ?>
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="select-div">Select Division :</label>
+                    <select class="form-control form-control-sm report-select-input" name="div_id" id="select-div">
+                        <option value=" "> </option>
+                        <?php 
+                            $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                            if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                            foreach($data as $d){
+                                echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
                             }
                         ?>
                     </select>
                 </div>
-                <div class="form-group col-sm-3">
+                <div class="form-group col-sm-2">
                     <label for="select-class">Select Class :</label>
                     <select class="form-control form-control-sm" name="class" id="select-class">
                         <option value=" "> </option>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="from-date">FROM :</label>
+                    <label for="from-date">From :</label>
                     <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="from-date" id="from-date">
                 </div>
                 <div class="form-group col-sm-2">

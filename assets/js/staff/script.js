@@ -3,63 +3,108 @@ $(document).ready(function(){
     // maxDate = now.toISOString().substring(0,10);
     // $('#datetime').prop('max', maxDate);
 
-    getClassAcademic();
+    //getClassAcademic();
     processAttendanceSheet();
     processMarkAttendance();
     generateStaffReport();
+    AttendanceDetails()
     //processSubmitAttendance();
 });
 
-function getClassAcademic(){
-    $("#select-acd").on("change", function(){
-        var id = $(this).val();
-        console.log(id);
-        $.ajax({
-            url : "../controller/ajaxController.php?action=get_acd_class",
-            type : "POST",
-            data : {'data' : id},
-            dataType : "JSON",
-            success : function(res){
-                console.log(res);
-                switch(res.error){
-                    case "notexist": 
-                        $("#select-class").val(" ");
-                        $("#select-class").prop("disabled",true);
-                        alert("No Class Found");
-                        break;
-                    case "none":
-                        if(res.data.length > 0){
-                            $("#select-class").prop("disabled",false);
-                            var html = '<option value=" "> </option>';
-                            for(var i = 0; i < res.data.length; i++){
-                                html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
-                            }
-                            $('#select-class').html(html);
-                        }
-                        break;
-                }
-            }
-        })
-    })
-}
+// function getClassAcademic(){
+//     $("#select-acd").on("change", function(){
+//         var id = $(this).val();
+//         console.log(id);
+//         $.ajax({
+//             url : "../controller/ajaxController.php?action=get_acd_class",
+//             type : "POST",
+//             data : {'data' : id},
+//             dataType : "JSON",
+//             success : function(res){
+//                 console.log(res);
+//                 switch(res.error){
+//                     case "notexist": 
+//                         $("#select-class").val(" ");
+//                         $("#select-class").prop("disabled",true);
+//                         alert("No Class Found");
+//                         break;
+//                     case "none":
+//                         if(res.data.length > 0){
+//                             $("#select-class").prop("disabled",false);
+//                             var html = '<option value=" "> </option>';
+//                             for(var i = 0; i < res.data.length; i++){
+//                                 html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
+//                             }
+//                             $('#select-class').html(html);
+//                         }
+//                         break;
+//                 }
+//             }
+//         })
+//     })
+// }
 
 function processAttendanceSheet(){
         $(".sheet-input-field").on("change" ,function(){
             console.log($(this).val());
             if($("#check-attend #select-acd").val() != " " && $("#check-attend #select-class").val() != " " && $("#check-attend #date").val() != "" && $("#check-attend #time").val() != ""){
                 var id = $("#check-attend #select-class").find(':selected').data('class');
-                var name = $("#check-attend #select-class").text();
-                var year = $("#check-attend #select-acd").val();
+                var class_id = $("#check-attend #select-class").find(':selected').val();
+                var name = $("#check-attend #select-class option:selected").text();
+                var year = $("#check-attend #select-year").val();
                 var date = $('#check-attend #date').val();
                 var time = $("#check-attend #time").val();
+                var div = $("#check-attend #select-div").val();
                 console.log(name,year,date,time);
-                ajaxAttendanceList(id,year,name,date,time);
+                ajaxAttendanceList(id,class_id,year,name,date,time,div);
                 
             }else{
                 console.log("empty");
             }
             //id = $(this).val();
             return false;
+        });
+
+        $("#select-div").on("change", function(){
+            var acd = $("#select-acd").val();
+            var id = $(this).val();
+            var year = $("#select-year").val();
+            if(($("#select-acd").val() != "" || $("#select-acd").val() != " ") && ($("#select-div").val() != "" || $("#select-div").val() != " ") && ($("#select-year").val() != "" || $("#select-year").val() != " ")){
+                $.ajax({
+                    url : "../controller/ajaxController.php?action=get_class_div_wise",
+                    type : "post",
+                    data : {"id" : id, "acd" : acd, "year" : year},
+                    dataType : "json",
+                    success : function(res){
+                        console.log(res);
+                        switch(res.error){
+                            case "empty":
+                                $("#select-class").val(" ");
+                                $("#select-class").text(" ");
+                                alert("Please fill all details!");
+                                break;
+                            case "notfound":
+                                $("#select-class").val(" ");
+                                $("#select-class").text(" ");
+                                $("#select-class").text("No class found");
+                                break;
+                            case "none":
+                                $("#select-class").prop("disabled", false);
+                                $("#select-class").val(" ");
+                                $("#select-class").text(" ");
+                                if(res.data.length > 0){
+                                    $("#select-class").prop("disabled",false);
+                                    var html = '<option value=" "> </option>';
+                                    for(var i = 0; i < res.data.length; i++){
+                                        html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
+                                    }
+                                    $('#select-class').html(html);
+                                }
+                                break;
+                        }
+                    }
+                })
+            }
         });
 
     // $("#select-acd").on("change",function(){
@@ -102,31 +147,66 @@ function processAttendanceSheet(){
     //     })
     // }
 
-    function ajaxAttendanceList(id,year,name,date, time){
+    function ajaxAttendanceList(id, class_id, year, name, date, time, div){
         console.log(id);
         $.ajax({
             url : "../controller/ajaxController.php?action=attendanceSheet",
             type : "post",
-            data : {data : id, year : year, date : date, time : time},
+            data : {id : id, class_id : class_id, year : year, date : date, time : time, div : div},
             dataType : 'json',
             success : function(res){
                 console.log(res);
-                $("#attend-list").removeAttr("hidden");
-                $("#save-btn").removeAttr("hidden");
-                var html = "";
-                if(res.length < 0) $('#attend-list').html('<div>Nothing Found<div>');
-                for(var i = 0; i < res.length; i++){
-                    html += '<div class="grid-item m-2 mark-attend">\
-                                <input type="hidden" name="attend['+res[i].prn_no+']" value="1" data-id="'+res[i].prn_no+'"/>\
-                                <p>'+res[i].roll_no+'</p>\
-                                <button type="button" class="btn btn-success rounded-0 marker">P</button>\
-                            </div>'
+                switch(res.error){
+                    case "empty" :
+                        alert("Please fill all details.");
+                        break;
+                    case "nostudent":
+                        $("#attend-list").removeAttr("hidden");
+                        $("#attend-list").html("<h3>No students found.<h3>");
+                        break;
+                    case "notfound" :
+                        $("#attend-list").removeAttr("hidden");
+                        $("#save-btn").removeAttr("hidden");
+                        var html = "";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<div class="grid-item m-2 mark-attend">\
+                                        <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
+                                        <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                        <button type="button" class="btn btn-success rounded-0 marker">P</button>\
+                                    </div>'
+                        }
+                        $('#attend-list').html(html);
+                        $('#class-header').html('<h5><b>Course:- </b>'+name+'</h5>');
+                        var d = new Date(date + 'T' + time);
+                        var strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
+                        $('#date-header').html('<h6><b>Date:- </b>'+strDate+'</h6>');
+                        break;
+                    case "none":
+                        $("#attend-list").removeAttr("hidden");
+                        $("#save-btn").removeAttr("hidden");
+                        var html = "";
+                        for(var i = 0; i < res.data.length; i++){
+                            if(res.data[i].status == 0){
+                                html += '<div class="grid-item m-2 mark-attend">\
+                                        <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
+                                        <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                        <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
+                                    </div>'
+                            }else{
+                                html += '<div class="grid-item m-2 mark-attend">\
+                                        <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
+                                        <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                        <button type="button" class="btn btn-success rounded-0 marker">P</button>\
+                                    </div>'
+                            } 
+                        }
+                        $('#attend-list').html(html);
+                        $('#class-header').html('<h5><b>Course:- </b>'+name+'</h5>');
+                        var d = new Date(date + 'T' + time);
+                        var strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
+                        $('#date-header').html('<h6><b>Date:- </b>'+strDate+'</h6>');
+                        break;
                 }
-                $('#attend-list').html(html);
-                $('#class-header').html('<h5><b>Course:- </b>'+name+'</h5>');
-                var d = new Date(date + 'T' + time);
-                var strDate = d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
-                $('#date-header').html('<h6><b>Date:- </b>'+strDate+'</h6>')
             }
         })
     }
@@ -181,12 +261,59 @@ function processMarkAttendance(){
 
 
 function generateStaffReport(){
+    $(document).on("change", ".report-select-input", function() {
+        if($("#report #select-acd").val() != " " && $("#report #select-year").val() != " " && $("#report #select-div").val() != " "){
+            var acd = $("#report #select-acd").val();
+            var year = $("#report #select-year").val();
+            var div = $("#report #select-div").val();
+            console.log(acd,year,div);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_class_div_wise",
+                type : "post",
+                data : {"id" : div, "acd" : acd, "year" : year},
+                dataType : "json",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            $("#select-class").prop("disabled", true);
+                            $("#select-class").val(" ");
+                            $("#select-class").text(" ");
+                            alert("Please fill all details!");
+                            break;
+                        case "notfound":
+                            $("#select-class").val(" ");
+                            $("#report #select-class").text("No class found");
+                            break;
+                        case "none":
+                            $("#select-class").prop("disabled", false);
+                            $("#select-class").val(" ");
+                            $("#select-class").text(" ");
+                            if(res.data.length > 0){
+                                $("#select-class").prop("disabled",false);
+                                var html = '<option value=" "> </option>';
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
+                                }
+                                $('#select-class').html(html);
+                            }
+                            break;
+                    }
+                }
+            })
+        }else{
+            console.log("empty");
+        }
+    })
+
     $("#get-report").on("click", function(){
         var data = {};
         var title = "";
         $.when(
             data[$("#report #select-acd").attr("name")] = $("#report #select-acd").val(),
             data[$("#report #select-class").attr("name")] = $("#report #select-class").val(),
+            data[$("#report #select-year").attr("name")] = $("#report #select-year").val(),
+            data[$("#report #select-div").attr("name")] = $("#report #select-div").val(),
             data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
             data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
             title = $("#report #select-class option:selected").text(),
@@ -237,7 +364,35 @@ function generateStaffReport(){
                             th += "<th>Student Name.</th>";
                             for(var i = 0; i < numCol; i++){
                                 // if(columns[i] == "student_id") continue;
-                                th += "<th>"+datecolumns[i]+"</th>";
+                                var date = new Date(datecolumns[i]);
+                                var dd = date.getDate();
+
+                                var mm = date.getMonth()+1; 
+                                var yyyy = date.getFullYear();
+                                var hour    = date.getHours();
+                                var minute  = date.getMinutes();
+                                var second  = date.getSeconds(); 
+                                if(dd<10) 
+                                {
+                                    dd='0'+dd;
+                                } 
+
+                                if(mm<10) 
+                                {
+                                    mm='0'+mm;
+                                } 
+                                if(hour.toString().length == 1) {
+                                    hour = '0'+hour;
+                               }
+                               if(minute.toString().length == 1) {
+                                    minute = '0'+minute;
+                               }
+                               if(second.toString().length == 1) {
+                                    second = '0'+second;
+                               } 
+                                date = dd+'/'+mm+'/'+yyyy;
+                                time = hour+':'+minute+':'+second;
+                                th += "<th>"+date+" </br> "+time+"</th>";
                             } 
                             th += "<th>Total</th>"; 
                             th += "<th>Percentage</th>";
@@ -247,8 +402,11 @@ function generateStaffReport(){
                                 td += "<td>"+res.data[i].roll_no+"</td>";
                                 td += "<td>"+res.data[i].student_name+"</td>";
                                 for(var j = 0; j < numCol; j++){
-                                    //if(columns[j] == "student_id") continue;
-                                    td += "<td>"+res.data[i][datecolumns[j]]+"</td>";
+                                    if(res.data[i][datecolumns[j]] == 1){
+                                        td += "<td>P</td>"
+                                    }else{
+                                        td += "<td style='color:red'>A</td>"
+                                    }
                                 } 
                                 td += "<td>"+res.total[i].total+"</td>";
                                 td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
@@ -256,7 +414,6 @@ function generateStaffReport(){
                             }
                             $("#staff-report thead tr").html(th);
                             $("#staff-report tbody").html(td);
-                            
                             var table = $("#staff-report").DataTable(
                                 {
                                     scrollY:        "500px",
@@ -273,7 +430,7 @@ function generateStaffReport(){
                                         {
                                             extend: 'excel',
                                             text : 'Export Excel',
-                                            title : title,
+                                            title : res.dept[0].dept_name+"-"+res.year[0].s_class_name,
                                             messageTop: title+" Attendance Academic Year "+academic_year,
                                         }
                                     ]
@@ -290,3 +447,109 @@ function generateStaffReport(){
         }
     })
 }
+
+
+// function AttendanceDetails(){
+//     $(document).on("change", "#attend-details #select-acd", function(e){
+//         e.preventDefault();
+//         var acd = $("#select-acd").val();
+//         var class_id = $("#select-class option:selected").val();
+//         console.log(class_id);
+//         if(acd != " "){
+//             $.ajax({
+//                 url : "../controller/ajaxController.php?action=get_class_div_wise",
+//                 type : "post",
+//                 data : {"acd" : acd, "for" : "detail"},
+//                 dataType : "json",
+//                 success : function(res){
+//                     switch(res.error){
+//                         case "empty":
+//                             alert("Please fill all details");
+//                             break;
+//                         case "notfound":
+//                             $("#box-content").html("<h4>Nothing found!</h4>");
+//                             break;
+//                         case "none":
+//                             var html = "";
+//                             html += '<option value=" "> </option>'
+//                             for(var i = 0; i < res.data.length; i++){
+//                                 html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
+//                             }
+//                             $("#select-class").html(html);
+//                             break;
+//                     }
+                    
+//                 },
+//                 error : function(e){
+//                     console.log(e);
+//                 }
+//             })
+//         }
+//         //else if(acd != " " && class_id != " "){
+//         //     $.ajax({
+//         //         url : "../controller/ajaxController.php?action=get_attend_details_class",
+//         //         type : "post",
+//         //         data : {"acd" : acd, "class_id": class_id, "for" : "detail"},
+//         //         dataType : "json",
+//         //         success : function(res){
+//         //             switch(res.error){
+//         //                 case "empty":
+//         //                     alert("Please fill all details");
+//         //                     break;
+//         //                 case "notfound":
+//         //                     $("#box-content").html("<h4>Nothing found!</h4>");
+//         //                     break;
+//         //                 case "none":
+//         //                     var html = "";
+//         //                     html += '<option value=" "> </option>'
+//         //                     for(var i = 0; i < res.data.length; i++){
+//         //                         html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
+//         //                     }
+//         //                     $("#select-class").html(html);
+//         //                     $("#box-content").load("attendance_details.php", {"data" : res.data, "count" : res.count});  
+//         //                     break;
+//         //             }
+                    
+//         //         },
+//         //         error : function(e){
+//         //             console.log(e);
+//         //         }
+//         //     })
+//         // }
+
+//         $(document).on("click", "#check-details", function(){
+//             var acd = $("#select-acd").val();
+//             var class_id = $("#select-class").val();
+//             console.log(class_id);
+//             $.ajax({
+//                 url : "../controller/ajaxController.php?action=get_attend_details_class",
+//                 type : "post",
+//                 data : {"acd" : acd, "class_id": class_id},
+//                 dataType : "json",
+//                 success : function(res){
+//                     switch(res.error){
+//                         case "empty":
+//                             alert("Please fill all details");
+//                             break;
+//                         case "notfound":
+//                             $("#box-content").html("<h4>Nothing found!</h4>");
+//                             break;
+//                         case "none":
+//                             var html = "";
+//                             html += '<option value=" "> </option>'
+//                             for(var i = 0; i < res.data.length; i++){
+//                                 html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
+//                             }
+//                             $("#select-class").html(html);
+//                             $("#box-content").load("attendance_details.php", {"data" : res.data, "count" : res.count});  
+//                             break;
+//                     }
+                    
+//                 },
+//                 error : function(e){
+//                     console.log(e);
+//                 }
+//             })
+//         })
+//     })
+// }

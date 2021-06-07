@@ -17,6 +17,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> 
     <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
     <script defer src="../assets/fontawesome/js/brands.js"></script>
     <script defer src="../assets/fontawesome/js/solid.js"></script>
@@ -94,7 +96,7 @@
                 </div>
             </div>
         </div>
-        <table class="table table-bordered table-hover" id="hod-table">
+        <table class="table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%" id="hod-table">
             <thead>
                 <tr border="4px">
                     <th>Faculty ID</th>
@@ -106,7 +108,6 @@
             <tbody>
                 <?php 
                     $data = $user->getFacultyByRole([1]);
-                    if(!$data) die("<tr><td colspan='4'>Nothing Found</td></tr>");
                     foreach($data as $d){
                         echo '<tr>
                                 <td class="faculty-id">'.$d['faculty_id'].'</td>

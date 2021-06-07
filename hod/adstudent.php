@@ -72,10 +72,10 @@
                                         <select class="form-control form-control-sm" name="class" id="class">
                                             <option value=" "> </option>
                                             <?php
-                                                $data = $user->getClassYear();
+                                                $data = $user->getYearBelongsDept([$_SESSION['dept']]);
                                                 if(!$data) echo '<option value=" "> </option>';
                                                 foreach($data as $d){
-                                                    echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                                    echo '<option value="'.$d['year_id'].'">'.$d['s_class_name'].'</option>';
                                                 }
                                             ?>
                                         </select>
@@ -134,9 +134,9 @@
                                             <select name="class_year" class="form-control form-control-sm" id="class_year">
                                                 <option value=" "> </option>
                                                 <?php 
-                                                    $data = $user->getClassYear();
+                                                    $data = $user->getYearBelongsDept([$_SESSION['dept']]);
                                                     foreach($data as $d){
-                                                        echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                                        echo '<option value="'.$d['year_id'].'">'.$d['s_class_name'].'</option>';
                                                     }
                                                 ?>
                                             </select>

@@ -13,6 +13,12 @@
     font-family: 'Poppins', sans-serif;
 }
 
+.head{
+
+    border-bottom:  3px solid #4b94c5;
+    padding-bottom: 5px;
+}
+
 .chart-hide{
     display: none;
 }

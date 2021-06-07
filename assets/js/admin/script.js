@@ -1,24 +1,9 @@
-// //  /* When the user clicks on the button, 
-// // toggle between hiding and showing the dropdown content */
-// function dropdownbtn() {
-//     document.getElementById("myDropdown").classList.toggle("show");
-//     }
-    
-//     // Close the dropdown if the user clicks outside of it
-//     window.onclick = function(event) {
-//     if (!event.target.matches('.dropbtn')) {
-//         var dropdowns = document.getElementsByClassName("dropdown-content");
-//         var i;
-//         for (i = 0; i < dropdowns.length; i++) {
-//         var openDropdown = dropdowns[i];
-//         if (openDropdown.classList.contains('show')) {
-//             openDropdown.classList.remove('show');
-//         }
-//         }
-//     }
-// }
 
 $(document).ready(function(){
+    $("#acad-table").DataTable();
+    $("#dept-table").DataTable();
+    $("#course-table").DataTable();
+    $("#hod-table").DataTable();
     processAddAcademicYear();
     processDeleteAcademicYear()
     processAddDepartment();
@@ -27,7 +12,6 @@ $(document).ready(function(){
     processDeleteDepartment();
     processAddHod();
     processDeleteHod();
-    //processHodDetail();
     processEditHod();
     processOnChangeClass()
     processAddCourse();
@@ -36,9 +20,9 @@ $(document).ready(function(){
     inputCoursePlaceholder();
     inputHodPlaceholder();
     processReport();
-    // $("#dept-m").on("click", function(){
-    //     $(this).find("option:selected",this).remove();
-    // })
+    processAjaxClass();
+    processAdminReport();
+    processAjaxYear()
 });
 
 function processAddAcademicYear(){
@@ -120,54 +104,14 @@ function processDeleteAcademicYear(){
 }
 
 
-// function processAddDepartment() {
-//     $('#dpt-form').submit(function(e){
-//         e.preventDefault();
-//         var data = {};
-//         $.when(
-//             $('#dpt-form input').each(function(k,v){
-//                 data[$(v).attr('name')] = $(v).val();
-//             })
-//         ).then(            
-//             console.log(jQuery.isEmptyObject(data)),
-//             $('#myModal').modal('hide'),
-//             $.ajax({
-//                 url : '../controller/ajaxController.php?action=addDept',
-//                 type : 'POST',
-//                 data : data,
-//                 dataType : 'json',
-//                 success : function(res) {
-//                     console.log(res);
-//                     switch(res.error){
-//                         case "empty":
-//                             alert("Please Fill all the fields");
-//                             break;
-//                         case "notinsert":
-//                             alert("Data Not Inserted");
-//                             break;
-//                         case "none":
-//                             var html = "";
-//                             for(var i = 0; i < res.data.length; i++){
-//                                 html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-4" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
-//                             }
-//                             $('#dept-table tbody').html(html)
-                            
-//                     }
-//                 }
-//             })
-//         );
-//     })
-// }
-
 function processAddDepartment() {
     $('#dpt-form').submit(function(e){
         e.preventDefault();
         var data = {};
         
-            $('#dpt-form input').each(function(k,v){
-                data[$(v).attr('name')] = $(v).val();
-            })
-                
+            data[$('#dpt-form #dptname').attr('name')] = $('#dpt-form #dptname').val();
+            data[$('#dpt-form #year_s').attr('name')] = $('#dpt-form #year_s').val();
+            data[$('#dpt-form #div_s').attr('name')] = $('#dpt-form #div_s').val();  
             console.log(jQuery.isEmptyObject(data));
             $('#myModal').modal('hide');
             $.ajax({
@@ -705,149 +649,6 @@ function processDeleteCourse(){
     })
 }
 
-
-// function processReport(){
-    
-//     $(document).on("change", "#acd-year" ,function(){
-//         if($(this).val() == " "){
-//             $("#dept").attr("disabled","");
-//             $("#chartContainer").addClass("chart-hide")
-//             alert("Please Select Academic Year!");
-//             return;
-//         }else{
-//             $("#dept").removeAttr("disabled");
-//             $("#chartContainer").removeClass("chart-hide");
-//             var acd_id = $(this).val();
-//             showAcademicChart(acd_id);
-            //else if(class_year_id == " "){
-            //     $.ajax({
-            //         url : "../controller/ajaxController.php?action=report_dept_attend",
-            //         type: "post",
-            //         data : {acd_id : acd_id, dept_id : dept_id},
-            //         dataType: "json",
-            //         success : function(res){
-            //             console.log(res);
-            //         }
-            //     })
-            // }else{
-            //     $.ajax({
-            //         url : "../controller/ajaxController.php?action=report_classyear_attend",
-            //         type: "post",
-            //         data : {acd_id : acd_id, dept_id : dept_id, class_year_id : class_year_id},
-            //         dataType: "json",
-            //         success : function(res){
-            //             console.log(res);
-            //         }
-            //     });
-    //          }
-            
-
-              
-    // })
-
-    // $(document).on("change","#dept", function(){
-    //     var acd_id = $("#acd-year").val();
-    //     var dept_id = $(this).val()
-    //     if(acd_id == " "){
-    //         $("#chartContainer").addClass("chart-hide")
-    //         alert("Please Select Academic Year!");
-    //         return;
-    //     }else if(acd_id!= " "){
-    //         showAcademicChart(acd_id);
-    //     }else if(dept_id != " "){
-    //         $("#chartContainer")
-    //         showDepartmentWiseChart(acd_id,dept_id);
-    //     }
-    // });
-
-    // $(document).on("change","#class-year", function(){
-    //     var acd_id = $("#acd-year").val();
-    //     var dept_id = $("#dept").val();
-    //     var class_year_id = $(this).val();
-    //     if(acd_id == " "){
-    //         $("#chartContainer").addClass("chart-hide")
-    //         alert("Please Select Academic Year!");
-    //         return;
-    //     }else if(acd_id!= " "){
-    //         showAcademicChart(acd_id);
-    //     }else if(dept_id != " "){
-    //         showDepartmentWiseChart(acd_id,dept_id);
-    //     }
-    // });
-// }
-
-// function showAcademicChart(){
-    // $.ajax({
-    //     url : "../controller/ajaxController.php?action=report_acd_attend",
-    //     type: "post",
-    //     data : {data : acd_id},
-    //     dataType: "json",
-    //     success : function(res){
-    //         console.log(res);
-    //     }
-    // });
-
-
-      //Better to construct options first and then pass it as a parameter
-                // var options = {
-                //     animationEnabled: true,
-                    
-                //     title:{
-                //         text: "Academic Record" ,
-                //         fontFamily: "tahoma",  
-                //     },
-                //     axisY:{
-                //         title:"Total number of Students"
-                //     },
-                //     toolTip: {
-                //         shared: true,
-                //         reversed: true
-                //     },
-                //     data: [{
-                //         type: "stackedColumn",
-                //         name: "Present",
-                //         showInLegend: "true",
-                //         yValueFormatString: "0",
-                //         dataPoints: [
-                //             { y: 50 , label: "CSE" },
-                //             { y: 1, label: "Mech" },
-                //             { y: 1, label: "ENTC" },
-                //         ]
-                //     },
-                //     {
-                //         type: "stackedColumn",
-                //         name: "Absent",
-                //         showInLegend: "true",
-                //           indexLabel: "#total",
-                //           indexLabelPlacement: "outside",
-                //         yValueFormatString: "0",
-                //         dataPoints: [
-                //             { y: 13, label: "CSE" },
-                //             { y: 1, label: "Mech" },
-                //             { y: 1, label: "ENTC" },
-                            
-                //         ]
-                //     }]
-                // };
-                
-                // $("#chartContainer").CanvasJSChart(options);
-           // }
-// }
-
-// function processReport(){
-//     $("#report-form").on("submit", function(){
-//         $.ajax({
-//             url : "../controller/ajaxController.php?action=admin_report",
-//             type : "post",
-//             data : $(this).serialize(),
-//             dataType : 'json',
-//             success: function(res) {
-//                 console.log(res);
-//             }
-//         })
-//     });
-// }
-
 function processReport(){
     
     $("#report").on("submit", function(){
@@ -862,4 +663,313 @@ function processReport(){
         console.log(jQuery.isEmptyObject(data));
         console.log(data.department);
     });
+}
+
+
+function processAjaxClass(){
+    $("#course-dept").on("change", function(){
+        var id = $(this).val();
+        console.log(id);
+        $("#s_sem").val(" ");
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_year_belong_dept",
+            type: "post",
+            data : {"id" : id},
+            dataType : "json",
+            success : function(res){
+                switch(res.error){
+                    case "empty":
+                        alert("Please fill all details.");
+                        break;
+                    case "notfound":
+                        var html = "<option value=' '>Not Found</option>";
+                        $("#class_year").html(html);
+                        $("#class_year").prop("disabled",true);
+                        break;
+                    case "none":
+                        $("#class_year").prop("disabled",false);
+                        var html = "";
+                        html += '<option value=" "> </option>'
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<option value="'+res.data[i].year_id+'">'+res.data[i].s_class_name+'</option>';
+                        }
+                        $("#class_year").html(html);
+                        break;
+                }
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
+    })
+}
+
+
+
+function processAdminReport(){
+    $(document).on("change", ".report-select-input", function(e){
+        if($("#report #select-acd").val() != " " && $("#report #select-year").val() != " " && $("#report #select-div").val() != " " && $("#report #select-dept").val() != " "){
+            var acd = $("#report #select-acd").val();
+            var year = $("#report #select-year").val();
+            var div = $("#report #select-div").val();
+            var dept = $("#report #select-dept").val();
+            console.log(acd,year,div,dept);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_class_div_wise",
+                type : "POST",
+                data : {"id" : div, "acd" : acd, "year" : year, "dept_id": dept},
+                dataType : "JSON",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            $("#select-class").prop("disabled", true);
+                            $("#select-class").val(" ");
+                            $("#select-class").text(" ");
+                            alert("Please fill all details!");
+                            break;
+                        case "notfound":
+                            $("#select-class").val(" ");
+                            $("#report #select-class").text("No class found");
+                            break;
+                        case "none":
+                            $("#select-class").prop("disabled", false);
+                            $("#select-class").val(" ");
+                            $("#select-class").text(" ");
+                            if(res.data.length > 0){
+                                $("#select-class").prop("disabled",false);
+                                var html = '<option value=" "> </option>';
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
+                                }
+                                $('#select-class').html(html);
+                            }
+                            break;
+                    }
+                }
+            })
+        }else{
+            if($("#select-acd option:selected").val() == " "){
+                alert("Please Select Academic Year");
+            }
+        }
+    })
+
+    $("#get-report").on("click", function(){
+        var data = {};
+        var title = "";
+        $.when(
+            data[$("#report #select-acd").attr("name")] = $("#report #select-acd").val(),
+            data[$("#report #select-dept").attr("name")] = $("#report #select-dept").val(),
+            data[$("#report #select-year").attr("name")] = $("#report #select-year").val(),
+            data[$("#report #select-class").attr("name")] = $("#report #select-class").val(),
+            data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
+            data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
+            data[$("#report #select-div").attr("name")] = $("#report #select-div").val(),
+            title = $("#report #select-class option:selected").text(),
+            year = $("#report #select-year option:selected").text(),
+            acd = $("#report #select-acd option:selected").text(),
+            div = $("#report #select-div option:selected").text(),
+            academic_year = $("#report #select-acd option:selected").text(),
+        ).then(
+            getAjaxReport()
+        );
+        function getAjaxReport(){
+            $.ajax({
+                url : "../controller/ajaxController.php?action=admin_report",
+                type : "post",
+                data : data,
+                dataType : "JSON",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            if($.fn.dataTable.isDataTable("#admin-report")){
+                                $("#admin-report").DataTable().destroy();
+                                $("#admin-report thead tr").html(" ");
+                                $("#admin-report tbody").html(" ");
+                            }
+                            alert("Enter all Details...");
+                            break;
+                        case "notexists":
+                            if($.fn.dataTable.isDataTable("#admin-report")){
+                                $("#admin-report").DataTable().destroy();
+                                $("#admin-report thead tr").html(" ");
+                                $("#admin-report tbody").html(" ");
+                            }
+                            alert("No attendance Found")
+                            break;
+                        case "date":
+                            alert("Please Enter Correct Date");
+                            break;
+                        case "none":
+                            if($.fn.dataTable.isDataTable("#admin-report")){
+                                $("#admin-report").DataTable().destroy();
+                                $("#admin-report thead tr").html(" ");
+                                $("#admin-report tbody").html(" ");
+                            }  
+                            var columns = Object.keys(res.data[0]);
+                            var datecolumns = columns.slice(3);
+                            var numCol = datecolumns.length;
+                            var th = "";
+                            th += "<th>Roll no.</th>";
+                            th += "<th>Student Name.</th>";
+                            for(var i = 0; i < numCol; i++){
+                                // if(columns[i] == "student_id") continue;
+                                var date = new Date(datecolumns[i]);
+                                var dd = date.getDate();
+
+                                var mm = date.getMonth()+1; 
+                                var yyyy = date.getFullYear();
+                                var hour    = date.getHours();
+                                var minute  = date.getMinutes();
+                                var second  = date.getSeconds(); 
+                                if(dd<10) 
+                                {
+                                    dd='0'+dd;
+                                } 
+
+                                if(mm<10) 
+                                {
+                                    mm='0'+mm;
+                                } 
+                                if(hour.toString().length == 1) {
+                                    hour = '0'+hour;
+                               }
+                               if(minute.toString().length == 1) {
+                                    minute = '0'+minute;
+                               }
+                               if(second.toString().length == 1) {
+                                    second = '0'+second;
+                               } 
+                                date = dd+'/'+mm+'/'+yyyy;
+                                time = hour+':'+minute+':'+second;
+                                th += "<th>"+date+"</br>"+time+"</th>";
+                            } 
+                            th += "<th>Total Present</th>";
+                            th += "<th>Percentage</th>";
+                            var td = "";
+                            for(var i = 0; i < res.data.length; i++){
+                                td += "<tr>"
+                                td += "<td>"+res.data[i].roll_no+"</td>";
+                                td += "<td>"+res.data[i].student_name+"</td>";
+                                for(var j = 0; j < numCol; j++){
+                                    //if(columns[j] == "student_id") continue;
+                                    
+                                    if(res.data[i][datecolumns[j]] == 1){
+                                        td += "<td>P</td>"
+                                    }else{
+                                        td += "<td style='color:red'>A</td>"
+                                    }
+                                } 
+                                td += "<td>"+res.total[i].total+"</td>";
+                                td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                td += "</tr>"
+                            }
+                          
+                            $("#admin-report thead tr").html(th);
+                            $("#admin-report tbody").html(td);
+                            var table = $("#admin-report").DataTable(
+                                {
+                                    scrollY:        "500px",
+                                    scrollX:        true,
+                                    scrollCollapse: true,
+                                    paging:         false,
+                                    autoWidth:  false,
+                                    fixedColumns:   {
+                                        leftColumns: 2,
+                                        rightColumns: 1
+                                    },
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        {
+                                            extend: 'excel',
+                                            text : 'Export Excel',
+                                            title : 'Attendance Report_'+title+'_'+year+'_'+'_Div_'+div+'_'+acd,
+                                            messageTop: title+" Attendance Academic Year "+academic_year,
+                                        }
+                                    ]
+                                }
+                            );
+                            break;
+                    }
+                },
+                error : function(e){
+                    console.log(e);
+                }
+            })
+        }
+    })
+}
+
+
+function processAjaxYear(){
+    $(document).on("change", "#select-dept", function(){
+        var id = $(this).val();
+        console.log(id);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_year_belong_dept",
+            type: "post",
+            data : {"id" : id},
+            dataType : "json",
+            success : function(res){
+                switch(res.error){
+                    case "empty":
+                        alert("Please fill all details.");
+                        break;
+                    case "notfound":
+                        var html = "<option value=' '>Not Found</option>";
+                        $("#select-year").html(html);
+                        $("#select-year").prop("disabled",true);
+                        break;
+                    case "none":
+                        $("#select-year").prop("disabled",false);
+                        var html = "";
+                        html += "<option value=' '> </option>";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<option value="'+res.data[i].year_id+'">'+res.data[i].s_class_name+'</option>';
+                        }
+                        $("#select-year").html(html);
+                        break;
+                }
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
+
+
+        var id = $(this).val();
+        console.log(id);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_div_belongs_dept",
+            type: "post",
+            data : {"dept_id" : id},
+            dataType : "json",
+            success : function(res){
+                switch(res.error){
+                    case "empty":
+                        alert("Please fill all details.");
+                        break;
+                    case "notfound":
+                        var html = "<option value=' '>Not Found</option>";
+                        $("#select-div").html(html);
+                        $("#select-div").prop("disabled",true);
+                        break;
+                    case "none":
+                        $("#select-div").prop("disabled",false);
+                        var html = "";
+                        html += "<option value=' '> </option>";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<option value="'+res.data[i].div_id+'">'+res.data[i].div_name+'</option>';
+                        }
+                        $("#select-div").html(html);
+                        break;
+                }
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
+    })
 }
