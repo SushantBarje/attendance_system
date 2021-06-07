@@ -14,9 +14,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../CSS/tables.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> 
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
+    <script defer src="../assets/fontawesome/js/brands.js"></script>
+    <script defer src="../assets/fontawesome/js/solid.js"></script>
+    <script defer src="../assets/fontawesome/js/fontawesome.js"></script>
     <script src="../assets/js/admin/script.js"></script>
     <title>Add Department</title>
 </head>
@@ -41,10 +49,38 @@
                             <!-- Modal body -->
                             <div class="modal-body">
                                 <form id="dpt-form" class="modal-body">
-                                    <div class="form-group">
-                                        <label for="fname"><b>Department Name</b></label>
-                                        <input type="text" id="dptname" class="form-control form-control-sm" placeholder="Department Name" name="dptname">
+                                    <div class="row">
+                                        <div class="form-group col-sm-12">
+                                            <label for="fname"><b>Department Name</b></label>
+                                            <input type="text" id="dptname" class="form-control form-control-sm" placeholder="Department Name" name="dptname">
+                                        </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="form-group col-sm-6">
+                                            <label for="year_s">Select Year</label>
+                                            <select class="form-control selectpicker " name="year[]" id="year_s" multiple data-live-search="true">
+                                                <?php 
+                                                    $data = $user->getClassYear();
+                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                                    foreach($data as $d){
+                                                        echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-sm-6">
+                                            <label for="div_s">Select Divisions</label>
+                                            <select class="form-control selectpicker " name="div[]" id="div_s" multiple data-live-search="true">
+                                                <?php 
+                                                    $data = $user->getAllDivision();
+                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                                    foreach($data as $d){
+                                                        echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>  
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-success">ADD</button>
@@ -58,9 +94,9 @@
                 </div>
             </div>
         </div>
-        <table class="table table-bordered table-hover" id="dept-table">
+        <table class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%" id="dept-table">
             <thead>
-                <tr border="4px">
+                <tr>
                     <th>Department Name</th>
                     <th>Edit</th>
                 </tr>

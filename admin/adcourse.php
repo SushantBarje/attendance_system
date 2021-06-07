@@ -12,12 +12,12 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> 
     <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
     <script defer src="../assets/fontawesome/js/brands.js"></script>
     <script defer src="../assets/fontawesome/js/solid.js"></script>
@@ -58,6 +58,7 @@
                                     <div class="form-group">
                                         <label for="course-dept">Department: </label>
                                         <select id="course-dept" name="course_dept" class="form-control form-control-sm">
+                                            <option value=" "> </option>
                                         <?php 
                                             $data = $user->getDepartment();
                                             if(!$data) die("<option>Department Not Available</option>");
@@ -72,11 +73,11 @@
                                         <select id="class_year" name="course_class" class="form-control form-control-sm c-y">
                                         <option value=" "> </option>
                                         <?php 
-                                            $data = $user->getClassYear();
-                                            if(!$data) die("<option>Department Not Available</option>");
-                                            foreach($data as $d){
-                                                echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
-                                            }
+                                            // $data = $user->getClassYear();
+                                            // if(!$data) die("<option>Department Not Available</option>");
+                                            // foreach($data as $d){
+                                            //     echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                            // }
                                         ?>
                                         </select>
                                     </div>
@@ -106,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <table class="table table-bordered table-hover" id="course-table">
+        <table class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%" id="course-table">
             <thead>
                 <tr border="3px">
                     <th>Course Code</th>
@@ -120,7 +121,6 @@
             <tbody>
                 <?php 
                     $data = $user->getCourses();
-                    if(!$data) echo "<tr><td>Nothing Found<td></tr>";
                     foreach($data as $d){
                         echo '<tr>
                                 <td class="course-id">'.$d['course_id'].'</td>
@@ -174,13 +174,13 @@
                                 <select id="class_year" name="edit_course_class" class="form-control form-control-sm c-y">
                                 <option value=" "> </option>
                                 <?php 
-                                    $data = $user->getClassYear();
-                                    if(!$data) die("<option>Department Not Available</option>");
-                                    foreach($data as $d){
-                                        echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
-                                    }
+                                    // $data = $user->getYearBelongsDept();
+                                    // if(!$data) die("<option>Department Not Available</option>");
+                                    // foreach($data as $d){
+                                    //     echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                    // }
                                 ?>
-                                </select>
+                                </select> 
                             </div>
                             <div class="form-group">
                                 <label for="s_sem"><b>Semester</b></label>

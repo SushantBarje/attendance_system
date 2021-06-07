@@ -18,6 +18,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> 
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
+    <script defer src="../assets/fontawesome/js/brands.js"></script>
+    <script defer src="../assets/fontawesome/js/solid.js"></script>
+    <script defer src="../assets/fontawesome/js/fontawesome.js"></script>
     <title>Add Department</title>
 </head>
 <body>
@@ -59,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <table id="acad-table" class="table table-bordered table-hover">
+        <table id="acad-table" class="table hover cell-border mt-5" style="width:100%">
             <thead>
                 <tr border="4px">
                     <th>Academic Year</th>
@@ -69,9 +75,6 @@
             <tbody>
                 <?php 
                     $data = $user->getAcademicYear();
-                    if(!$data){
-                        echo "<tr><td colspan='2'>Nothing Found</td></tr>";
-                    }
                     foreach($data as $d){
                         echo '<tr><td>'.$d['academic_descr'].'</td><td><button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['acedemic_id'].'">Delete</button></td></tr>';
                     }

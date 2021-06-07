@@ -88,7 +88,6 @@
             <tbody>
                 <?php 
                     $data = $user->getFacultyByDept([$_SESSION['dept']]);
-                    if(!$data) die("<tr><td colspan='4'>Nothing Found</td></tr>");
                     foreach($data as $d){
                         echo '<tr>
                                 <td class="faculty-id">'.$d['faculty_id'].'</td>

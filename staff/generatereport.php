@@ -31,6 +31,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
 <script src="../assets/js/staff/script.js"></script>
+
 <!-- <script>
     // $(document).ready(function() {
     //     var table = $('#example').DataTable( {
@@ -52,11 +53,12 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
 <body>
 <?php   include "staffHeader.php" ?>
 <main>
+    <h2 class="head">Report</h2>
     <form id="report">
-        <div class="row">
-            <div class="form-group col-sm-3">
+        <div class="row mt-3">
+            <div class="form-group col-sm-2">
                 <label for="acd-year">Academic Year</label>
-                <select class="form-control form-control-sm" name="academic_year" id="select-acd">
+                <select class="form-control form-control-sm report-select-input" name="academic_year" id="select-acd">
                     <option value=" "> </option>
                     <?php 
                         $data = $user->getAcademicYear();
@@ -65,6 +67,32 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
                             echo '<option value="'.$d['acedemic_id'].'">'.$d['academic_descr'].'</option>';
                         }
                     ?>
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <label for="select-year" class="mr-sm-2">Year: </label>
+                <select id="select-year" name="year" class="form-control form-control-sm mr-3 report-select-input"> 
+                    <option value=" "> </option>
+                    <?php 
+                        $data = $user->getYearBelongsDept([$_SESSION['dept']]);
+                        if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                        foreach($data as $d){
+                            echo '<option value="'.$d['year_id'].'" >'.$d['s_class_name'].'</option>';
+                        }
+                    ?>  
+                </select>
+            </div>
+            <div class="col-sm-1">
+                <label for="select-div" class="mr-sm-2">Division: </label>
+                <select id="select-div" name="div_id" class="form-control form-control-sm mr-3 report-select-input"> 
+                    <option value=" "> </option>
+                    <?php 
+                        $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                        if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                        foreach($data as $d){
+                            echo '<option value="'.$d['div_id'].'" >'.$d['div_name'].'</option>';
+                        }
+                    ?>  
                 </select>
             </div>
             <div class="form-group col-sm-3">
@@ -81,30 +109,16 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
                 <label for="till-date">Till :</label>
                 <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="till-date" id="till-date">
             </div>
-            <div class="form-group col-sm-2">
+            
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-2 offset-sm-5 offset-xs-4">
                 <button class="btn btn-success mt-4" id="get-report" type="button">Check</button>
             </div>
         </div>
-        <!-- <div class="row mb-4">
-            <div class="col-sm-6">
-                <label for="">Start Date</label>
-                <input type="date" class="form-control" name="start_date">
-            </div>
-            <div class="col-sm-6">
-                <label for="">End Date</label>
-                <input type="date" class="form-control" name="end_date">
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-sm-12 ">
-                <button class="btn btn-success" type="submit">
-                    <i class="bi bi-printer-fill "></i> View
-                </button>
-            </div>
-        </div> -->
     </form>
 
-    <table id="staff-report" class="stripe row-border order-column" style="width:100%">
+    <table id="staff-report" class="table table-sm stripe row-border order-column" style="width:100%">
         <thead>
             <tr>
             </tr>

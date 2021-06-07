@@ -62,10 +62,10 @@
                                         <select id="class_year" name="course_class" class="form-control form-control-sm">
                                         <option value=" "> </option>
                                         <?php 
-                                            $data = $user->getClassYear();
+                                            $data = $user->getYearBelongsDept([$_SESSION['dept']]);
                                             if(!$data) die("<option>Department Not Available</option>");
                                             foreach($data as $d){
-                                                echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                                echo '<option value="'.$d['year_id'].'">'.$d['s_class_name'].'</option>';
                                             }
                                         ?>
                                         </select>
@@ -102,7 +102,6 @@
             <tbody>
                 <?php 
                     $data = $user->getCoursesByDept([$_SESSION['dept']]);
-                    if(!$data) echo "<tr><td>Nothing Found<td></tr>";
                     foreach($data as $d){
                         echo '<tr>
                                 <td class="course-id">'.$d['course_id'].'</td>
@@ -142,11 +141,12 @@
                                 <select id="class_year" name="edit_course_class" class="form-control form-control-sm c-y">
                                 <option value=" "> </option>
                                 <?php 
-                                    $data = $user->getClassYear();
+                                    $data = $user->getYearBelongsDept([$_SESSION['dept']]);
                                     if(!$data) die("<option>Department Not Available</option>");
                                     foreach($data as $d){
-                                        echo '<option value="'.$d['s_class_id'].'">'.$d['s_class_name'].'</option>';
+                                        echo '<option value="'.$d['year_id'].'">'.$d['s_class_name'].'</option>';
                                     }
+                                ?>
                                 ?>
                                 </select>
                             </div>

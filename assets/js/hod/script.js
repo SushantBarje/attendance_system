@@ -22,6 +22,7 @@ $(document).ready(function(){
     processDeleteCourse();
     processAddPractClass()
     processHodReport();
+    processAjaxClass();
 });
 
 function processOnChangeClass(){
@@ -432,13 +433,68 @@ function processDeleteStaff(){
 
 
 function processAddClass(){
-    $("#add-class").on("submit", function(e){
+    $("#faculty_s").on("change", function(){
+        if($(this).val() == "other"){
+            console.log("ok");
+            $("#foreign-select-dept").removeAttr("hidden");
+            $("#foreign-select-faculty").removeAttr("hidden");
+        }else{
+            console.log("not")
+            $("#foreign-select-dept").attr("hidden", true);
+            $("#foreign-select-faculty").attr("hidden", true);
+        }
+    });
+
+    $("#foreign_dept_s").on("change", function(){
+        var id = $(this).val();
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_faculty_dept_wise",
+            type : "POST",
+            data : {dept_id : id},
+            dataType : "json",
+            success : function(res){
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please Fill All Details");
+                        break;
+                    case "notfound":
+                        var html = '<option value="">Faculty not available<option>';
+                        $("#foreign_faculty_s").html(html);
+                        break;
+                    case "none":
+                        var html = "";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<option value="'+res.data[i].faculty_id+'">'+res.data[i].last_name+' '+res.data[i].first_name+'</option>'
+                        }
+                        $("#foreign_faculty_s").html(html);
+                        break;
+                }
+            },
+            error : function(e){
+                console.log(e);
+            }
+        });
+    })
+
+    $("#add-class").on("click", function(e){
         e.preventDefault();
         var data = {};
+        function takeInput(){
+            data[$("#add-class-form #acd_year").attr("name")] = $("#add-class-form #acd_year").val();
+            data[$("#add-class-form #courses_s").attr("name")] = $("#courses_s").val();
+            data[$("#add-class-form #div_s").attr("name")] = $("#add-class-form #div_s").val();
+            if($("#add-class-form #faculty_s").val() == "other"){
+                data[$("#add-class-form #foreign_faculty_s").attr("name")] = $("#add-class-form #foreign_faculty_s").val(); 
+            }else{
+                data[$("#add-class-form #faculty_s").attr("name")] = $("#add-class-form #faculty_s").val();
+            }
+        }
         $.when(
-            data[$("#add-class #acd_year").attr("name")] = $("#add-class #acd_year").val(),
-            data[$("#add-class #faculty_s").attr("name")] = $("#add-class #faculty_s").val(),
-            data[$("#add-class #courses_s").attr("name")] = $("#courses_s").val(),
+            // data[$("#add-class #acd_year").attr("name")] = $("#add-class #acd_year").val(),
+            // data[$("#add-class #faculty_s").attr("name")] = $("#add-class #faculty_s").val(),
+            // data[$("#add-class #courses_s").attr("name")] = $("#courses_s").val(),
+            takeInput()
         ).then(() => {
             console.log(data);
             $('#manageClassModal #add-class').trigger("reset");
@@ -472,8 +528,9 @@ function processAddClass(){
                                     <td>'+res.data[i].course_name+'</td>\
                                     <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
                                     <td>'+res.data[i].s_class_name+'</td>\
+                                    <td>'+res.data[i].div_name+'</td>\
                                     <td>\
-                                        <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
                                     </td>\
                                 </tr>'
                                 }
@@ -529,7 +586,7 @@ function processDeleteClass(){
                                                     <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
                                                     <td>'+res.data[i].s_class_name+'</td>\
                                                     <td>\
-                                                        <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
                                                     </td>\
                                                 </tr>'
                                     }
@@ -592,7 +649,7 @@ function processAddCourse(){
                         alert("Please Fill all the fields");
                         break;
                     case "exists":
-                        alert("HOD already Exists");
+                        alert("Course already Exists");
                         break;
                     case "notinsert":
                         alert("Data Not Inserted");
@@ -621,6 +678,9 @@ function processAddCourse(){
                         
                         break;     
                 }
+            },
+            error : function(e){
+                console.log(e);
             }
         })
     })
@@ -845,27 +905,37 @@ function processAddPractClass(){
 
 
 function processHodReport(){
-    $(document).on("change", "#select-year", function(e){
-        if($("#select-acd").val() != " " && $(this).val() != " "){
-            var year = $(this).val();
-            var acd = $("#select-acd option:selected").val();
+    $(document).on("change", ".report-select-input", function(e){
+        if($("#report #select-acd").val() != " " && $("#report #select-year").val() != " " && $("#report #select-div").val() != " "){
+            var acd = $("#report #select-acd").val();
+            var year = $("#report #select-year").val();
+            var div = $("#report #select-div").val();
+            console.log(acd,year,div);
             $.ajax({
-                url : "../controller/ajaxController.php?action=get_hod_class",
+                url : "../controller/ajaxController.php?action=get_class_div_wise",
                 type : "POST",
-                data : {'year' : year, 'acd' : acd},
+                data : {"id" : div, "acd" : acd, "year" : year},
                 dataType : "JSON",
                 success : function(res){
                     console.log(res);
                     switch(res.error){
-                        case "notexist": 
-                            // $("#select-class").val(" ");
-                            $("#select-class").prop("disabled",true);
-                            alert("No class found!");
+                        case "empty":
+                            $("#select-class").prop("disabled", true);
+                            $("#select-class").val(" ");
+                            $("#select-class").text(" ");
+                            alert("Please fill all details!");
+                            break;
+                        case "notfound":
+                            $("#select-class").val(" ");
+                            $("#report #select-class").text("No class found");
                             break;
                         case "none":
+                            $("#select-class").prop("disabled", false);
+                            $("#select-class").val(" ");
+                            $("#select-class").text(" ");
                             if(res.data.length > 0){
                                 $("#select-class").prop("disabled",false);
-                                var html = '<option> </option>';
+                                var html = '<option value=" "> </option>';
                                 for(var i = 0; i < res.data.length; i++){
                                     html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
                                 }
@@ -876,7 +946,7 @@ function processHodReport(){
                 }
             })
         }else{
-            if($(this).val() != " " && $("#select-acd option:selected").val() == " "){
+            if($("#select-acd option:selected").val() == " "){
                 alert("Please Select Academic Year");
             }
         }
@@ -891,6 +961,7 @@ function processHodReport(){
             data[$("#report #select-class").attr("name")] = $("#report #select-class").val(),
             data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
             data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
+            data[$("#report #select-div").attr("name")] = $("#report #select-div").val(),
             title = $("#report #select-class option:selected").text(),
             academic_year = $("#report #select-acd option:selected").text(),
         ).then(
@@ -919,7 +990,7 @@ function processHodReport(){
                                 $("#hod-report thead tr").html(" ");
                                 $("#hod-report tbody").html(" ");
                             }
-                            alert("NO attendance Found")
+                            alert("No attendance Found")
                             break;
                         case "date":
                             alert("Please Enter Correct Date");
@@ -938,9 +1009,37 @@ function processHodReport(){
                             th += "<th>Student Name.</th>";
                             for(var i = 0; i < numCol; i++){
                                 // if(columns[i] == "student_id") continue;
-                                th += "<th>"+datecolumns[i]+"</th>";
+                                var date = new Date(datecolumns[i]);
+                                var dd = date.getDate();
+
+                                var mm = date.getMonth()+1; 
+                                var yyyy = date.getFullYear();
+                                var hour    = date.getHours();
+                                var minute  = date.getMinutes();
+                                var second  = date.getSeconds(); 
+                                if(dd<10) 
+                                {
+                                    dd='0'+dd;
+                                } 
+
+                                if(mm<10) 
+                                {
+                                    mm='0'+mm;
+                                } 
+                                if(hour.toString().length == 1) {
+                                    hour = '0'+hour;
+                               }
+                               if(minute.toString().length == 1) {
+                                    minute = '0'+minute;
+                               }
+                               if(second.toString().length == 1) {
+                                    second = '0'+second;
+                               } 
+                                date = dd+'/'+mm+'/'+yyyy;
+                                time = hour+':'+minute+':'+second;
+                                th += "<th>"+date+"</br>"+time+"</th>";
                             } 
-                            th += "<th>Total</th>";
+                            th += "<th>Total Present</th>";
                             th += "<th>Percentage</th>";
                             var td = "";
                             for(var i = 0; i < res.data.length; i++){
@@ -948,16 +1047,19 @@ function processHodReport(){
                                 td += "<td>"+res.data[i].roll_no+"</td>";
                                 td += "<td>"+res.data[i].student_name+"</td>";
                                 for(var j = 0; j < numCol; j++){
-                                    //if(columns[j] == "student_id") continue;
-                                    td += "<td>"+res.data[i][datecolumns[j]]+"</td>";
+                                    if(res.data[i][datecolumns[j]] == 1){
+                                        td += "<td>P</td>"
+                                    }else{
+                                        td += "<td style='color:red'>A</td>"
+                                    }
                                 } 
                                 td += "<td>"+res.total[i].total+"</td>";
                                 td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
                                 td += "</tr>"
                             }
+                          
                             $("#hod-report thead tr").html(th);
                             $("#hod-report tbody").html(td);
-                            
                             var table = $("#hod-report").DataTable(
                                 {
                                     scrollY:        "500px",
@@ -988,5 +1090,43 @@ function processHodReport(){
                 }
             })
         }
+    })
+}
+
+
+
+function processAjaxClass(){
+    $("#dept_s").on("change", function(){
+        var id = $(this).val();
+        console.log(id);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_year_belong_dept",
+            type: "post",
+            data : {"id" : id},
+            dataType : "json",
+            success : function(res){
+                switch(res.error){
+                    case "empty":
+                        alert("Please fill all details.");
+                        break;
+                    case "notfound":
+                        var html = "<option value=' '>Not Found</option>";
+                        $("#class_year").html(html);
+                        $("#class_year").prop("disabled",true);
+                        break;
+                    case "none":
+                        $("#class_year").prop("disabled",false);
+                        var html = "";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<option value="'+res.data[i].s_class_id+'">'+res.data[i].s_class_name+'</option>';
+                        }
+                        $("#class_year").html(html);
+                        break;
+                }
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
     })
 }
