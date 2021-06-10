@@ -101,6 +101,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
                     <option value=" "> </option>
                 </select>
             </div>
+            <?php date_default_timezone_set("Asia/Kolkata");?>
             <div class="form-group col-sm-2">
                 <label for="from-date">FROM :</label>
                 <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="from-date" id="from-date">

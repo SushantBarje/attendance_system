@@ -29,6 +29,9 @@ class FacultyController extends Faculty {
     private $time;
     private $attend = [];
     private $acd_year;
+    private $from_date;
+    private $till_date;
+    private $year;
 
 
     public function verifyInput($data){
@@ -210,7 +213,7 @@ class FacultyController extends Faculty {
         return json_encode(array("error" => "none","data" => $getHod));
     }
 
-    public function getSemesterByClassYear(){   
+    public function getSemesterByClassYear(){  
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $id = $this->verifyInput($_POST['data']);
         $getdata = $this->getSemesterByYearId([$id]);
@@ -618,37 +621,9 @@ class FacultyController extends Faculty {
 
         return json_encode(array("error" => "none","data" => $result,"total" => $getTotal, 'dept' => $getDept, 'year' => $year));
 
-        // $sql_query = "";
-        // $data = [];
-        // if(!empty($_POST['academic_year'])){
-        //     $sql_query .= "academic_year = ?";
-        //     $data[] = $this->verifyInput($_POST['academic_year']);
-        // }
-        // if(!empty($_POST['deptartment'])){
-        //     $sql_query .= "AND dept_id = ?";
-        //     $data[] = $this->verifyInput($_POST['deptartment']);
-        // }
-        // if(!empty($_POST['classyear'])){
-        //     $sql_query .= "AND s_class_id = ?";
-        //     $data[] = $this->verifyInput($_POST['classyear']);
-        // }
-        // if(!empty($_POST['start_date'])){
-        //     $sql_query .= "AND DATE(date_time)) BETWEEN ? AND ?";
-        //     $data[] = $this->verifyInput($_POST['start_date']);
-        // }
-        // if(!empty($_POST['end_date'])){
-        //     $sql_query .= "<= date_time = ?";
-        //     $data[] = $this->verifyInput($_POST['end_date']);
-        // }
-
-        //$result = $this->getAdminReport($sql_query,[$data]);
     }
 
-    // public function reportAcademicWise(){
-    //     $this->checkEmpty();
-    //     $this->acd_id = $this->verifyInput($_POST['data']);
-        
-    // }
+  
 
     public function getHodReport(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
@@ -660,7 +635,8 @@ class FacultyController extends Faculty {
         $fromdate = $this->verifyInput($_POST['from-date']);
         $fromdate = date('Y-m-d', strtotime("$fromdate"));
         $tilldate = $this->verifyInput($_POST['till-date']);
-        $tilldate = date('Y-m-d', strtotime("$tilldate")); 
+        $tilldate = date('Y-m-d', strtotime("$tilldate"));
+        $this->sem = $this->verifyInput($_POST['sem']); 
         //$this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
         $result = $this->findClassByAcademicYearAndClassYear([(int)$this->acd_year,(int)$this->year,(int)$this->class,$fromdate,$tilldate]);
         if(!$result) return json_encode(array("error" => "notexists"));
@@ -678,12 +654,15 @@ class FacultyController extends Faculty {
     }
 
     public function showStudentByClassForAttendance(){
+
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $s_class_id = $this->verifyInput($_POST['id']);
         $this->class = $this->verifyInput($_POST['class_id']);
         $this->acd_year = $this->verifyInput($_POST['year']);
         $this->s_div = $this->verifyInput($_POST['div']);
-        $this->dept = (isset($_POST['dept_id'])) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        $result = $this->getClassById([$this->faculty_id,$this->class]);
+        $this->dept = $result['dept_id'];
         $year = $this->verifyInput($_POST['year']);
         $date = $this->verifyInput($_POST['date']);
         $time = $this->verifyInput($_POST['time']);
@@ -708,19 +687,22 @@ class FacultyController extends Faculty {
     }
 
     public function showClassByDiv(){
+      
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
 
         if(isset($_POST['div'])) $this->s_div = $this->verifyInput($_POST['div']);
         else if(isset($_POST['id'])) $this->s_div = (int)$this->verifyInput($_POST['id']);
         else $this->s_div = 1;
 
-        $this->acd_year = (int)$this->verifyInput($_POST['acd']);
         
+        $this->acd_year = (int)$this->verifyInput($_POST['acd']);
+        //$this->sem = (int)$this->verifyInput($_POST['sem']);
 
         if(isset($_POST['year'])) $this->year = (int)$this->verifyInput($_POST['year']);
 
         $this->faculty_id = (isset($_POST['faculty_id'])) ? (int)$this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
         $this->dept = isset($_POST['dept_id']) ? (int)$this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+
 
         if(isset($_POST['for'])){
             $result =  $this->getClassByAcademicAndFaculty([$this->acd_year, $this->faculty_id]);
@@ -728,8 +710,9 @@ class FacultyController extends Faculty {
             else return json_encode(array("error" => "notfound"));
         }
 
+        $this->sem = $this->verifyInput($_POST['sem']);
         //if($_SESSION['role_id'] == 0) $result = $this->getAllClassByDeptAndYear([$this->$this->acd_year , $this->year, $this->s_div, $this->dept])
-        if($_SESSION['role_id'] == 1 || $_SESSION['role_id'] == 0) $result = $this->getClassByYearDivisionAcademicAndDept([$this->acd_year , $this->year, $this->s_div, $this->dept]);
+        if($_SESSION['role_id'] == 1 || $_SESSION['role_id'] == 0) $result = $this->getClassByYearDivisionAcademicAndDept([$this->acd_year , $this->year, $this->s_div, $this->sem, $this->dept]);
         else $result = $this->getClassByYearDivisionAcademicAndFaculty([$this->acd_year , $this->year, $this->s_div, $this->faculty_id]);
         if(!$result) return json_encode(array("error" => "notfound"));
         else return json_encode(array("error" => "none", "data" => $result)); 
@@ -773,6 +756,129 @@ class FacultyController extends Faculty {
             $count = $this->getTotalLecturesConducted([$this->class]);
             return json_encode(array("error" => "none", "data" => $result, "count" => $count));
         } 
+    }
+
+
+    public function removeAttendance(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->class = $this->verifyInput($_POST['class']);
+        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($this->verifyInput($_POST['faculty_id'])) : $_SESSION['faculty'];
+        $this->date_time = $this->verifyInput($_POST['date_time']);
+        $result = $this->deleteAttendance([$this->class, $this->faculty_id, $this->date_time]);
+    }
+
+
+    /* Show Dynamic Attendance Report to HOD */
+
+    public function showHodReport(){
+        $data = [];
+        $query = "";
+        $from = $till = 0;
+        if(!empty($_POST['academic_year'])){
+            $query .= " academic_id = ? ";
+            $this->acd_year = $this->verifyInput($_POST['academic_year']);
+            $data[] = $this->acd_year;
+        }
+        if(!empty($_POST['s_class_year'])){
+            $query .= " AND courses.s_class_id = ? ";
+            $this->year = $this->verifyInput($_POST['s_class_year']);
+            $data[] = $this->year;
+        }
+        if(!empty($_POST['div_id'])){
+            $query .= " AND class.div_id = ? ";
+            $this->s_div = $this->verifyInput($_POST['div_id']);
+            $data[] = $this->s_div;
+        }
+        if(!empty($_POST['sem_id']) || !empty($_POST['sem'])){
+            $query .= " AND courses.sem_id = ?";
+            $this->sem = isset($_POST['sem_id']) ? $this->verifyInput($_POST['sem_id']) : $this->verifyInput($_POST['sem']);
+            $data[] = $this->sem;
+        }
+        if(!empty($_POST['class'])){
+            $query .= " AND class.class_id = ? ";
+            $this->class = $this->verifyInput($_POST['class']);
+            $data[] = $this->class;
+        }
+        if(isset($_POST['dept_id']) && !empty($_POST['dept_id'])){
+            $query .= " AND courses.dept_id = ? ";
+            $this->dept = $this->verifyInput($_POST['dept_id']);
+            $data[] = $this->dept;
+        }else{
+            $query .= " AND courses.dept_id = ? ";
+            $this->dept = $this->verifyInput($_SESSION['dept']);
+            $data[] = $this->dept;
+        }
+       
+        $result = $this->getStudentByDeptDivisionAndYear([$this->dept, $this->year, $this->s_div]);
+        if(!$result) return json_encode(array("error" => "nostudent"));
+
+        if(!empty($_POST['from-date']) && !empty($_POST['till-date'])){
+            $query .= " AND DATE(date_time) >= DATE(?) AND DATE(date_time) <= DATE(?) ";
+            $this->from_date = $this->verifyInput($_POST['from-date']);
+            $this->till_date = $this->verifyInput($_POST['till-date']);
+            $data[] = date('Y-m-d', strtotime($this->from_date));
+            $data[] = date('Y-m-d', strtotime($this->till_date));
+            
+            $result = $this->getAttendanceByDate("date_time >= DATE(?) AND date_time <= DATE(?)",[$this->dept, $this->year, $this->s_div, date('Y-m-d', strtotime($this->from_date)) , date('Y-m-d', strtotime($this->till_date))]);
+            
+             if(!$result) return (array("error" => "noattend"));
+        }
+        else if(!empty($_POST['from-date'])){
+            $query .= " AND DATE(date_time) >= DATE(?) ";
+            $this->from_date = $this->verifyInput($_POST['from-date']);
+            $data[] = date('Y-m-d', strtotime($this->from_date));
+            $from_data = $this->getAttendanceByDate("DATE(date_time) >= DATE(?)",[$this->dept, $this->year, $this->s_div, date('Y-m-d', strtotime($this->from_date))]);
+            if(!$from_data) return (array("error" => "noattend"));
+        }
+        else if(!empty($_POST['till-date'])){
+            $query .= " AND DATE(date_time) <= DATE(?) ";
+            $this->till_date = $this->verifyInput($_POST['till-date']);
+            $data[] = date('Y-m-d', strtotime($this->till_date));
+            
+            $till_data = $this->getAttendanceByDate("date_time <= DATE(?)",[$this->dept, $this->year, $this->s_div, $this->sem_id, date('Y-m-d', strtotime($this->till_date))]);
+            if(!$till_data) return (array("error" => "noattend"));
+        }
+    
+        $result = $this->getClassByYearDivisionAcademicAndDept([$_POST['academic_year'],$_POST['s_class_year'],$_POST['div_id'],$this->dept]);
+        if(!$result) json_encode(array("error" => "noclass"));
+        else {
+            //var_dump($_POST);
+            //var_dump($query);
+           
+            $result = $this->getHodReportYearWise($query,$data);
+            
+            // if(empty($_POST['class_id'])){
+            //     $result = $this->getHodReportYearWise($query,$data);
+            // }else{
+
+            // } 
+            return json_encode(array("error" => "none", "data" => $result["each_total"], "total" => $result['total'], "lectures" =>$result['total_lectures']));
+            // if($from == 1 && $till == 1){
+            //     $query .= " AND date_time >= DATE(?) AND date_time <= DATE(?) ";
+            //     $getTotal = $this->getReportTotalClassWise([(int)$this->class,$_POST['form-date'],$_POST['till-date']]);
+            // }else if($from == 1 && $till == 0){
+            //     $query .= " AND date_time >= DATE(?) ";
+            //     $getTotal = $this->getReportTotalClassWise([(int)$this->class,$_POST['form-date'], '9999-12-31']);
+            // }else if($from = 0 && $till == 1){
+            //     $query .= " AND date_time <= DATE(?) ";
+            //     $getTotal = $this->getReportTotalClassWise([(int)$this->class,'0000-00-00',$_POST['till-date']]);
+            // }else{
+            //     $getTotal = $this->getReportTotalClassWise([(int)$this->class]);
+            // }
+            
+            //return json_encode(array("error" => "none","data" => $result,"total" => $getTotal));
+        }
+    }
+
+    public function showClassSemWise(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->acd_year = $this->verifyInput($_POST['academic_year']);
+        $this->year = $this->verifyInput($_POST['s_class_year']);
+        $this->s_div = $this->verifyInput($_POST['div_id']);
+        $this->sem = $this->verifyInput($_POST['sem_id']);
+        $result = $this->getClassSemWise([$this->acd_year, $this->year, $this->s_div, $this->sem]);
+        if(!$result) return json_encode(array("error" => "notfound"));
+        return json_encode(array("error" => "none", "data" => $result));
     }
     
     public function getFacultyId(){

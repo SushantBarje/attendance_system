@@ -29,7 +29,7 @@
                         <span>View Student</span></a>
                 </li>
                 <li>
-                    <a href="markattendence.php"><span class="las la-shopping-bag"></span>
+                    <a href="attendance.php"><span class="las la-shopping-bag"></span>
                         <span>Mark Attendence</span></a>
                 </li>
                 <li>

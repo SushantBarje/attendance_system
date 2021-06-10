@@ -754,7 +754,7 @@ class Faculty extends Database {
 	public function getClassById($data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id WHERE a.faculty_id = ? AND a.class_id = ?";
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.faculty_id = ? AND a.class_id = ?";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)){
 				if($stmt->rowCount() > 0){
@@ -808,7 +808,7 @@ class Faculty extends Database {
 
 	public function getClassByYearDivisionAcademicAndDept($data){
 		try{
-			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.div_id = ? AND a.dept_id = ?";
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.div_id = ? AND a.sem_id = ? AND a.dept_id = ?";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($data);
 			return $stmt->fetchAll();
@@ -835,6 +835,7 @@ class Faculty extends Database {
 			return array("e" => $e->getMessage());
 		}
 	}
+
 
 	public function deleteClassById($data){
 		try{
@@ -1124,6 +1125,87 @@ class Faculty extends Database {
 		try{
 			$con = $this->connect();
 			$sql = "SELECT COUNT(DISTINCT date_time) as total_lectures FROM attendance WHERE class_id = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function deleteAttendance($data){
+		try{
+			$con = $this->connect();
+			$sql = "DELETE FROM attendance WHERE class_id = ? AND date_time = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getHodReportYearWise($query, $data){
+		try{
+			$con = $this->connect();
+			$con->query("SET @sql = NULL");
+            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(a.class_id = ''', class.class_id, ''', a.status, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) INTO @sql FROM courses LEFT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query." ORDER BY courses.course_id+0");
+            $stmt->execute($data);
+            $stmt = $con->prepare("SET @sql = CONCAT('SELECT  b.roll_no, CONCAT(b.last_name,'' '', b.first_name,'' '', b.middle_name) as student_name, a.student_id, ', @sql ,' FROM attendance as a JOIN student as b ON a.student_id = b.prn_no JOIN class as c ON a.class_id = c.class_id GROUP BY a.student_id ORDER BY b.roll_no+0')");
+            $stmt->execute();
+            $stmt = $con->prepare("PREPARE stmt FROM @sql");
+            $stmt->execute();
+            $stmt = $con->prepare("EXECUTE stmt");
+            $stmt->execute();
+            $each_sub_total = $stmt->fetchAll();
+            $con->query("DEALLOCATE PREPARE stmt");
+
+
+			$con = $this->connect();
+			$con->query("SET @sql = NULL");
+            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(c.dept_id = ''', class.dept_id, ''', a.status, NULL)) AS Total')) INTO @sql FROM courses LEFT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query." ORDER BY courses.course_id+0");
+            $stmt->execute($data);
+            $stmt = $con->prepare("SET @sql = CONCAT('SELECT ', @sql ,' FROM attendance as a JOIN student as b ON a.student_id = b.prn_no JOIN class as c ON a.class_id = c.class_id GROUP BY a.student_id ORDER BY b.roll_no+0')");
+            $stmt->execute();
+            $stmt = $con->prepare("PREPARE stmt FROM @sql");
+            $stmt->execute();
+            $stmt = $con->prepare("EXECUTE stmt");
+            $stmt->execute();
+            $total_sum = $stmt->fetchAll();
+            $con->query("DEALLOCATE PREPARE stmt");
+
+
+			$con = $this->connect();
+			$con->query("SET @sql = NULL");
+            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'COUNT(IF(a.class_id = ''', class.class_id, ''', a.class_id, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) INTO @sql FROM courses LEFT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE".$query." ORDER BY courses.course_id+0");
+            $stmt->execute($data);
+            $stmt = $con->prepare("SET @sql = CONCAT('SELECT ', @sql ,' FROM attendance as a JOIN student as b ON a.student_id = b.prn_no JOIN class as c ON a.class_id = c.class_id GROUP BY a.student_id ORDER BY b.roll_no+0')");
+            $stmt->execute();
+            $stmt = $con->prepare("PREPARE stmt FROM @sql");
+            $stmt->execute();
+            $stmt = $con->prepare("EXECUTE stmt");
+            $stmt->execute();
+            $total_lectures_conducted = $stmt->fetch();
+            $con->query("DEALLOCATE PREPARE stmt");
+			return array("each_total" => $each_sub_total, "total" => $total_sum, "total_lectures" => $total_lectures_conducted);
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getAttendanceByDate($query, $data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT DISTINCT a.class_id FROM attendance as a JOIN class as b ON a.class_id = b.class_id JOIN courses  ON b.course_id = courses.course_id JOIN division ON division.div_id = b.div_id WHERE ".$query."";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getClassSemWise($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*,b.course_name FROM class as a JOIN courses as b ON a.course_id = b.course_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.div_id = ? AND a.sem_id = ?";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}catch(PDOException $e){

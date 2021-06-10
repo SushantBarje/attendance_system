@@ -1,8 +1,8 @@
 <?php
     namespace app\admin;
     require_once __DIR__ . '\..\vendor\autoload.php';
-    use app\controller\FacultyController;
-    $user = new FacultyController();
+    use app\controller\StudentController;
+    $user = new StudentController();
     if(!isset($_SESSION['prn_no'])){
         header('Location:../index.php');
     }
@@ -25,7 +25,7 @@
 <body>
     <?php include "studentHeader.php"?>
     <div class="main-content">
-        <?php include "head.php"?>
+       
         
     </div>
     

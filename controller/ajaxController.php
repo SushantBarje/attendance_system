@@ -2,6 +2,9 @@
 namespace app\controller;
 require_once __DIR__ . '\..\vendor\autoload.php';
 use app\controller\FacultyController;
+use app\model\Faculty;
+
+
 $faculty = new FacultyController();
 
 ob_start();
@@ -108,6 +111,18 @@ if($req == "addAcademicYear"){
 }else if($req == "get_attend_details_class"){
   $r = $faculty->showAttendTakenClass();
   die($r);
+}else if($req == "del_attend"){
+    $r = $faculty->removeAttendance();
+    die($r);
+}else if($req == "perform_hod_report"){
+    $r = $faculty->showHodReport();
+    die($r);
+}else if($req == "get_class_sem_wise"){
+    $r = $faculty->showClassSemWise();
+    die($r);
+}else if($req == "get_student_report"){
+    $r = $student->showGrandReport();
+    die($r);
 }
 ob_end_flush();
 ?>

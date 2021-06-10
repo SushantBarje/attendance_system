@@ -7,7 +7,9 @@ $(document).ready(function(){
     processAttendanceSheet();
     processMarkAttendance();
     generateStaffReport();
-    AttendanceDetails()
+    AttendanceDetails();
+    processDeleteAttendance()
+    processOnChangeClass()
     //processSubmitAttendance();
 });
 
@@ -316,6 +318,7 @@ function generateStaffReport(){
             data[$("#report #select-div").attr("name")] = $("#report #select-div").val(),
             data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
             data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
+            data[$("#report #s_sem").attr("name")] = $("#report #s_sem").val(),
             title = $("#report #select-class option:selected").text(),
             academic_year = $("#report #select-acd option:selected").text(),
         ).then(
@@ -449,107 +452,156 @@ function generateStaffReport(){
 }
 
 
-// function AttendanceDetails(){
-//     $(document).on("change", "#attend-details #select-acd", function(e){
-//         e.preventDefault();
-//         var acd = $("#select-acd").val();
-//         var class_id = $("#select-class option:selected").val();
-//         console.log(class_id);
-//         if(acd != " "){
-//             $.ajax({
-//                 url : "../controller/ajaxController.php?action=get_class_div_wise",
-//                 type : "post",
-//                 data : {"acd" : acd, "for" : "detail"},
-//                 dataType : "json",
-//                 success : function(res){
-//                     switch(res.error){
-//                         case "empty":
-//                             alert("Please fill all details");
-//                             break;
-//                         case "notfound":
-//                             $("#box-content").html("<h4>Nothing found!</h4>");
-//                             break;
-//                         case "none":
-//                             var html = "";
-//                             html += '<option value=" "> </option>'
-//                             for(var i = 0; i < res.data.length; i++){
-//                                 html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
-//                             }
-//                             $("#select-class").html(html);
-//                             break;
-//                     }
+function AttendanceDetails(){
+    $(document).on("change", "#attend-details #select-acd", function(e){
+        e.preventDefault();
+        var acd = $("#select-acd").val();
+        var class_id = $("#select-class option:selected").val();
+        console.log(class_id);
+        if(acd != " "){
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_class_div_wise",
+                type : "post",
+                data : {"acd" : acd, "for" : "detail"},
+                dataType : "json",
+                success : function(res){
+                    switch(res.error){
+                        case "empty":
+                            alert("Please fill all details");
+                            break;
+                        case "notfound":
+                            $("#box-content").html("<h4>Nothing found!</h4>");
+                            break;
+                        case "none":
+                            var html = "";
+                            html += '<option value=" "> </option>'
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
+                            }
+                            $("#select-class").html(html);
+                            break;
+                    }
                     
-//                 },
-//                 error : function(e){
-//                     console.log(e);
-//                 }
-//             })
-//         }
-//         //else if(acd != " " && class_id != " "){
-//         //     $.ajax({
-//         //         url : "../controller/ajaxController.php?action=get_attend_details_class",
-//         //         type : "post",
-//         //         data : {"acd" : acd, "class_id": class_id, "for" : "detail"},
-//         //         dataType : "json",
-//         //         success : function(res){
-//         //             switch(res.error){
-//         //                 case "empty":
-//         //                     alert("Please fill all details");
-//         //                     break;
-//         //                 case "notfound":
-//         //                     $("#box-content").html("<h4>Nothing found!</h4>");
-//         //                     break;
-//         //                 case "none":
-//         //                     var html = "";
-//         //                     html += '<option value=" "> </option>'
-//         //                     for(var i = 0; i < res.data.length; i++){
-//         //                         html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
-//         //                     }
-//         //                     $("#select-class").html(html);
-//         //                     $("#box-content").load("attendance_details.php", {"data" : res.data, "count" : res.count});  
-//         //                     break;
-//         //             }
+                },
+                error : function(e){
+                    console.log(e);
+                }
+            })
+        }
+        //else if(acd != " " && class_id != " "){
+        //     $.ajax({
+        //         url : "../controller/ajaxController.php?action=get_attend_details_class",
+        //         type : "post",
+        //         data : {"acd" : acd, "class_id": class_id, "for" : "detail"},
+        //         dataType : "json",
+        //         success : function(res){
+        //             switch(res.error){
+        //                 case "empty":
+        //                     alert("Please fill all details");
+        //                     break;
+        //                 case "notfound":
+        //                     $("#box-content").html("<h4>Nothing found!</h4>");
+        //                     break;
+        //                 case "none":
+        //                     var html = "";
+        //                     html += '<option value=" "> </option>'
+        //                     for(var i = 0; i < res.data.length; i++){
+        //                         html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
+        //                     }
+        //                     $("#select-class").html(html);
+        //                     $("#box-content").load("attendance_details.php", {"data" : res.data, "count" : res.count});  
+        //                     break;
+        //             }
                     
-//         //         },
-//         //         error : function(e){
-//         //             console.log(e);
-//         //         }
-//         //     })
-//         // }
+        //         },
+        //         error : function(e){
+        //             console.log(e);
+        //         }
+        //     })
+        // }
 
-//         $(document).on("click", "#check-details", function(){
-//             var acd = $("#select-acd").val();
-//             var class_id = $("#select-class").val();
-//             console.log(class_id);
-//             $.ajax({
-//                 url : "../controller/ajaxController.php?action=get_attend_details_class",
-//                 type : "post",
-//                 data : {"acd" : acd, "class_id": class_id},
-//                 dataType : "json",
-//                 success : function(res){
-//                     switch(res.error){
-//                         case "empty":
-//                             alert("Please fill all details");
-//                             break;
-//                         case "notfound":
-//                             $("#box-content").html("<h4>Nothing found!</h4>");
-//                             break;
-//                         case "none":
-//                             var html = "";
-//                             html += '<option value=" "> </option>'
-//                             for(var i = 0; i < res.data.length; i++){
-//                                 html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
-//                             }
-//                             $("#select-class").html(html);
-//                             $("#box-content").load("attendance_details.php", {"data" : res.data, "count" : res.count});  
-//                             break;
-//                     }
+        $(document).on("click", "#check-details", function(){
+            var acd = $("#select-acd").val();
+            var class_id = $("#select-class").val();
+            console.log(class_id);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_attend_details_class",
+                type : "post",
+                data : {"acd" : acd, "class_id": class_id},
+                dataType : "json",
+                success : function(res){
+                    switch(res.error){
+                        case "empty":
+                            alert("Please fill all details");
+                            break;
+                        case "notfound":
+                            $("#box-content").html("<h4>Nothing found!</h4>");
+                            break;
+                        case "none":
+                            var html = "";
+                            html += '<option value=" "> </option>'
+                            for(var i = 0; i < res.data.length; i++){
+                                html += '<option value="'+res.data[i].class_id+'">'+res.data[i].course_name+' Div-'+res.data[i].div_name+'</option>';
+                            }
+                            $("#box-content").load("attendance_details.php", {"data" : res.data, "count" : res.count});  
+                            break;
+                    }
                     
-//                 },
-//                 error : function(e){
-//                     console.log(e);
-//                 }
-//             })
-//         })
-//     })
-// }
+                },
+                error : function(e){
+                    console.log(e);
+                }
+            })
+        })
+    })
+}
+
+
+function processDeleteAttendance(){
+    $(document).on("click", ".del-attend", function(){
+        var class_id = $(this).attr("id");
+        var date_time = $(this).data("time");
+        console.log(class_id);
+        console.log(date_time);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=del_attend",
+            type : "post",
+            data : {"class" : class_id, "date_time" : date_time},
+            dataType : "json",
+            success : function(res){
+                console.log(e);
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
+    })
+}
+
+function processOnChangeClass(){
+    $("#select-year").on("change", function(){
+        var id = $(this).val();
+        console.log(id);
+        if(id == " ") return $("#s_sem").html('<option value="'+' '+'">Select Year</option>').prop("disabled",true);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=getSem",
+            type : "post",
+            data : {data : id},
+            dataType : "json",
+            success : function(res){
+                console.log(res);
+                if(res.data.length > 0){
+                    $("#s_sem").prop("disabled",false);
+                    var html = "";
+                    html += '<option value=""></option>';
+                    for(var i = 0; i < res.data.length; i++){
+                        html += '<option value="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</option>';
+                    }
+                    $('#s_sem').html(html);
+                }
+            }
+        })
+    })
+}
+
+
