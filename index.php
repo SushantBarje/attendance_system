@@ -57,7 +57,7 @@
                             <input type="password" class="form-control" name="password" placeholder="Password" />
                         </div>
                     </div>
-                    <button class="btn btn-primary" name="faculty-login" type="submit">Log In</button>
+                    <button class="btn btn-primary" name="faculty-login" value="submit" type="submit">Log In</button>
                 </form>
             </div>
             <div class="col-sm-2"></div>
@@ -65,14 +65,14 @@
                 <div class="header">
                     <h3>Student</h3>
                 </div>
-                <form method="post">
+                <form method="POST">
                     <div class="form-group">
                         <label for="prn_no">PRN</label>
                         <div class="input-group mb-3 input-group-sm">
                             <input type="text" class="form-control" name="prn_no" placeholder="Enter PRN">
                         </div>
                     </div>
-                    <button class="btn btn-primary" name="student-login" type="submit">Log In</button>
+                    <button class="btn btn-primary" name="student-login" value="submit" type="submit">Log In</button>
                 </form>
             </div>
             <div class="col-sm-1"></div>

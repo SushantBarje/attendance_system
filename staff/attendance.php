@@ -43,7 +43,7 @@
         <h2 class="head">Attendance</h2>
         <div class="row">
             <div class="col-sm-12">
-                <button class="btn btn-secondary"> + New</button>
+                <a href="markattendance.php" class="btn btn-secondary"> + New</a>
             </div>
         </div>
         
@@ -100,9 +100,8 @@
             </div>
                                             
         </form> 
-        
         <div class="box">
-            <div class="d-flex flex-wrap" id="box-content">
+            <div class="d-flex align-content-start flex-wrap" id="box-content">
                                           
             </div>
         </div>

@@ -30,24 +30,30 @@
     <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/TableExport/TableExport-master/src/stable/css/tableexport.min.css">
+    <script src="../assets/blob.js/Blob.js-master/Blob.js"></script>
+    <script src="../assets/sheetjs/sheetjs-master/dist/xlsx.full.min.js"></script>
+    <script src="../assets/FileSaver/FileSaver.js-master/FileSaver.min.js"></script>
+    <script src="../assets/TableExport/TableExport-master/src/stable/js/tableexport.min.js"></script>
+    <script src="../assets/table2excel/jquery-table2excel-master/dist/jquery.table2excel.min.js"></script>
     <script src="../assets/js/hod/script.js"></script>
     <title>Generate Reports</title>
     <style> 
         th, td { white-space: nowrap;}
-        
     </style>
+    
 </head>
 <body>
 <body>
 <?php   include "hodHeader.php" ?>
     <main>
         <h2 class="head">Report</h2>
-        <form id="report">
+        <form id="report-hod" method="post">
             <div class="row mt-3">
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-3">
                     <label for="acd-year">Academic Year</label>
                     <select class="form-control form-control-sm report-select-input" name="academic_year" id="select-acd">
-                        <option value=" "> </option>
+                        <option value=""></option>
                         <?php 
                             $data = $user->getAcademicYear();
                             if(!$data) echo '<option value=" ">Nothing Found</option>';
@@ -57,10 +63,10 @@
                         ?>
                     </select>
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-3">
                     <label for="select-year">Select Year :</label>
                     <select class="form-control form-control-sm report-select-input" name="s_class_year" id="select-year">
-                        <option value=" "> </option>
+                        <option value=""> </option>
                         <?php 
                             $data = $user->getYearBelongsDept([$_SESSION['dept']]);
                             if(!$data) die("<option>Department Not Available</option>");
@@ -71,10 +77,10 @@
                         ?>
                     </select>
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-3">
                     <label for="select-div">Select Division :</label>
                     <select class="form-control form-control-sm report-select-input" name="div_id" id="select-div">
-                        <option value=" "> </option>
+                        <option value=""> </option>
                         <?php 
                             $data = $user->getDivBelongsDept([$_SESSION['dept']]);
                             if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
@@ -84,24 +90,32 @@
                         ?>
                     </select>
                 </div>
-                <div class="form-group col-sm-2">
-                    <label for="select-class">Select Class :</label>
-                    <select class="form-control form-control-sm" name="class" id="select-class">
-                        <option value=" "> </option>
+                <div class="form-group col-sm-3">
+                    <label for="select-sem">Select Semester :</label>
+                    <select class="form-control form-control-sm report-select-input" name="sem" id="s_sem">
+                        <option value=""> </option>
                     </select>
                 </div>
-                <div class="form-group col-sm-2">
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-4">
+                    <label for="select-class">Select Class :</label>
+                    <select class="form-control form-control-sm" name="class" id="select-class">
+                        <option value=""> </option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-4">
                     <label for="from-date">From :</label>
                     <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="from-date" id="from-date">
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-4">
                     <label for="till-date">Till :</label>
                     <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="till-date" id="till-date">
                 </div>
             </div>
             <div class="row">
                 <div class="col offset-5">
-                    <button class="btn btn-success mt-2" id="get-report" type="button">Check</button>
+                    <button class="btn btn-success mt-2" id="get-report" type="submit">Check</button>
                 </div>
             </div>
             
@@ -132,6 +146,18 @@
             
             </tbody>
         </table>
+
+        <button type="button" class="btn btn-success" id="export">Print</button>
+        <div id="tableWrap">
+            <table id="hod-report-adv" class="table table-bordered stripe row-border order-column" style="width:100%">
+                <thead>
+                </thead>   
+                <tbody>
+                </tbody>            
+            </table>
+        </div>
+        
+
     </main>
 </body>
 

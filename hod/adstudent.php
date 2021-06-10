@@ -184,6 +184,7 @@
             <table id="student-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
                 <thead>
                     <tr border="4px">
+                    
                         <th>PRN</th>
                         <th>Name</th>
                         <th>Roll no</th>
@@ -194,6 +195,20 @@
                         <th>Edit</th>
                     </tr>
                 </thead>
+                <!-- <tfoot>
+                    <tr border="4px">
+                        <th></th>
+                        <th>PRN</th>
+                        <th>Name</th>
+                        <th>Roll no</th>
+                        <th>Class </th>
+                        <th>Department</th>
+                        <th>Div</th>
+                        <th>Batch</th>
+                        <th>Edit</th>
+                    </tr>
+                </tfoot> -->
+                
                 <tbody>
                     <?php 
                         $data = $user->getStudentByDept([$_SESSION['dept']]);
