@@ -26,10 +26,10 @@ class Faculty extends Database {
 	public function getLastAcademicYear(){
 		try {
 			$con = $this->connect();
-			$sql = "SELECT * FROM academic_year";
+			$sql = "SELECT * FROM academic_year ORDER BY acedemic_id DESC LIMIT 1";
 			$stmt = $con->prepare($sql);
 			$stmt->execute();
-			return $stmt->fetchAll();	
+			return $stmt->fetch();	
 		}  
 		catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -796,7 +796,7 @@ class Faculty extends Database {
 
 	public function getClassByYearDivisionAcademicAndFaculty($data){
 		try{
-			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.div_id = ? AND a.faculty_id = ?";
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.div_id = ? AND a.sem_id = ? AND a.faculty_id = ?";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($data);
 			return $stmt->fetchAll();
@@ -902,6 +902,29 @@ class Faculty extends Database {
 			return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getStudentByRollno($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT roll_no FROM student WHERE roll_no = ? AND year_id = ? AND dept_id = ? AND div_id = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+
+		}catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function checkStudentPresentInAttendance($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT student_id FROM attendance WHERE class_id = ? AND student_id = ? AND date_time = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetch();
+		}catch (PDOException $e){
 			return array("e" => $e->getMessage());
 		}
 	}
@@ -1206,6 +1229,18 @@ class Faculty extends Database {
 		try{
 			$con = $this->connect();
 			$sql = "SELECT a.*,b.course_name FROM class as a JOIN courses as b ON a.course_id = b.course_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.div_id = ? AND a.sem_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+
+	public function checkIfClassAttendanceExisits($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT DISTINCT a.class_id, a.date_time FROM attendance as a JOIN class as b ON a.class_id = b.class_id WHERE b.dept_id = ? AND b.s_class_id = ? AND b.div_id = ? and b.academic_id = ?;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}catch(PDOException $e){

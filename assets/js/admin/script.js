@@ -23,6 +23,7 @@ $(document).ready(function(){
     processAjaxClass();
     processAdminReport();
     processAjaxYear()
+    //processAdminAdvReport()
 });
 
 function processAddAcademicYear(){
@@ -410,9 +411,19 @@ function processDeleteHod(){
 
 function processOnChangeClass(){
     $(".c-y").on("change",function(){
-        var id = $(this).val();
+        OnChangeClass($(this).val(),".s-sem");
+    });
+
+    $("#select-year-report").on("change", function(e){
+        e.preventDefault();
+        OnChangeClass($(this).val(),"#select-sem-report");
+    })
+
+    function OnChangeClass(data, selector){
+        var id = data;
         console.log(id);
-        if(id == " ") return $(".s-sem").html('<option value="'+' '+'">Select Year</option>').prop("disabled",true);
+        console.log(selector)
+        if(id == " ") return $(selector).html('<option value="'+' '+'">Select Year</option>').prop("disabled",true);
         $.ajax({
             url : "../controller/ajaxController.php?action=getSem",
             type : "post",
@@ -421,16 +432,18 @@ function processOnChangeClass(){
             success : function(res){
                 console.log(res);
                 if(res.data.length > 0){
-                    $(".s-sem").prop("disabled",false);
+                    $(selector).prop("disabled",false);
                     var html = "";
                     for(var i = 0; i < res.data.length; i++){
                         html += '<option value="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</option>';
                     }
-                    $('.s-sem').html(html);
+                    $(selector).html(html);
                 }
             }
         })
-    });
+    }
+        
+   
 }
 
 function processAddCourse(){
@@ -689,7 +702,7 @@ function processAjaxClass(){
                     case "none":
                         $("#class_year").prop("disabled",false);
                         var html = "";
-                        html += '<option value=" "> </option>'
+                        html += '<option value=""> </option>'
                         for(var i = 0; i < res.data.length; i++){
                             html += '<option value="'+res.data[i].year_id+'">'+res.data[i].s_class_name+'</option>';
                         }
@@ -707,70 +720,74 @@ function processAjaxClass(){
 
 
 function processAdminReport(){
-    $(document).on("change", ".report-select-input", function(e){
-        if($("#report #select-acd").val() != " " && $("#report #select-year").val() != " " && $("#report #select-div").val() != " " && $("#report #select-dept").val() != " "){
-            var acd = $("#report #select-acd").val();
-            var year = $("#report #select-year").val();
-            var div = $("#report #select-div").val();
-            var dept = $("#report #select-dept").val();
+    $(document).on("change", ".report-select-input-report", function(e){
+        if($("#report #select-acd-report").val() != "" && $("#report #select-year-report").val() != "" && $("#report #select-div-report").val() != "" && $("#report #select-dept-report").val() != ""){
+            var acd = $("#report #select-acd-report").val();
+            var year = $("#report #select-year-report").val();
+            var div = $("#report #select-div-report").val();
+            var dept = $("#report #select-dept-report").val();
+            var sem = $("#report #select-sem-report").val();
             console.log(acd,year,div,dept);
             $.ajax({
                 url : "../controller/ajaxController.php?action=get_class_div_wise",
                 type : "POST",
-                data : {"id" : div, "acd" : acd, "year" : year, "dept_id": dept},
+                data : {"id" : div, "acd" : acd, "year" : year, "dept_id": dept, "sem" : sem},
                 dataType : "JSON",
                 success : function(res){
                     console.log(res);
                     switch(res.error){
                         case "empty":
-                            $("#select-class").prop("disabled", true);
-                            $("#select-class").val(" ");
-                            $("#select-class").text(" ");
+                            $("#select-class-report").prop("disabled", true);
+                            $("#select-class-report").val(" ");
+                            $("#select-class-report").text(" ");
                             alert("Please fill all details!");
                             break;
                         case "notfound":
-                            $("#select-class").val(" ");
-                            $("#report #select-class").text("No class found");
+                            $("#select-class-report").val(" ");
+                            $("#report #select-class-report").text("No class found");
                             break;
                         case "none":
-                            $("#select-class").prop("disabled", false);
-                            $("#select-class").val(" ");
-                            $("#select-class").text(" ");
+                            $("#select-class-report").prop("disabled", false);
+                            $("#select-class-report").val(" ");
+                            $("#select-class-report").text(" ");
                             if(res.data.length > 0){
-                                $("#select-class").prop("disabled",false);
-                                var html = '<option value=" "> </option>';
+                                $("#select-class-report").prop("disabled",false);
+                                var html = '<option value=""> </option>';
                                 for(var i = 0; i < res.data.length; i++){
                                     html += '<option value="'+res.data[i].class_id+'" data-class="'+res.data[i].s_class_id+'">'+res.data[i].course_name+'</option>';
                                 }
-                                $('#select-class').html(html);
+                                $('#select-class-report').html(html);
                             }
                             break;
                     }
                 }
             })
         }else{
-            if($("#select-acd option:selected").val() == " "){
+            if($("#select-acd-report option:selected").val() == " "){
                 alert("Please Select Academic Year");
             }
         }
     })
 
+
+
     $("#get-report").on("click", function(){
         var data = {};
         var title = "";
         $.when(
-            data[$("#report #select-acd").attr("name")] = $("#report #select-acd").val(),
-            data[$("#report #select-dept").attr("name")] = $("#report #select-dept").val(),
-            data[$("#report #select-year").attr("name")] = $("#report #select-year").val(),
-            data[$("#report #select-class").attr("name")] = $("#report #select-class").val(),
+            data[$("#report #select-acd-report").attr("name")] = $("#report #select-acd-report").val(),
+            data[$("#report #select-dept-report").attr("name")] = $("#report #select-dept-report").val(),
+            data[$("#report #select-year-report").attr("name")] = $("#report #select-year-report").val(),
+            data[$("#report #select-class-report").attr("name")] = $("#report #select-class-report").val(),
+            data[$("#report #select-sem-report").attr("name")] = $("#report #select-sem-report").val(),
             data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
             data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
-            data[$("#report #select-div").attr("name")] = $("#report #select-div").val(),
-            title = $("#report #select-class option:selected").text(),
-            year = $("#report #select-year option:selected").text(),
-            acd = $("#report #select-acd option:selected").text(),
-            div = $("#report #select-div option:selected").text(),
-            academic_year = $("#report #select-acd option:selected").text(),
+            data[$("#report #select-div-report").attr("name")] = $("#report #select-div-report").val(),
+            title = $("#report #select-class-report option:selected").text(),
+            year = $("#report #select-year-report option:selected").text(),
+            acd = $("#report #select-acd-report option:selected").text(),
+            div = $("#report #select-div-report option:selected").text(),
+            academic_year = $("#report #select-acd-report option:selected").text(),
         ).then(
             getAjaxReport()
         );
@@ -904,7 +921,7 @@ function processAdminReport(){
 
 
 function processAjaxYear(){
-    $(document).on("change", "#select-dept", function(){
+    $(document).on("change", "#select-dept-report", function(){
         var id = $(this).val();
         console.log(id);
         $.ajax({
@@ -919,17 +936,17 @@ function processAjaxYear(){
                         break;
                     case "notfound":
                         var html = "<option value=' '>Not Found</option>";
-                        $("#select-year").html(html);
-                        $("#select-year").prop("disabled",true);
+                        $("#select-year-report").html(html);
+                        $("#select-year-report").prop("disabled",true);
                         break;
                     case "none":
-                        $("#select-year").prop("disabled",false);
+                        $("#select-year-report").prop("disabled",false);
                         var html = "";
-                        html += "<option value=' '> </option>";
+                        html += "<option value=''> </option>";
                         for(var i = 0; i < res.data.length; i++){
                             html += '<option value="'+res.data[i].year_id+'">'+res.data[i].s_class_name+'</option>';
                         }
-                        $("#select-year").html(html);
+                        $("#select-year-report").html(html);
                         break;
                 }
             },
@@ -953,17 +970,17 @@ function processAjaxYear(){
                         break;
                     case "notfound":
                         var html = "<option value=' '>Not Found</option>";
-                        $("#select-div").html(html);
-                        $("#select-div").prop("disabled",true);
+                        $("#select-div-report").html(html);
+                        $("#select-div-report").prop("disabled",true);
                         break;
                     case "none":
-                        $("#select-div").prop("disabled",false);
+                        $("#select-div-report").prop("disabled",false);
                         var html = "";
-                        html += "<option value=' '> </option>";
+                        html += "<option value=''> </option>";
                         for(var i = 0; i < res.data.length; i++){
                             html += '<option value="'+res.data[i].div_id+'">'+res.data[i].div_name+'</option>';
                         }
-                        $("#select-div").html(html);
+                        $("#select-div-report").html(html);
                         break;
                 }
             },
@@ -973,3 +990,7 @@ function processAjaxYear(){
         })
     })
 }
+
+ 
+
+

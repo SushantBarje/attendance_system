@@ -84,13 +84,13 @@
                 </div>
                 <div class="form-group col-sm-3">
                     <label for="select-div">Select Semester :</label>
-                    <select class="form-control form-control-sm report-select-input" name="sem" id="s_sem">
+                    <select class="form-control form-control-sm sheet-input-field" name="sem" id="s_sem">
                         <option value=""> </option>
                     </select>
                 </div>
                 <div class="col-sm-3">
                     <label for="class" class="mr-sm-2">Class:</label>
-                    <select id="select-class" name="class" class="form-control form-control-sm sheet-input-field" disabled> 
+                    <select id="select-class" name="class" class="form-control form-control-sm" disabled> 
                         <option value=" " data-class=" "> </option>
                         <!-- <?php 
                             $data = $user->getClassByStaff([$_SESSION['faculty_id']]);

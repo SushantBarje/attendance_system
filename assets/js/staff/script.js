@@ -57,8 +57,9 @@ function processAttendanceSheet(){
                 var date = $('#check-attend #date').val();
                 var time = $("#check-attend #time").val();
                 var div = $("#check-attend #select-div").val();
+                var sem = $("#check-attend #s_sem").val();
                 console.log(name,year,date,time);
-                ajaxAttendanceList(id,class_id,year,name,date,time,div);
+                ajaxAttendanceList(id,class_id,year,name,date,time,div, sem);
                 
             }else{
                 console.log("empty");
@@ -67,15 +68,16 @@ function processAttendanceSheet(){
             return false;
         });
 
-        $("#select-div").on("change", function(){
+        $("#s_sem").on("change", function(){
             var acd = $("#select-acd").val();
-            var id = $(this).val();
+            var id = $("#select-div").val();
             var year = $("#select-year").val();
+            var sem = $(this).val();
             if(($("#select-acd").val() != "" || $("#select-acd").val() != " ") && ($("#select-div").val() != "" || $("#select-div").val() != " ") && ($("#select-year").val() != "" || $("#select-year").val() != " ")){
                 $.ajax({
                     url : "../controller/ajaxController.php?action=get_class_div_wise",
                     type : "post",
-                    data : {"id" : id, "acd" : acd, "year" : year},
+                    data : {"id" : id, "acd" : acd, "year" : year, "sem" : sem},
                     dataType : "json",
                     success : function(res){
                         console.log(res);
@@ -149,12 +151,12 @@ function processAttendanceSheet(){
     //     })
     // }
 
-    function ajaxAttendanceList(id, class_id, year, name, date, time, div){
+    function ajaxAttendanceList(id, class_id, year, name, date, time, div, sem){
         console.log(id);
         $.ajax({
             url : "../controller/ajaxController.php?action=attendanceSheet",
             type : "post",
-            data : {id : id, class_id : class_id, year : year, date : date, time : time, div : div},
+            data : {id : id, class_id : class_id, year : year, date : date, time : time, div : div, sem : sem},
             dataType : 'json',
             success : function(res){
                 console.log(res);
@@ -411,8 +413,13 @@ function generateStaffReport(){
                                         td += "<td style='color:red'>A</td>"
                                     }
                                 } 
-                                td += "<td>"+res.total[i].total+"</td>";
-                                td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                if(res.total[i].total == ""){
+                                    td += "<td>NA</td>";
+                                    td += '<td style="mso-number-format:0.00%">NA</td>';
+                                }else{
+                                    td += "<td>"+res.total[i].total+"</td>";
+                                    td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                }
                                 td += "</tr>"
                             }
                             $("#staff-report thead tr").html(th);
