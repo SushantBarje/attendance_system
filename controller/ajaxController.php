@@ -120,9 +120,14 @@ if($req == "addAcademicYear"){
 }else if($req == "get_class_sem_wise"){
     $r = $faculty->showClassSemWise();
     die($r);
-}else if($req == "get_student_report"){
-    $r = $student->showGrandReport();
+}else if($req == "get_courses_sem_wise"){
+    $r = $faculty->showCoursesBySem();
+    die($r);
+}else if($req == "check_pract_attend"){
+    $r = $faculty->showPractAttendance();
+    die($r);
+}else if($req == "save_pract_attendance"){
+    $r = $faculty->savePracticalAttendance();
     die($r);
 }
 ob_end_flush();
-?>

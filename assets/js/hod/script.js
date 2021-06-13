@@ -28,10 +28,11 @@ $(document).ready(function(){
     inputCoursePlaceholder();
     processEditCourse();
     processDeleteCourse();
-    processAddPractClass()
     processHodReport();
     processAjaxClass();
     performReport();
+    processAddPractClass();
+    //processSemesterBelongsClass();
     //exportTable();
     //ajaxClassSemWise()
 });
@@ -45,10 +46,14 @@ function processOnChangeClass(){
         ajaxOnChangeClass($(this).val());
     });
 
-    function ajaxOnChangeClass(data){
+    $("#year_s_pract").on("change", function(){
+        ajaxOnChangeClass($(this).val(),"#sem_s_pract");
+    });
+
+    function ajaxOnChangeClass(data, selector="#s_sem"){
         var id = data;
         console.log(id);
-        if(id == " ") return $("#s_sem").html('<option value="'+' '+'">Select Year</option>').prop("disabled",true);
+        if(id == " ") return $(selector).html('<option value="'+' '+'">Select Year</option>').prop("disabled",true);
         $.ajax({
             url : "../controller/ajaxController.php?action=getSem",
             type : "post",
@@ -57,13 +62,13 @@ function processOnChangeClass(){
             success : function(res){
                 console.log(res);
                 if(res.data.length > 0){
-                    $("#s_sem").prop("disabled",false);
+                    $(selector).prop("disabled",false);
                     var html = "";
                     html += '<option value=""></option>';
                     for(var i = 0; i < res.data.length; i++){
                         html += '<option value="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</option>';
                     }
-                    $('#s_sem').html(html);
+                    $(selector).html(html);
                 }
             }
         })
@@ -504,6 +509,7 @@ function processAddClass(){
             data[$("#add-class-form #acd_year").attr("name")] = $("#add-class-form #acd_year").val();
             data[$("#add-class-form #courses_s").attr("name")] = $("#add-class-form #courses_s").val();
             data[$("#add-class-form #div_s").attr("name")] = $("#add-class-form #div_s").val();
+            
             if($("#add-class-form #faculty_s").val() == "other"){
                 data[$("#add-class-form #foreign_faculty_s").attr("name")] = $("#add-class-form #foreign_faculty_s").val(); 
             }else{
@@ -860,68 +866,68 @@ function processDeleteCourse(){
     })
 }
 
-function processAddPractClass(){
-    $("#add-pract-class").on("click","#practical-submit",function(e){
-        e.preventDefault();
-        var data = {};
-        $.when(
-            data[$("#add-pract-class #acd_year").attr("name")] = $("#add-pract-class #acd_year").val(),
-            data[$("#add-pract-class #faculty_s").attr("name")] = $("#add-pract-class #faculty_s").val(),
-            data[$("#add-pract-class #courses_s").attr("name")] = $("#add-pract-class #courses_s").val(),
-            data[$("#add-pract-class #div_s").attr("name")] = $('#add-pract-class #div_s').val(),
-            data[$("#add-pract-class #batch_s").attr("name")] = $('#add-pract-class #batch_s').val(),
-        ).then(() => {
-            console.log(data);
-            $('#managePractClassModal #add-class').trigger("reset");
-            $('#managePractClassModal').modal('hide');
-            $.ajax({
-                url : "../controller/ajaxController.php?action=add_pract_class",
-                type : "post",
-                data : data,
-                dataType : 'json',
-                success : function(res){
-                    console.log(res);
-                    switch(res.error){
-                        case "empty":
-                            alert("Please Fill all the fields");
-                            break;
-                        case "exists":
-                            alert("Practical already Exists");
-                            break;
-                        case "notinsert":
-                            alert("Data Not Inserted");
-                            break;
-                        case "none":
-                            var html = "";
-                            console.log(res.data.length);
-                            if(res.data.length < 1) {
-                                $('#pract-class-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
-                            }else{
-                                for(var i = 0; i < res.data.length; i++){
-                                    html += '<tr>\
-                                    <td>'+res.data[i].class_id+'</td>\
-                                    <td>'+res.data[i].course_name+'</td>\
-                                    <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
-                                    <td>'+res.data[i].s_class_name+'</td>\
-                                    <td>'+res.data[i].batch_name+'</td>\
-                                    <td>\
-                                        <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
-                                    </td>\
-                                </tr>'
-                                }
-                                $.when(
-                                    $('#pract-class-table tbody').html(html)
-                                ).then(
-                                    alert("Class Added!")
-                                ) 
-                            }
-                            break;  
-                    }   
-                }
-            })
-        })   
-    })
-}
+// function processAddPractClass(){
+//     $("#add-pract-class").on("click","#practical-submit",function(e){
+//         e.preventDefault();
+//         var data = {};
+//         $.when(
+//             data[$("#add-pract-class #acd_year").attr("name")] = $("#add-pract-class #acd_year").val(),
+//             data[$("#add-pract-class #faculty_s").attr("name")] = $("#add-pract-class #faculty_s").val(),
+//             data[$("#add-pract-class #courses_s").attr("name")] = $("#add-pract-class #courses_s").val(),
+//             data[$("#add-pract-class #div_s").attr("name")] = $('#add-pract-class #div_s').val(),
+//             data[$("#add-pract-class #batch_s").attr("name")] = $('#add-pract-class #batch_s').val(),
+//         ).then(() => {
+//             console.log(data);
+//             $('#managePractClassModal #add-class').trigger("reset");
+//             $('#managePractClassModal').modal('hide');
+//             $.ajax({
+//                 url : "../controller/ajaxController.php?action=add_pract_class",
+//                 type : "post",
+//                 data : data,
+//                 dataType : 'json',
+//                 success : function(res){
+//                     console.log(res);
+//                     switch(res.error){
+//                         case "empty":
+//                             alert("Please Fill all the fields");
+//                             break;
+//                         case "exists":
+//                             alert("Practical already Exists");
+//                             break;
+//                         case "notinsert":
+//                             alert("Data Not Inserted");
+//                             break;
+//                         case "none":
+//                             var html = "";
+//                             console.log(res.data.length);
+//                             if(res.data.length < 1) {
+//                                 $('#pract-class-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+//                             }else{
+//                                 for(var i = 0; i < res.data.length; i++){
+//                                     html += '<tr>\
+//                                     <td>'+res.data[i].class_id+'</td>\
+//                                     <td>'+res.data[i].course_name+'</td>\
+//                                     <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+//                                     <td>'+res.data[i].s_class_name+'</td>\
+//                                     <td>'+res.data[i].batch_name+'</td>\
+//                                     <td>\
+//                                         <button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+//                                     </td>\
+//                                 </tr>'
+//                                 }
+//                                 $.when(
+//                                     $('#pract-class-table tbody').html(html)
+//                                 ).then(
+//                                     alert("Class Added!")
+//                                 ) 
+//                             }
+//                             break;  
+//                     }   
+//                 }
+//             })
+//         })   
+//     })
+// }
 
 
 function processHodReport(){
@@ -1306,7 +1312,6 @@ function performReport(){
             })
         }
         else if($("#report-hod #select-acd").val() != "" && $("#report-hod #select-year") != "" && $("#report-hod #select-div").val() != "" && $("#report-hod #s_sem").val() != "" && $("#report-hod #select-class").val() != ""){
-            console.log("barje");
             var data = {};
             var title = "";
             $.when(
@@ -1453,4 +1458,170 @@ function performReport(){
         }
     })
 }
+
+
+function processAddPractClass(){
+    $("#add-pract-class #faculty_s_pract").on("change", function(){
+        if($(this).val() == "other"){
+            console.log("ok");
+            $("#add-pract-class #foreign-select-dept").removeAttr("hidden");
+            $("#add-pract-class #foreign-select-faculty").removeAttr("hidden");
+        }else{
+            console.log("not")
+            $("#add-pract-class #foreign-select-dept").attr("hidden", true);
+            $("#add-pract-class #foreign-select-faculty").attr("hidden", true);
+        }
+    });
+
+    $("#add-pract-class #foreign_dept_s_pract").on("change", function(){
+        var id = $(this).val();
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_faculty_dept_wise",
+            type : "POST",
+            data : {dept_id : id},
+            dataType : "json",
+            success : function(res){
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please Fill All Details");
+                        break;
+                    case "notfound":
+                        var html = '<option value="">Faculty not available<option>';
+                        $("#add-pract-class #foreign_faculty_s_pract").html(html);
+                        break;
+                    case "none":
+                        var html = "";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<option value="'+res.data[i].faculty_id+'">'+res.data[i].last_name+' '+res.data[i].first_name+'</option>'
+                        }
+                        $("#add-pract-class #foreign_faculty_s_pract").html(html);
+                        break;
+                }
+            },
+            error : function(e){
+                console.log(e);
+            }
+        });
+    })
+
+    $("#add-pract-class").on("change", ".select-input-field", function(){
+        if($("#add-pract-class #acd_year_pract").val() != " " && $("#add-pract-class #year_s_pract").val() != " " && $("#add-pract-class #div_s_pract").val() != " " && $("#add-pract-class #sem_s_pract").val() != " "){
+            var acd = $("#add-pract-class #acd_year_pract").val();
+            var year = $("#add-pract-class #year_s_pract").val();
+            var div = $("#add-pract-class #div_s_pract").val();
+            var sem = $("#add-pract-class #sem_s_pract").val();
+            console.log(acd,year,div);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_courses_sem_wise",
+                type : "POST",
+                data : {"year" : year, "sem" : sem},
+                dataType : "JSON",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            $("#add-pract-class #courses_s_pract").prop("disabled", true);
+                            $("#add-pract-class #courses_s_pract").val(" ");
+                            $("#add-pract-class #courses_s_pract").text(" ");
+                            break;
+                        case "notfound":
+                            $("#add-pract-class #courses_s_pract").val(" ");
+                            $("#add-pract-class #courses_s_pract").text("No class found");
+                            break;
+                        
+                        case "none":
+                            $("#add-pract-class #courses_s_pract").prop("disabled", false);
+                            $("#add-pract-class #courses_s_pract").val(" ");
+                            $("#add-pract-class #courses_s_pract").text(" ");
+                            if(res.data.length > 0){
+                                $("#add-pract-class #courses_s_pract").prop("disabled",false);
+                                var html = '<option value=""> </option>';
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<option value="'+res.data[i].course_id+'">'+res.data[i].course_name+'</option>';
+                                }
+                                $('#add-pract-class #courses_s_pract').html(html);
+                            }
+                            break;
+                    }
+                }
+            })
+        }
+    });
+
+    $("#add-pract-class").on("click","#practical-submit",function(e){
+        e.preventDefault();
+        var data = {};
+        function takeInput(){
+            data[$("#add-pract-class #acd_year_pract").attr("name")] = $("#add-pract-class #acd_year_pract").val();
+            data[$("#add-pract-class #courses_s_pract").attr("name")] = $("#add-pract-class #courses_s_pract").val();
+            data[$("#add-pract-class #div_s_pract").attr("name")] = $("#add-pract-class #div_s_pract").val();
+            data[$("#add-pract-class #batch_s_pract").attr("name")] = $("#add-pract-class #batch_s_pract").val();
+            data[$("#add-pract-class #year_s_pract").attr("name")] = $("#add-pract-class #year_s_pract").val();
+            data[$("#add-pract-class #sem_s_pract").attr("name")] = $("#add-pract-class #sem_s_pract").val();
+            if($("#add-pract-class #faculty_s_pract").val() == "other"){
+                data[$("#add-pract-class #foreign_faculty_s_pract").attr("name")] = $("#add-pract-class #foreign_faculty_s_pract").val(); 
+            }else{
+                data[$("#add-pract-class #faculty_s_pract").attr("name")] = $("#add-pract-class #faculty_s_pract").val();
+            }
+        }
+        $.when(
+            takeInput()
+        ).then(() => {
+            console.log(data);
+            $('#managePracticalClassModal #add-pract-class_pract').trigger("reset");
+            $('#managePracticalClassModal').modal('hide');
+            $.ajax({
+                url : "../controller/ajaxController.php?action=add_pract_class",
+                type : "post",
+                data : data,
+                dataType : 'json',
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please Fill all the fields");
+                            break;
+                        case "exists":
+                            alert("HOD already Exists");
+                            break;
+                        case "notinsert":
+                            alert("Data Not Inserted");
+                            break;
+                        case "taken":
+                            alert("Some Batches are already taken. Please check again!");
+                            break;
+                        case "none":
+                            var html = "";
+                            console.log(res.data.length);
+                            if(res.data.length < 1) {
+                                $('#pract-class-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            }else{
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr>\
+                                    <td>'+res.data[i].class_id+'</td>\
+                                    <td>'+res.data[i].course_name+'</td>\
+                                    <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                    <td>'+res.data[i].s_class_name+'</td>\
+                                    <td>'+res.data[i].div_name+'</td>\
+                                    <td>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                    </td>\
+                                </tr>'
+                                }
+                                $.when(
+                                    $('#pract-class-table tbody').html(html)
+                                ).then(
+                                    alert("Class Added!")
+                                ) 
+                            }
+                            break;  
+                    }   
+                }
+            })
+        })   
+    })
+}
+
+
 

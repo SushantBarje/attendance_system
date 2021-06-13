@@ -10,6 +10,7 @@ $(document).ready(function(){
     AttendanceDetails();
     processDeleteAttendance()
     processOnChangeClass()
+    processPracticalAttendance()
     //processSubmitAttendance();
 });
 
@@ -218,22 +219,30 @@ function processAttendanceSheet(){
 
 
 function processMarkAttendance(){
+    $("#pract-attend-list").on("click",".marker", function(){
+        marker($(this))
+    })
+
     $('#attend-list').on("click", '.marker', function(){
-        if($(this).text() == "P"){
-            $(this).text("A");
-            $(this).removeClass("btn btn-success");
-            $(this).addClass("btn btn-danger");
-            $(this).attr("data-control",0);
-            $(this).parent().find('input').val(0); 
-        }else{
-            $(this).text("P");
-            $(this).removeClass("btn btn-danger");
-            $(this).addClass("btn btn-success");
-            $(this).attr("data-control",1);
-            $(this).find('input').val(1);
-            $(this).parent().find('input').val(1)
-        }
+        marker($(this))
     }); 
+
+    function marker(selector){
+        if(selector.text() == "P"){
+            selector.text("A");
+            selector.removeClass("btn btn-success");
+            selector.addClass("btn btn-danger");
+            selector.attr("data-control",0);
+            selector.parent().find('input').val(0); 
+        }else{
+            selector.text("P");
+            selector.removeClass("btn btn-danger");
+            selector.addClass("btn btn-success");
+            selector.attr("data-control",1);
+            selector.find('input').val(1);
+            selector.parent().find('input').val(1)
+        }
+    }
 }
 
 // function processSubmitAttendance(){
@@ -612,3 +621,82 @@ function processOnChangeClass(){
 }
 
 
+
+function processPracticalAttendance(){
+    $("#check-attend-pract").on("change",".sheet-input-field-pract" ,function(){
+        var date = $("#date-pract");
+        var time = $("#time-pract");
+        var class_id = $("#class_id_pract");
+        console.log(class_id);
+        if(date.val() != "" && time.val() != ""){
+            $.ajax({
+                url : "../controller/ajaxController.php?action=check_pract_attend",
+                type : "POST",
+                data : {"class_id" : class_id.val(), "date" : date.val(), "time" : time.val()},
+                dataType : "json",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please fill all details.");
+                            break;
+                        case "notfound":
+                            break;
+                        case "none":
+                            if(!confirm("Already Attendance Take Do you want to edit!")){
+                                break;
+                            }else{
+                                var html = "";
+                                for(var i = 0; i < res.data.length; i++){
+                                    if(res.data[i].status == 0){
+                                        html += '<div class="grid-item m-2 mark-attend">\
+                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
+                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                                <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
+                                            </div>'
+                                    }else{
+                                        html += '<div class="grid-item m-2 mark-attend">\
+                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
+                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                                <button type="button" class="btn btn-success rounded-0 marker">P</button>\
+                                            </div>'
+                                    } 
+                                }
+                                $("#pract-attend-list").html(" ");
+                                $("#pract-attend-list").html(html);
+                            }
+                            break;
+                    }
+                }
+            });
+        }
+    })
+
+    $("#check-attend-pract").on("submit", function(e){
+        e.preventDefault(); 
+        $.ajax({
+            url : "../controller/ajaxController.php?action=save_pract_attendance",
+            type : "post",
+            data : $(this).serialize(),
+            dataType : 'json',
+            success : function(res){
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please fill date and time");
+                        break;
+                    case "update":
+                        alert("Attendance Updated!");
+                        break;
+                    case "none":
+                        alert("Attendance Submitted");
+                        break;
+                }
+                window.location.href = "";
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
+    })
+}
