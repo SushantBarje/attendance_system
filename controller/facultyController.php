@@ -295,13 +295,26 @@ class FacultyController extends Faculty {
         $this->s_first_name = $this->verifyInput($_POST['fname']);
         $this->s_middle_name = $this->verifyInput($_POST['mname']);
         $this->s_last_name = $this->verifyInput($_POST['lname']);
-        $this->s_roll_no = $this->verifyInput($_POST['roll_no']);
+        $this->s_roll_no = (int)$this->verifyInput($_POST['roll_no']);
         $this->class = (int)$this->verifyInput($_POST['class_year']);
         $this->dept = (!isset($_POST['s_dept'])) ? $_SESSION['dept'] : (int)$this->verifyInput($_POST['s_dept']);
         $this->s_div = (int)$this->verifyInput($_POST['s_div']);
         $this->s_batch = (int)$this->verifyInput($_POST['s_batch']);
+        if($this->getStudentByRollno([$this->s_roll_no, $this->class, $this->dept, $this->s_div])) return json_encode(array("error" => "exists"));
         $result = $this->insertOneStudent([$this->prn_no, $this->s_first_name, $this->s_middle_name, $this->s_last_name, $this->s_roll_no, $this->dept, $this->class, $this->s_batch, $this->s_div]);
         if($result){ 
+            $acd_year_last = $this->getLastAcademicYear();
+            $class_found = $this->checkIfClassAttendanceExisits([$this->dept, $this->class, $this->s_div, $acd_year_last["acedemic_id"]]);
+            if($class_found){
+                for($i = 0; $i < count($class_found); $i++){
+                    $student_present_in_attendance = $this->checkStudentPresentInAttendance([$class_found[$i]["class_id"], $this->prn_no, $class_found[$i]["date_time"]]);
+                    if(!$student_present_in_attendance){
+                        $status = 0;
+                        $this->insertStudentAttendance([$class_found[$i]['class_id'], $this->prn_no, $status, $class_found[$i]['date_time']]);
+                    }
+                    
+                }
+            }
             $getdata = $this->getStudentByDept([$_SESSION['dept']]);
         }
         else {
@@ -350,6 +363,7 @@ class FacultyController extends Faculty {
     public function saveBulkStudent(){
         $this->checkEmpty();
         $this->class = $this->verifyInput($_POST['class']);
+
         $allowedFileType = [
             'application/vnd.ms-excel',
             'text/xls',
@@ -371,7 +385,6 @@ class FacultyController extends Faculty {
                 $cells = array();
                 foreach ($excelSheet->getRowIterator() as $row) {
                     $cell = $excelSheet->getCell($column . $row->getRowIndex())->getValue();
-                    
                     if (($ignoreEmptyCells == false) && (empty($cell) == false)) {
                         $cells[] = $cell;
                     }
@@ -410,14 +423,27 @@ class FacultyController extends Faculty {
                     $div_id = $this->searchDivision(['%'.$div.'%']);
                     $div_id = $div_id[0]['div_id'];
                 }
+                $this->dept = (isset($_POST['dept_id'])) ? $this->verifyInput($_POST['dept']) : $_SESSION['dept'];
                 $dup = [];
                 if (!empty($prn_no) || !empty($first_name) || !empty($middle_name) || !empty($last_name) || !empty($roll_no) || !empty($batch)) {
                     if(!$this->getStudentById([$prn_no])){
-                        $result = $this->insertOneStudent([$prn_no, $first_name, $middle_name, $last_name, $roll_no, $_SESSION['dept'], $this->class, $batch, $div_id]);
+                        $this->insertOneStudent([$prn_no, $first_name, $middle_name, $last_name, $roll_no, $_SESSION['dept'], $this->class, $batch, $div_id]);
+                        $acd_year_last = $this->getLastAcademicYear();
+                        $class_found = $this->checkIfClassAttendanceExisits([$this->dept, $this->class, $div_id, $acd_year_last["acedemic_id"]]);
+                        if($class_found){
+                            for($i = 0; $i < count($class_found); $i++){
+                                $student_present_in_attendance = $this->checkStudentPresentInAttendance([$class_found[$i]["class_id"], $prn_no, $class_found[$i]["date_time"]]);
+                                if(!$student_present_in_attendance){
+                                    $status = 0;
+                                    $this->insertStudentAttendance([$class_found[$i]['class_id'], $prn_no, $status, $class_found[$i]['date_time']]);
+                                } 
+                            }
+                        }
                     }else{
                         $count++;
                         $dup[] = $prn_no;
                     }
+                    
                     //if(!$result) return json_encode(array("error" => "notinsert"));
                 }
             }
@@ -687,9 +713,8 @@ class FacultyController extends Faculty {
     }
 
     public function showClassByDiv(){
-      
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
-
+        
         if(isset($_POST['div'])) $this->s_div = $this->verifyInput($_POST['div']);
         else if(isset($_POST['id'])) $this->s_div = (int)$this->verifyInput($_POST['id']);
         else $this->s_div = 1;
@@ -713,7 +738,7 @@ class FacultyController extends Faculty {
         $this->sem = $this->verifyInput($_POST['sem']);
         //if($_SESSION['role_id'] == 0) $result = $this->getAllClassByDeptAndYear([$this->$this->acd_year , $this->year, $this->s_div, $this->dept])
         if($_SESSION['role_id'] == 1 || $_SESSION['role_id'] == 0) $result = $this->getClassByYearDivisionAcademicAndDept([$this->acd_year , $this->year, $this->s_div, $this->sem, $this->dept]);
-        else $result = $this->getClassByYearDivisionAcademicAndFaculty([$this->acd_year , $this->year, $this->s_div, $this->faculty_id]);
+        else $result = $this->getClassByYearDivisionAcademicAndFaculty([$this->acd_year , $this->year, $this->s_div, $this->sem, $this->faculty_id]);
         if(!$result) return json_encode(array("error" => "notfound"));
         else return json_encode(array("error" => "none", "data" => $result)); 
     }

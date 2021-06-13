@@ -31,9 +31,6 @@
     <script src="../assets/js/hod/script.js"></script>
     <title>Manage Classes</title>
 </head>
-
-<body>
-
 <body>
 <?php   include "hodHeader.php" ?>
     <main>
@@ -285,8 +282,7 @@
                                     
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
-
-                                        <button type="submit" class="btn btn-success">ADD</button>
+                                        <button type="button" id="practical-submit" class="btn btn-success">Add</button>
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                     </div>
                                     <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
@@ -313,7 +309,7 @@
             </thead>
             <tbody>
                 <?php 
-                    $data = $user->getClassByDept([$_SESSION['dept']]);
+                    $data = $user->getPracticalClassByDept([$_SESSION['dept']]);
                     foreach($data as $d){
                         echo '<tr>
                                 <td>'.$d['class_id'].'</td>

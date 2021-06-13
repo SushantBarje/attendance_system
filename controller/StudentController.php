@@ -59,7 +59,7 @@ class StudentController extends Student {
             $_SESSION['year_id'] = $result[0]['year_id'];
             $_SESSION['batch_id'] = $result[0]['batch_id'];
             $_SESSION['div_id'] = $result[0]['div_id'];
-            header("Location:student/studentdash.php");
+            header("Location:student/generatereport.php");
         }
         else{
            $this->errors["invalid"] = "Invalid PRN Number";

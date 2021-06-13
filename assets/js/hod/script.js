@@ -453,19 +453,19 @@ function processDeleteStaff(){
 
 
 function processAddClass(){
-    $("#faculty_s").on("change", function(){
+    $("#add-class-form #faculty_s").on("change", function(){
         if($(this).val() == "other"){
             console.log("ok");
-            $("#foreign-select-dept").removeAttr("hidden");
-            $("#foreign-select-faculty").removeAttr("hidden");
+            $("#add-class-form #foreign-select-dept").removeAttr("hidden");
+            $("#add-class-form #foreign-select-faculty").removeAttr("hidden");
         }else{
             console.log("not")
-            $("#foreign-select-dept").attr("hidden", true);
-            $("#foreign-select-faculty").attr("hidden", true);
+            $("#add-class-form #foreign-select-dept").attr("hidden", true);
+            $("#add-class-form #foreign-select-faculty").attr("hidden", true);
         }
     });
 
-    $("#foreign_dept_s").on("change", function(){
+    $("#add-class-form #foreign_dept_s").on("change", function(){
         var id = $(this).val();
         $.ajax({
             url : "../controller/ajaxController.php?action=get_faculty_dept_wise",
@@ -480,14 +480,14 @@ function processAddClass(){
                         break;
                     case "notfound":
                         var html = '<option value="">Faculty not available<option>';
-                        $("#foreign_faculty_s").html(html);
+                        $("#add-class-form #foreign_faculty_s").html(html);
                         break;
                     case "none":
                         var html = "";
                         for(var i = 0; i < res.data.length; i++){
                             html += '<option value="'+res.data[i].faculty_id+'">'+res.data[i].last_name+' '+res.data[i].first_name+'</option>'
                         }
-                        $("#foreign_faculty_s").html(html);
+                        $("#add-class-form #foreign_faculty_s").html(html);
                         break;
                 }
             },
@@ -497,12 +497,12 @@ function processAddClass(){
         });
     })
 
-    $("#add-class").on("click", function(e){
+    $("#add-class-form #add-class").on("click", function(e){
         e.preventDefault();
         var data = {};
         function takeInput(){
             data[$("#add-class-form #acd_year").attr("name")] = $("#add-class-form #acd_year").val();
-            data[$("#add-class-form #courses_s").attr("name")] = $("#courses_s").val();
+            data[$("#add-class-form #courses_s").attr("name")] = $("#add-class-form #courses_s").val();
             data[$("#add-class-form #div_s").attr("name")] = $("#add-class-form #div_s").val();
             if($("#add-class-form #faculty_s").val() == "other"){
                 data[$("#add-class-form #foreign_faculty_s").attr("name")] = $("#add-class-form #foreign_faculty_s").val(); 
@@ -570,7 +570,7 @@ function processAddClass(){
 
 
 function processDeleteClass(){
-    $('#class-table').on("click","#del-btn",function(){
+    $('#add-class-form #class-table').on("click","#add-class-form #del-btn",function(){
         if(confirm("Are you sure you want to delete ?")){
             var data = {};
             $.when(
@@ -861,7 +861,7 @@ function processDeleteCourse(){
 }
 
 function processAddPractClass(){
-    $("#add-pract-class").on("submit", function(e){
+    $("#add-pract-class").on("click","#practical-submit",function(e){
         e.preventDefault();
         var data = {};
         $.when(
@@ -1213,80 +1213,6 @@ function performReport(){
                     console.log(res);
                     switch(res.error){
                         case "none":
-                            
-                                // var columns = Object.keys(res.data[0]);
-                                // var class_columns = columns.slice(3);
-                                // var numColClass = class_columns.length;
-                                // var table_header_1 = '<tr>\
-                                //                         <th colspan="2">Class :</th>\
-                                //                         <th colspan="'+numColClass+'">Intersaction Session</th>\
-                                //                         <th colspan="2">Total</th>\
-                                //                     </tr>\
-                                //                     <tr>\
-                                //                         <th rowspan="2">Roll no.</th>\
-                                //                         <th>Name of Student</th>';
-    
-                                // var th_1;
-                                // for(var i = 0; i < numColClass; i++){
-                                //     th_1 += '<th>'+class_columns[i]+'</th>'
-                                // }
-                                // var total_th = "<th>Total</th><th>%</th></tr>"
-    
-                                // var total_header = "<tr><th>Total No. of Lectures</th>";
-                                // var columns = Object.values(res.lectures);
-                                // var numColTotal = class_columns.length;
-                                // var th_2;
-                                // var total_sum_lectures = 0;
-                                // for(var i = 0; i < numColTotal; i++){
-                                //     total_sum_lectures += parseInt(columns[i]);
-                                //     th_2 += '<th>'+columns[i]+'</th>'
-                                    
-                                // }
-                                // th_2 += '<th>'+total_sum_lectures+'</th>'
-                                // th_2 += "<th>-</th></tr>";
-                                // var tbody = "<tr>";
-                                // for(var i = 0; i < res.data.length; i++){
-                                //     tbody += '<td>'+res.data[i].roll_no+'</td>';
-                                //     tbody += '<td>'+res.data[i].student_name+'</td>';
-                                //     var sum = 0;
-                                //     for(var j = 0; j < numColClass; j++){
-                                //         if(res.data[i][class_columns[j]] != null){
-                                //             sum += parseInt(res.data[i][class_columns[j]]);
-                                //             tbody += '<td>'+res.data[i][class_columns[j]]+'</td>' 
-                                //         }else{
-                                //             tbody += '<td>-</td>'
-                                //         }
-                                //     }
-                                //     total_percent = (sum/total_sum_lectures)*100;
-                                //     tbody += '<td>'+sum+'</td>'
-                                //     tbody += '<td style="mso-number-format:"'+0.00+'%">'+total_percent.toFixed(2)+'%</td></tr>';
-                                // }
-                                // var concat_header = table_header_1+th_1+total_th+total_header+th_2;
-    
-                                // $("#hod-report-adv thead").html(concat_header);
-                                // $("#hod-report-adv tbody").html(tbody);
-                                // $("#hod-report-adv").DataTable(
-                                //     {
-                                //         scrollY:        "500px",
-                                //         scrollX:        true,
-                                //         scrollCollapse: true,
-                                //         paging:         false,
-                                //         autoWidth:  false,
-                                //         fixedColumns:   {
-                                //             leftColumns: 2,
-                                //             rightColumns: 1
-                                //         },
-                                //         dom: 'Bfrtip',
-                                //         extend: 'excel'
-                                        
-
-                                //     }
-                                // );
-                                
-
-
-
-
                                 if($.fn.dataTable.isDataTable("#hod-report-adv")){
                                     $("#hod-report-adv").DataTable().destroy();
                                     $("#hod-report-adv thead").html(" ");
@@ -1438,7 +1364,6 @@ function performReport(){
                                 th += "<th>Roll no.</th>";
                                 th += "<th>Student Name.</th>";
                                 for(var i = 0; i < numCol; i++){
-                                    // if(columns[i] == "student_id") continue;
                                     var date = new Date(datecolumns[i]);
                                     var dd = date.getDate();
 
@@ -1482,9 +1407,14 @@ function performReport(){
                                             }else{
                                                 td += "<td style='color:red'>A</td>"
                                             }
-                                        } 
-                                        td += "<td>"+res.total[i].total+"</td>";
-                                        td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                        }
+                                        if(typeof res.total[i].total === 'undefined'){
+                                            td += "<td>NA</td>";
+                                            td += '<td style="mso-number-format:0.00%">NA</td>';
+                                        }else{
+                                            td += "<td>"+res.total[i].total+"</td>";
+                                            td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                        }
                                         td += "</tr>"
                                     }
                             
@@ -1523,26 +1453,4 @@ function performReport(){
         }
     })
 }
-
-// function exceller() {
-//     var uri = 'data:application/vnd.ms-excel;base64,',
-//       template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
-//       base64 = function(s) {
-//         return window.btoa(unescape(encodeURIComponent(s)))
-//       },
-//       format = function(s, c) {
-//         return s.replace(/{(\w+)}/g, function(m, p) {
-//           return c[p];
-//         })
-//       }
-//     var toExcel = document.getElementById("toExcel").innerHTML;
-//     var ctx = {
-//       worksheet: name || '',
-//       table: toExcel
-//     };
-//     var link = document.createElement("a");
-//     link.download = "export.xls";
-//     link.href = uri + base64(format(template, ctx))
-//     link.click();
-//   }
 
