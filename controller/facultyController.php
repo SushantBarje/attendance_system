@@ -32,6 +32,7 @@ class FacultyController extends Faculty {
     private $from_date;
     private $till_date;
     private $year;
+    private $batch_ar = [];
 
 
     public function verifyInput($data){
@@ -427,7 +428,8 @@ class FacultyController extends Faculty {
                 $dup = [];
                 if (!empty($prn_no) || !empty($first_name) || !empty($middle_name) || !empty($last_name) || !empty($roll_no) || !empty($batch)) {
                     if(!$this->getStudentById([$prn_no])){
-                        $this->insertOneStudent([$prn_no, $first_name, $middle_name, $last_name, $roll_no, $_SESSION['dept'], $this->class, $batch, $div_id]);
+                        $result = $this->insertOneStudent([$prn_no, $first_name, $middle_name, $last_name, $roll_no, $_SESSION['dept'], $this->class, $batch, $div_id]);
+            
                         $acd_year_last = $this->getLastAcademicYear();
                         $class_found = $this->checkIfClassAttendanceExisits([$this->dept, $this->class, $div_id, $acd_year_last["acedemic_id"]]);
                         if($class_found){
@@ -552,26 +554,34 @@ class FacultyController extends Faculty {
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $this->acd_year = $this->verifyInput($_POST['acd_year']);
         $this->faculty_id = $this->verifyInput($_POST['faculty_s']);
-        $this->course_id = (int)$this->verifyInput($_POST['courses']);
+        $this->course_id = $this->verifyInput($_POST['courses']);
         $this->div_id = (int)$this->verifyInput($_POST['div']);
-        $this->batch_ar = (array)$this->verifyInput($_POST['batches']);
+        $this->batch_ar = $this->verifyInput($_POST['batches']);
+        $this->year = $this->verifyInput($_POST['year']);
+        $this->sem = $this->verifyInput($_POST['sem']);
         $this->dept = isset($_POST['dept']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
         $c = $p = [];
         foreach($this->batch_ar as $batch){
-            if($this->getPractClass([(int)$this->faculty_id, (int)$this->course_id, (int)$this->div_id ,(int)$this->dept, (int)$batch, (int)$this->acd_year]))
+            $result = $this->checkPractClassAlreadyTaken([(int)$this->course_id, (int)$this->div_id ,(int)$this->dept, (int)$this->year, (int)$this->sem, (int)$batch, (int)$this->acd_year]);
+            if($result) return json_encode(array("error" => "taken"));
+            $result = $this->checkPractClass([(int)$this->faculty_id, (int)$this->course_id, (int)$this->div_id ,(int)$this->dept, (int)$this->year, (int)$this->sem, (int)$batch, (int)$this->acd_year]);
+            if($result)
             { 
                 $p[] = $batch;
                 continue;
             }
             else
             {
-                $result = $this->insertOnePractClass([(int)$this->faculty_id, (int)$this->course_id, (int)$this->div_id ,(int)$this->dept, (int)$batch, (int)$this->acd_year]);
+                //var_dump((int)$this->course_id);
+                $result = $this->insertOnePractClass([(int)$this->faculty_id, (int)$this->course_id, (int)$this->div_id ,(int)$this->dept, (int)$this->year, (int)$this->sem, (int)$batch, (int)$this->acd_year]);
+        
                 if(!$result) $c[] = $batch;
             }
         }
+
         if(count($p) > 0) return json_encode(array("error" => "already", "count" => $p));
         if(count($c) > 0) return json_encode(array("error" => "notinsert", "count" => $c));
-        else $getclass = $this->getPractClassByDept([$_SESSION['dept']]);
+        $getclass = $this->getPractClassByDept([(int)$this->dept]);
         return json_encode(array("error" => "none", "data" => $getclass));
     }
 
@@ -697,7 +707,7 @@ class FacultyController extends Faculty {
         if(!$result) return json_encode(array("error" => "nostudent"));
         $result = $this->getTheoryAttendance([(int)$this->class,$timestamp]);
         if(!$result){
-            $getclass = $this->getClassById([$_SESSION['faculty_id'], $this->class]);
+            $getclass = $this->getClassById([$this->faculty_id, $this->class]);
             $result = $this->selectStudentByDeptAndYearForAttend([$getclass['dept_id'],$s_class_id]);
             return json_encode(array("error" => "notfound", "data" => $result));
         } 
@@ -904,6 +914,60 @@ class FacultyController extends Faculty {
         $result = $this->getClassSemWise([$this->acd_year, $this->year, $this->s_div, $this->sem]);
         if(!$result) return json_encode(array("error" => "notfound"));
         return json_encode(array("error" => "none", "data" => $result));
+    }
+
+
+    public function showCoursesBySem(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->year = $this->verifyInput($_POST['year']);
+        $this->sem = $this->verifyInput($_POST['sem']);
+        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        $result = $this->getCoursesByYearSem([$this->year, $this->sem, $this->dept]);
+        if(!$result) return json_encode(array("error" => "notfound"));
+        return json_encode(array("error" => "none", "data" => $result));
+    }
+
+    public function showPractAttendance(){
+ 
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $date = $this->verifyInput($_POST['date']);
+        $time = $this->verifyInput($_POST['time']);
+        $this->class = $this->verifyInput($_POST['class_id']);
+        $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
+        $result = $this->getFullPracticalAttendanceByClassDateAndTime([$this->class, $timestamp]);
+        if($result){
+            $getAttend = $this->getPracticalAttendance([$this->class, $timestamp]);
+            return json_encode(array("error" => "none" , "data" => $getAttend));
+        }else{
+            return json_encode(array("error" => "notfound"));
+        }
+    }
+
+    public function savePracticalAttendance(){
+       
+        if($this->checkEmpty()) return array("error" => "empty");
+        $this->class = $this->verifyInput($_POST['class']);
+        date_default_timezone_set("Asia/Kolkata");
+        $date = $this->verifyInput($_POST['date']);
+        $time = $this->verifyInput($_POST['time']);
+        $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
+        $this->attend = $this->verifyInput($_POST['attend']);
+        $result = $this->getPracticalAttendance([(int)$this->class,$timestamp]);
+        if(count($result) == 0){
+            $c = 0;
+            foreach((array)$this->attend as $key => $value){
+               
+                $result = $this->insertStudentPracticalAttendance([(int)$this->class, $key,(int)$value,$timestamp]);
+                //var_dump($result);
+               $c++;
+            }
+        }else{
+            foreach((array)$this->attend as $key => $value){
+                $result = $this->updateStudentPracticalAttendance([(int)$value,(int)$this->class, $key, $timestamp]);
+             }
+             return json_encode(array("error" => "update"));
+        }
+        return json_encode(array("error" => "none"));
     }
     
     public function getFacultyId(){

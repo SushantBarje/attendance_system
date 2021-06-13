@@ -639,6 +639,8 @@ class Faculty extends Database {
 		}
 	}
 
+	
+
 	public function getCourses(){
 		try{
 			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id ORDER BY b.dept_id,c.s_class_id,d.sem_id";
@@ -657,6 +659,17 @@ class Faculty extends Database {
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($id);
 			return $stmt->fetch();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getCoursesByYearSem($data){
+		try{
+			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id WHERE a.s_class_id = ? AND a.sem_id = ? AND a.dept_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
@@ -1018,7 +1031,7 @@ class Faculty extends Database {
 	public function insertOnePractClass($data){
 		try{
 			$con = $this->connect();
-			$sql = "INSERT INTO practical_class(faculty_id, course_id, div_id, batch_id, academic_id) VALUES(?,?,?,?,?);";
+			$sql = "INSERT INTO practical_class(faculty_id, course_id, div_id, dept_id, year_id, sem_id, batch_id, academic_id) VALUES(?,?,?,?,?,?,?,?);";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return true;
 		}catch (PDOException $e){
@@ -1026,10 +1039,22 @@ class Faculty extends Database {
 		}
 	}
 
-	public function getPractClass($data){
+	public function checkPractClassAlreadyTaken($data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT FROM practical_class WHERE faculty_id = ? AND course_id = ? AND  div_id = ? AND batch_id = ? AND academic_year = ?;";
+			$sql = "SELECT p_class_id FROM practical_class WHERE course_id = ? AND div_id = ? AND dept_id = ? AND year_id = ? AND sem_id = ? AND batch_id = ? AND academic_id = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function checkPractClass($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT * FROM practical_class WHERE faculty_id = ? AND course_id = ? AND  div_id = ? AND dept_id = ? AND year_id = ? AND sem_id = ? AND batch_id = ? AND academic_id = ?;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}catch (PDOException $e){
@@ -1040,7 +1065,7 @@ class Faculty extends Database {
 	public function getPractClassByDept($data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT a.*, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE c.dept_id = ? GROUP BY faculty_id;";			
+			$sql = "SELECT a.faculty_id, a.dept_id, a.year_id, a.sem_id, d.div_name , group_concat(a.p_class_id) as p_class_ids, group_concat(a.batch_id) as batch_ids, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE a.dept_id = ? GROUP BY a.faculty_id, a.year_id, a.sem_id, a.dept_id";			
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}
@@ -1247,4 +1272,86 @@ class Faculty extends Database {
 			return array("e" => $e->getMessage());
 		}
 	}
+
+
+	public function getStaffPracticalClassByAcademicYearAndFacultyID($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name, j.batch_name FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.year_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id JOIN batch as j ON a.batch_id = j.batch_id WHERE a.academic_id = ? AND a.faculty_id = ? ORDER BY p_class_id, year_id, sem_id, academic_id";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getStudentForPractAttendanceBatchWise($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, p_class_id FROM student as a JOIN practical_class as b ON a.year_id = b.year_id AND a.div_id = b.div_id AND a.batch_id = b.batch_id WHERE b.p_class_id = ? ORDER BY roll_no+0;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getPractClassById($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.batch_name, j.div_name FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.year_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN batch as i ON a.batch_id = i.batch_id JOIN division as j ON a.div_id = j.div_id WHERE p_class_id = ? AND a.faculty_id = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetch();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getFullPracticalAttendanceByClassDateAndTime($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT b.* ,a.*, dept_name, s_class_name, div_name, batch_name FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no JOIN department as c ON b.dept_id = c.dept_id JOIN student_class as d ON b.year_id = d.s_class_id JOIN division as e ON e.div_id = b.div_id JOIN batch as f ON f.batch_id = b.batch_id WHERE a.p_class_id = ? AND a.date_time = ? ORDER BY b.roll_no+0;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getPracticalAttendance($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.* FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no WHERE p_class_id = ? AND date_time = ? ORDER BY b.roll_no+0";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function insertStudentPracticalAttendance($data){
+		try{
+			$con = $this->connect();
+			$sql = "INSERT INTO pract_attend(p_class_id, prn_no, status, date_time) VALUES(?,?,?,?)";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+				
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function updateStudentPracticalAttendance($data){
+        try{
+			$con = $this->connect();
+			$sql = "UPDATE pract_attend SET status = ? WHERE p_class_id = ? AND prn_no = ? AND date_time = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
+				
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+    }
+
 };
