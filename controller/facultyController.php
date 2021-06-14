@@ -678,7 +678,9 @@ class FacultyController extends Faculty {
         if(!$result) return json_encode(array("error" => "notexists"));
         $result = $this->getStaffReport([(int)$this->class,$fromdate,$tilldate]);
         $getTotal = $this->getStaffReportTotal([(int)$this->class,$fromdate,$tilldate]);
-        return json_encode(array("error" => "none","data" => $result,"total" => $getTotal));
+        $faculty = $this->getFacultyofClassById([$this->class]);
+        $faculty = $faculty["last_name"]." ".$faculty["first_name"];
+        return json_encode(array("error" => "none","data" => $result,"total" => $getTotal, "faculty" => $faculty));
     }
 
     public function showFacultyByDept(){
@@ -778,7 +780,9 @@ class FacultyController extends Faculty {
         if(!$result) return json_encode(array("error" => "notexists"));
         $result = $this->getStaffReport([(int)$this->class,$fromdate,$tilldate]);
         $getTotal = $this->getStaffReportTotal([(int)$this->class,$fromdate,$tilldate]);
-        return json_encode(array("error" => "none","data" => $result,"total" => $getTotal));
+        $faculty = $this->getFacultyofClassById([$this->class]);
+        $faculty = $faculty["last_name"]." ".$faculty["first_name"];
+        return json_encode(array("error" => "none","data" => $result,"total" => $getTotal, "faculty" => $faculty));
     }
 
     public function showAttendTakenClass(){
@@ -809,6 +813,7 @@ class FacultyController extends Faculty {
         $data = [];
         $query = "";
         $from = $till = 0;
+    
         if(!empty($_POST['academic_year'])){
             $query .= " academic_id = ? ";
             $this->acd_year = $this->verifyInput($_POST['academic_year']);
@@ -856,7 +861,7 @@ class FacultyController extends Faculty {
             
             $result = $this->getAttendanceByDate("date_time >= DATE(?) AND date_time <= DATE(?)",[$this->dept, $this->year, $this->s_div, date('Y-m-d', strtotime($this->from_date)) , date('Y-m-d', strtotime($this->till_date))]);
             
-             if(!$result) return (array("error" => "noattend"));
+            if(!$result) return (array("error" => "noattend"));
         }
         else if(!empty($_POST['from-date'])){
             $query .= " AND DATE(date_time) >= DATE(?) ";
@@ -944,7 +949,6 @@ class FacultyController extends Faculty {
     }
 
     public function savePracticalAttendance(){
-       
         if($this->checkEmpty()) return array("error" => "empty");
         $this->class = $this->verifyInput($_POST['class']);
         date_default_timezone_set("Asia/Kolkata");
@@ -968,6 +972,54 @@ class FacultyController extends Faculty {
              return json_encode(array("error" => "update"));
         }
         return json_encode(array("error" => "none"));
+    }
+
+
+    public function showPractClassBySemester(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->acd = $this->verifyInput($_POST['acd']);
+        $this->year = $this->verifyInput($_POST['year']);
+        $this->sem = $this->verifyInput($_POST['sem']);
+        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+
+        $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->dept, $this->faculty_id]);
+        if(!$result) return json_encode(array("error" => "notfound"));
+        else return json_encode(array("error" => "none", "data" => $result));
+    
+    }
+
+    public function showPracticalReport(){
+        var_dump($_POST);
+        $query = " ";
+        $data = [];
+        if(!empty($_POST['"academic_year'])){
+            $this->acd = $this->verifyInput($_POST['"academic_year']);
+            $query += "y.academic_id = ?";
+            $data[] = $this->acd;
+        }
+        if(!empty($_POST['year'])){
+            $this->year = $this->verifyInput($_POST['year']);
+            $query += "AND a.year_id = ?";
+            $data[] = $this->year;
+        }
+        if(!empty($_POST['sem'])){
+            $this->sem = $this->verifyInput($_POST['sem']);
+            $query = "AND a.sem_id = ?";
+            $data[] = $this->sem;
+        }
+        if(!empty($_POST['class'])){
+            $this->sem = $this->verifyInput($_POST['class']);
+            $query = "AND a.p_class_id = ?";
+            $data[] = $this->sem;
+        }
+        if(!empty($_POST['from-date']) && !empty($_POST['till-date'])){
+            $this->from_date = date('Y-m-d', strtotime($this->verifyInput($_POST['from-date'])));
+            $this->till_date = date('Y-m-d', strtotime($this->verifyInput($_POST['till-date'])));
+            $query = "AND DATE(date_time) >= ? AND DATE(date_time) <= ?";
+            $data[] = $this->from_date;
+            $data[] = $this->till_date;
+        }
     }
     
     public function getFacultyId(){

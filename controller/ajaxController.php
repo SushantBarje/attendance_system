@@ -129,5 +129,12 @@ if($req == "addAcademicYear"){
 }else if($req == "save_pract_attendance"){
     $r = $faculty->savePracticalAttendance();
     die($r);
+}else if($req == "get_pract_class_sem_wise"){
+    $r = $faculty->showPractClassBySemester();
+    die($r);
+}
+else if($req == "get_staff_pract_report"){
+    $r = $faculty->showPracticalReport();
+   // die($r);
 }
 ob_end_flush();

@@ -3,7 +3,9 @@ $(document).ready(function(){
     $('#class-table').DataTable();
     $('#course-table').DataTable();
     $('#staff-table').DataTable();
-    $('#pract-class-table').DataTable();
+    $('#pract-class-table').DataTable({
+ 
+    });
     //$("#hod-report-adv").DataTable();
     // $("#export").on("click", function(){
     //     $("table").tableExport({
@@ -1208,7 +1210,7 @@ function processAjaxClass(){
 function performReport(){
     $(document).on("submit", "#report-hod", function(e){
         e.preventDefault();
-        if($("#report-hod #select-acd").val() != "" && $("#report-hod #select-year") != "" && $("#report-hod #select-div").val() != "" && $("#report-hod #s_sem").val() != "" && $("#report-hod #select-class").val() == ""){
+        if($("#report-hod #select-acd").val() != "" && $("#report-hod #select-year").val() != "" && $("#report-hod #select-div").val() != "" && $("#report-hod #s_sem").val() != "" && $("#report-hod #select-class").val() == ""){
             console.log("sushant");
             $.ajax({
                 url : "../controller/ajaxController.php?action=perform_hod_report",
@@ -1223,6 +1225,12 @@ function performReport(){
                                     $("#hod-report-adv").DataTable().destroy();
                                     $("#hod-report-adv thead").html(" ");
                                     $("#hod-report-adv tbody").html(" ");
+                                } 
+
+                                if($.fn.dataTable.isDataTable("#hod-report")){
+                                    $("#hod-report").DataTable().destroy();
+                                    $("#hod-report thead").html(" ");
+                                    $("#hod-report tbody").html(" ");
                                 } 
 
                                 var columns = Object.keys(res.data[0]);
@@ -1276,6 +1284,8 @@ function performReport(){
                                 $("#hod-report-adv thead").html(concat_header);
                                 $("#hod-report-adv tbody").html(tbody);
                                 $('#hod-report-adv thead th[colspan]').wrapInner( '<span/>' ).append( '&nbsp;' );
+                                $("#faculty_header").html(" ");
+                                $("#lecture_header").html(" ");
                                 $("#hod-report-adv").DataTable(
                                     {
                                         scrollY:        "500px",
@@ -1311,7 +1321,7 @@ function performReport(){
                 }
             })
         }
-        else if($("#report-hod #select-acd").val() != "" && $("#report-hod #select-year") != "" && $("#report-hod #select-div").val() != "" && $("#report-hod #s_sem").val() != "" && $("#report-hod #select-class").val() != ""){
+        else if($("#report-hod #select-acd").val() != "" && $("#report-hod #select-year").val() != "" && $("#report-hod #select-div").val() != "" && $("#report-hod #s_sem").val() != "" && $("#report-hod #select-class").val() != ""){
             var data = {};
             var title = "";
             $.when(
@@ -1362,6 +1372,11 @@ function performReport(){
                                     $("#hod-report thead tr").html(" ");
                                     $("#hod-report tbody").html(" ");
                                 }  
+                                if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                                    $("#hod-report-adv").DataTable().destroy();
+                                    $("#hod-report-adv thead").html(" ");
+                                    $("#hod-report-adv tbody").html(" ");
+                                } 
                                 var columns = Object.keys(res.data[0]);
                                 var datecolumns = columns.slice(3);
                                 var numCol = datecolumns.length;
@@ -1425,6 +1440,8 @@ function performReport(){
                             
                                 $("#hod-report thead tr").html(th);
                                 $("#hod-report tbody").html(td);
+                                $("#faculty_header").html("<h5>Faculty Name: "+res.faculty+"</h5>");
+                                $("#lecture_header").html("<h5>Total Lectures: "+numCol+"</h5>");
                                 var table = $("#hod-report").DataTable(
                                     {
                                         scrollY:        "500px",
@@ -1593,27 +1610,27 @@ function processAddPractClass(){
                             break;
                         case "none":
                             var html = "";
+                            alert("Practical Class Added!");
                             console.log(res.data.length);
                             if(res.data.length < 1) {
                                 $('#pract-class-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
                             }else{
+                             
                                 for(var i = 0; i < res.data.length; i++){
                                     html += '<tr>\
-                                    <td>'+res.data[i].class_id+'</td>\
+                                    <td hidden>'+res.data[i].p_class_id+'</td>\
                                     <td>'+res.data[i].course_name+'</td>\
-                                    <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                    <td>'+res.data[i].faculty_name+'</td>\
                                     <td>'+res.data[i].s_class_name+'</td>\
                                     <td>'+res.data[i].div_name+'</td>\
+                                    <td>'+res.data[i].batch_name+'</td>\
                                     <td>\
-                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].p_class_id+'">Delete</button>\
                                     </td>\
                                 </tr>'
                                 }
-                                $.when(
-                                    $('#pract-class-table tbody').html(html)
-                                ).then(
-                                    alert("Class Added!")
-                                ) 
+                               
+                                $('#pract-class-table tbody').html(html);
                             }
                             break;  
                     }   

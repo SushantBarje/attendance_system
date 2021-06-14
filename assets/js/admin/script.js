@@ -727,7 +727,7 @@ function processAdminReport(){
             var div = $("#report #select-div-report").val();
             var dept = $("#report #select-dept-report").val();
             var sem = $("#report #select-sem-report").val();
-            console.log(acd,year,div,dept);
+            console.log(acd,year,div,dept,sem);
             $.ajax({
                 url : "../controller/ajaxController.php?action=get_class_div_wise",
                 type : "POST",
@@ -771,150 +771,270 @@ function processAdminReport(){
 
 
 
-    $("#get-report").on("click", function(){
-        var data = {};
-        var title = "";
-        $.when(
-            data[$("#report #select-acd-report").attr("name")] = $("#report #select-acd-report").val(),
-            data[$("#report #select-dept-report").attr("name")] = $("#report #select-dept-report").val(),
-            data[$("#report #select-year-report").attr("name")] = $("#report #select-year-report").val(),
-            data[$("#report #select-class-report").attr("name")] = $("#report #select-class-report").val(),
-            data[$("#report #select-sem-report").attr("name")] = $("#report #select-sem-report").val(),
-            data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
-            data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
-            data[$("#report #select-div-report").attr("name")] = $("#report #select-div-report").val(),
-            title = $("#report #select-class-report option:selected").text(),
-            year = $("#report #select-year-report option:selected").text(),
-            acd = $("#report #select-acd-report option:selected").text(),
-            div = $("#report #select-div-report option:selected").text(),
-            academic_year = $("#report #select-acd-report option:selected").text(),
-        ).then(
-            getAjaxReport()
-        );
-        function getAjaxReport(){
+    $("#report").on("click", "#get-report",function(){
+        if($("#report #select-acd-report").val() != "" && $("#report #select-year-report").val() != "" && $("#report #select-div-report").val() != "" && $("#report #select-sem-report").val() != "" && $("#report #select-dept-report").val() != "" && $("#report #select-class-report").val() == ""){
+            console.log("sushant");
             $.ajax({
-                url : "../controller/ajaxController.php?action=admin_report",
+                url : "../controller/ajaxController.php?action=perform_hod_report",
                 type : "post",
-                data : data,
-                dataType : "JSON",
+                data : {"academic_year" : $("#report #select-acd-report").val(), "s_class_year" : $("#report #select-year-report").val(), "div_id" : $("#report #select-div-report").val(), "sem" : $("#report #select-sem-report").val(), "dept_id" : $("#report #select-dept-report").val()},
+                dataType : 'json',
                 success : function(res){
                     console.log(res);
                     switch(res.error){
-                        case "empty":
-                            if($.fn.dataTable.isDataTable("#admin-report")){
-                                $("#admin-report").DataTable().destroy();
-                                $("#admin-report thead tr").html(" ");
-                                $("#admin-report tbody").html(" ");
-                            }
-                            alert("Enter all Details...");
-                            break;
-                        case "notexists":
-                            if($.fn.dataTable.isDataTable("#admin-report")){
-                                $("#admin-report").DataTable().destroy();
-                                $("#admin-report thead tr").html(" ");
-                                $("#admin-report tbody").html(" ");
-                            }
-                            alert("No attendance Found")
-                            break;
-                        case "date":
-                            alert("Please Enter Correct Date");
-                            break;
                         case "none":
-                            if($.fn.dataTable.isDataTable("#admin-report")){
-                                $("#admin-report").DataTable().destroy();
-                                $("#admin-report thead tr").html(" ");
-                                $("#admin-report tbody").html(" ");
-                            }  
-                            var columns = Object.keys(res.data[0]);
-                            var datecolumns = columns.slice(3);
-                            var numCol = datecolumns.length;
-                            var th = "";
-                            th += "<th>Roll no.</th>";
-                            th += "<th>Student Name.</th>";
-                            for(var i = 0; i < numCol; i++){
-                                // if(columns[i] == "student_id") continue;
-                                var date = new Date(datecolumns[i]);
-                                var dd = date.getDate();
-
-                                var mm = date.getMonth()+1; 
-                                var yyyy = date.getFullYear();
-                                var hour    = date.getHours();
-                                var minute  = date.getMinutes();
-                                var second  = date.getSeconds(); 
-                                if(dd<10) 
-                                {
-                                    dd='0'+dd;
+                                if($.fn.dataTable.isDataTable("#admin-report-adv")){
+                                    $("#admin-report-adv").DataTable().destroy();
+                                    $("#admin-report-adv thead").html(" ");
+                                    $("#admin-report-adv tbody").html(" ");
                                 } 
 
-                                if(mm<10) 
-                                {
-                                    mm='0'+mm;
+                                if($.fn.dataTable.isDataTable("#admin-report")){
+                                    $("#admin-report").DataTable().destroy();
+                                    $("#admin-report thead").html(" ");
+                                    $("#admin-report tbody").html(" ");
                                 } 
-                                if(hour.toString().length == 1) {
-                                    hour = '0'+hour;
-                               }
-                               if(minute.toString().length == 1) {
-                                    minute = '0'+minute;
-                               }
-                               if(second.toString().length == 1) {
-                                    second = '0'+second;
-                               } 
-                                date = dd+'/'+mm+'/'+yyyy;
-                                time = hour+':'+minute+':'+second;
-                                th += "<th>"+date+"</br>"+time+"</th>";
-                            } 
-                            th += "<th>Total Present</th>";
-                            th += "<th>Percentage</th>";
-                            var td = "";
-                            for(var i = 0; i < res.data.length; i++){
-                                td += "<tr>"
-                                td += "<td>"+res.data[i].roll_no+"</td>";
-                                td += "<td>"+res.data[i].student_name+"</td>";
-                                for(var j = 0; j < numCol; j++){
-                                    //if(columns[j] == "student_id") continue;
-                                    
-                                    if(res.data[i][datecolumns[j]] == 1){
-                                        td += "<td>P</td>"
-                                    }else{
-                                        td += "<td style='color:red'>A</td>"
-                                    }
-                                } 
-                                td += "<td>"+res.total[i].total+"</td>";
-                                td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
-                                td += "</tr>"
-                            }
-                          
-                            $("#admin-report thead tr").html(th);
-                            $("#admin-report tbody").html(td);
-                            var table = $("#admin-report").DataTable(
-                                {
-                                    scrollY:        "500px",
-                                    scrollX:        true,
-                                    scrollCollapse: true,
-                                    paging:         false,
-                                    autoWidth:  false,
-                                    fixedColumns:   {
-                                        leftColumns: 2,
-                                        rightColumns: 1
-                                    },
-                                    dom: 'Bfrtip',
-                                    buttons: [
-                                        {
-                                            extend: 'excel',
-                                            text : 'Export Excel',
-                                            title : 'Attendance Report_'+title+'_'+year+'_'+'_Div_'+div+'_'+acd,
-                                            messageTop: title+" Attendance Academic Year "+academic_year,
-                                        }
-                                    ]
+
+                                var columns = Object.keys(res.data[0]);
+                                var class_columns = columns.slice(3);
+                                var numColClass = class_columns.length;
+                                var table_header_1 = '<tr>\
+                                                        <th colspan="2">Class :</th>\
+                                                        <th colspan="'+numColClass+'">Intersaction Session</th>\
+                                                        <th colspan="2">Total</th>\
+                                                    </tr>';
+                                var th_body =      '<tr>\
+                                                        <th rowspan="2">Roll no.</th>\
+                                                        <th>Name of Student</th>';
+    
+                                var th_1;
+                                for(var i = 0; i < numColClass; i++){
+                                    th_1 += '<th>'+class_columns[i]+'</th>'
                                 }
-                            );
-                            break;
+                                var total_th = "<th>Total</th><th>%</th></tr>"
+    
+                                var total_header = "<tr><th>Total No. of Lectures</th>";
+                                var columns = Object.values(res.lectures);
+                                var numColTotal = class_columns.length;
+                                var th_2;
+                                var total_sum_lectures = 0;
+                                for(var i = 0; i < numColTotal; i++){
+                                    total_sum_lectures += parseInt(columns[i]);
+                                    th_2 += '<th>'+columns[i]+'</th>' 
+                                }
+                                th_2 += '<th>'+total_sum_lectures+'</th>'
+                                th_2 += "<th>-</th></tr>";
+                                var tbody = "<tr>";
+                                for(var i = 0; i < res.data.length; i++){
+                                    tbody += '<td>'+res.data[i].roll_no+'</td>';
+                                    tbody += '<td>'+res.data[i].student_name+'</td>';
+                                    var sum = 0;
+                                    for(var j = 0; j < numColClass; j++){
+                                        if(res.data[i][class_columns[j]] != null){
+                                            sum += parseInt(res.data[i][class_columns[j]]);
+                                            tbody += '<td>'+res.data[i][class_columns[j]]+'</td>' 
+                                        }else{
+                                            tbody += '<td>-</td>'
+                                        }
+                                    }
+                                    total_percent = (sum/total_sum_lectures)*100;
+                                    tbody += '<td>'+sum+'</td>'
+                                    tbody += '<td style="mso-number-format:"'+0.00+'%">'+total_percent.toFixed(2)+'%</td></tr>';
+                                }
+                                var concat_header = table_header_1+th_body+th_1+total_th+total_header+th_2;
+                                
+                                $("#admin-report-adv thead").html(concat_header);
+                                $("#admin-report-adv tbody").html(tbody);
+                                $("#admin-report-adv").DataTable(
+                                    {
+                                        scrollY:        "500px",
+                                        scrollX:        true,
+                                        scrollCollapse: true,
+                                        paging:         false,
+                                        autoWidth:  false,
+                                        fixedColumns:   {
+                                            leftColumns: 2,
+                                            rightColumns: 1
+                                        },
+                                    }
+                                )
+                                
+                                // $("#hod-report-adv").tableExport({
+                                //     headers: true, 
+                                //     bootstrap : true,
+                                //     exportButtons: true,                // (Boolean), automatically generate the built-in export buttons for each of the specified formats (default: true)
+                                //     position: "bottom", 
+                                // })
+                                $("#export").on("click", function(){
+                                    $("#admin-report-adv").table2excel({
+                                        name: "Worksheet Name",
+                                        filename: "SomeFile.xls", 
+                                        preserveColors: false
+                                    }); 
+                                })
+                                                             
                     }
                 },
                 error : function(e){
                     console.log(e);
                 }
             })
+        }
+        else if($("#report #select-acd-report").val() != "" && $("#report #select-year-report").val() != "" && $("#report #select-div-report").val() != "" && $("#report #select-sem-report").val() != "" && $("#report #select-class-report").val() != ""){
+            var data = {};
+            var title = "";
+            $.when(
+                data[$("#report #select-acd-report").attr("name")] = $("#report #select-acd-report").val(),
+                data[$("#report #select-dept-report").attr("name")] = $("#report #select-dept-report").val(),
+                data[$("#report #select-year-report").attr("name")] = $("#report #select-year-report").val(),
+                data[$("#report #select-class-report").attr("name")] = $("#report #select-class-report").val(),
+                data[$("#report #select-sem-report").attr("name")] = $("#report #select-sem-report").val(),
+                data[$("#report #from-date").attr("name")] = $("#report #from-date").val(),
+                data[$("#report #till-date").attr("name")] = $("#report #till-date").val(),
+                data[$("#report #select-div-report").attr("name")] = $("#report #select-div-report").val(),
+                title = $("#report #select-class-report option:selected").text(),
+                year = $("#report #select-year-report option:selected").text(),
+                acd = $("#report #select-acd-report option:selected").text(),
+                div = $("#report #select-div-report option:selected").text(),
+                academic_year = $("#report #select-acd-report option:selected").text(),
+            ).then(
+                getAjaxReport()
+            );
+            function getAjaxReport(){
+                $.ajax({
+                    url : "../controller/ajaxController.php?action=admin_report",
+                    type : "post",
+                    data : data,
+                    dataType : "JSON",
+                    success : function(res){
+                        console.log(res);
+                        switch(res.error){
+                            case "empty":
+                                if($.fn.dataTable.isDataTable("#admin-report")){
+                                    $("#admin-report").DataTable().destroy();
+                                    $("#admin-report thead tr").html(" ");
+                                    $("#admin-report tbody").html(" ");
+                                }
+                                alert("Enter all Details...");
+                                break;
+                            case "notexists":
+                                if($.fn.dataTable.isDataTable("#admin-report")){
+                                    $("#admin-report").DataTable().destroy();
+                                    $("#admin-report thead tr").html(" ");
+                                    $("#admin-report tbody").html(" ");
+                                }
+                                alert("No attendance Found")
+                                break;
+                            case "date":
+                                alert("Please Enter Correct Date");
+                                break;
+                            case "none":
+                                if($.fn.dataTable.isDataTable("#admin-report")){
+                                    $("#admin-report").DataTable().destroy();
+                                    $("#admin-report thead tr").html(" ");
+                                    $("#admin-report tbody").html(" ");
+                                } 
+                                if($.fn.dataTable.isDataTable("#admin-report-adv")){
+                                    $("#admin-report-adv").DataTable().destroy();
+                                    $("#admin-report-adv thead").html(" ");
+                                    $("#admin-report-adv tbody").html(" ");
+                                } 
+                                var columns = Object.keys(res.data[0]);
+                                var datecolumns = columns.slice(3);
+                                var numCol = datecolumns.length;
+                                var th = "";
+                                th += "<th>Roll no.</th>";
+                                th += "<th>Student Name.</th>";
+                        
+                                for(var i = 0; i < numCol; i++){
+                                    
+                                    // if(columns[i] == "student_id") continue;
+                                    var date = new Date(datecolumns[i]);
+                                    var dd = date.getDate();
+
+                                    var mm = date.getMonth()+1; 
+                                    var yyyy = date.getFullYear();
+                                    var hour    = date.getHours();
+                                    var minute  = date.getMinutes();
+                                    var second  = date.getSeconds(); 
+                                    if(dd<10) 
+                                    {
+                                        dd='0'+dd;
+                                    } 
+
+                                    if(mm<10) 
+                                    {
+                                        mm='0'+mm;
+                                    } 
+                                    if(hour.toString().length == 1) {
+                                        hour = '0'+hour;
+                                }
+                                if(minute.toString().length == 1) {
+                                        minute = '0'+minute;
+                                }
+                                if(second.toString().length == 1) {
+                                        second = '0'+second;
+                                } 
+                                    date = dd+'/'+mm+'/'+yyyy;
+                                    time = hour+':'+minute+':'+second;
+                                    th += "<th>"+date+"</br>"+time+"</th>";
+                                } 
+                                th += "<th>Total Present</th>";
+                                th += "<th>Percentage</th>";
+                                var td = "";
+                                
+                                for(var i = 0; i < res.data.length; i++){
+                                    td += "<tr>"
+                                    td += "<td>"+res.data[i].roll_no+"</td>";
+                                    td += "<td>"+res.data[i].student_name+"</td>";
+                                    for(var j = 0; j < numCol; j++){
+                                        //if(columns[j] == "student_id") continue;
+                                       
+                                        if(res.data[i][datecolumns[j]] == 1){
+                                            td += "<td>P</td>"
+                                        }else{
+                                            td += "<td style='color:red'>A</td>"
+                                        }
+                                    } 
+                                    td += "<td>"+res.total[i].total+"</td>";
+                                    td += '<td style="mso-number-format:0.00%">'+res.total[i].percent+'</td>';
+                                    td += "</tr>"
+                                }
+                            
+                                $("#admin-report thead tr").html(th);
+                                $("#admin-report tbody").html(td);
+                                $("#faculty_header").html("<h5>Faculty Name: "+res.faculty+"</h5>");
+                                $("#lecture_header").html("<h5>Total Lectures: "+numCol+"</h5>");
+                                var table = $("#admin-report").DataTable(
+                                    {
+                                        scrollY:        "500px",
+                                        scrollX:        true,
+                                        scrollCollapse: true,
+                                        paging:         false,
+                                        autoWidth:  false,
+                                        fixedColumns:   {
+                                            leftColumns: 2,
+                                            rightColumns: 1
+                                        },
+                                        dom: 'Bfrtip',
+                                        buttons: [
+                                            {
+                                                extend: 'excel',
+                                                text : 'Export Excel',
+                                                title : 'Attendance Report_'+title+'_'+year+'_'+'_Div_'+div+'_'+acd,
+                                                messageTop: title+" Attendance Academic Year "+academic_year,
+                                            }
+                                        ]
+                                    }
+                                );
+                                break;
+                        }
+                    },
+                    error : function(e){
+                        console.log(e);
+                    }
+                })
+            }
         }
     })
 }

@@ -323,7 +323,7 @@
                 </tr>
                 <tr>
                     <th hidden>Class ID</th>
-                    <th>Sr no.</th>
+            
                     <th>Course Name</th>
                     <th>Faculty</th>
                     <th>Class</th>
@@ -335,11 +335,11 @@
             <tbody>
                 <?php 
                     $data = $user->getPractClassByDept([$_SESSION['dept']]);
-                    $count = count($data);
+                   
                     foreach($data as $d){
                         echo '<tr>
                                 <td hidden>'.$d['p_class_ids'].'</td>
-                                <td>'.$count--.'</td>
+                           
                                 <td>'.$d['course_name'].'</td>
                                 <td>'.$d['faculty_name'].'</td>
                                 <td>'.$d['s_class_name'].'</td>

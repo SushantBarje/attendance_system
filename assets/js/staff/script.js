@@ -11,6 +11,7 @@ $(document).ready(function(){
     processDeleteAttendance()
     processOnChangeClass()
     processPracticalAttendance()
+    processPracticalReport()
     //processSubmitAttendance();
 });
 
@@ -69,7 +70,7 @@ function processAttendanceSheet(){
             return false;
         });
 
-        $("#s_sem").on("change", function(){
+        $("#report").on("change", "#s_sem" ,function(){
             var acd = $("#select-acd").val();
             var id = $("#select-div").val();
             var year = $("#select-year").val();
@@ -274,7 +275,7 @@ function processMarkAttendance(){
 
 
 function generateStaffReport(){
-    $(document).on("change", ".report-select-input", function() {
+    $("#report").on("change", ".report-select-input", function() {
         if($("#report #select-acd").val() != " " && $("#report #select-year").val() != " " && $("#report #select-div").val() != " "){
             var acd = $("#report #select-acd").val();
             var year = $("#report #select-year").val();
@@ -319,7 +320,7 @@ function generateStaffReport(){
         }
     })
 
-    $("#get-report").on("click", function(){
+    $("#report #get-report").on("click", function(){
         var data = {};
         var title = "";
         $.when(
@@ -693,6 +694,70 @@ function processPracticalAttendance(){
                         break;
                 }
                 window.location.href = "";
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
+    })
+}
+
+
+function processPracticalReport(){
+    $("#report-pract").on("change", ".report-select-input", function() {
+        if($("#report-pract #select-acd").val() != " " && $("#report-pract #select-year").val() != " " && $("#report-pract #s_sem").val() != " "){
+            var acd = $("#report-pract #select-acd").val();
+            var year = $("#report-pract #select-year").val();
+            var sem = $("#report-pract #s_sem").val();
+            console.log(acd,year,sem);
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_pract_class_sem_wise",
+                type : "post",
+                data : {"sem" : sem, "acd" : acd, "year" : year},
+                dataType : "json",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            $("#report-pract #select-class").prop("disabled", true);
+                            $("#report-pract #select-class").val(" ");
+                            $("#report-pract #select-class").text(" ");
+                            alert("Please fill all details!");
+                            break;
+                        case "notfound":
+                            $("#report-pract #select-class").val(" ");
+                            $("#report-pract #report #select-class").text("No class found");
+                            break;
+                        case "none":
+                            $("#report-pract #select-class").prop("disabled", false);
+                            $("#report-pract #select-class").val(" ");
+                            $("#report-pract #select-class").text(" ");
+                            if(res.data.length > 0){
+                                $("#report-pract #select-class").prop("disabled",false);
+                                var html = '<option value=" "> </option>';
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<option value="'+res.data[i].p_class_id+'" data-class="'+res.data[i].year_id+'">'+res.data[i].course_name+' Batch - '+res.data[i].batch_name+'</option>';
+                                }
+                                $('#report-pract #select-class').html(html);
+                            }
+                            break;
+                    }
+                }
+            })
+        }else{
+            console.log("empty");
+        }
+    });
+
+    $("#report-pract").on("submit", function(e){
+        e.preventDefault();
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_staff_pract_report",
+            type : "post",
+            data : $(this).serialize(),
+            dataType : "json",
+            success : function(res){
+                console.log(res);
             },
             error : function(e){
                 console.log(e);
