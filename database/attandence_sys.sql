@@ -112,10 +112,13 @@ CREATE TABLE practical_class (
 );
 
 CREATE TABLE pract_attend_list (
-	`p_attend_id` INT NOT NULL PRIMARY KEY,
+	`uid` INT NOT NULL PRIMARY KEY AUTOINCREMENT,
     `p_class_id` INT,
+    `prn_no` INT,
+    `status` INT DEFAULT 0,
     `date_time` DATETIME,
-     FOREIGN KEY (p_class_id) REFERENCES practical_class(p_class_id)
+    FOREIGN KEY (p_class_id) REFERENCES practical_class(p_class_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (prn_no) REFERENCES student(prn_no) ON DELETE CASCADE ON UPDATE CASCADE,
 );
 
 CREATE TABLE pract_attend (
@@ -136,5 +139,3 @@ INSERT INTO student_class VALUES
 (2, 'S.Y.B.Tech'),
 (3, 'T.Y.B.Tech'),
 (4, 'B.Tech');
-
-INSERT INTO 

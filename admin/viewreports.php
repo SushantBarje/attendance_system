@@ -21,21 +21,9 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.3.2/css/fixedColumns.dataTables.min.css">
-    <script src="https://cdn.datatables.net/fixedcolumns/3.3.2/js/dataTables.fixedColumns.min.js"></script>
-    <script src="https://cdn.datatables.net/plug-ins/1.10.24/api/sum().js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="../assets/TableExport/TableExport-master/src/stable/css/tableexport.min.css">
-    <script src="../assets/blob.js/Blob.js-master/Blob.js"></script>
-    <script src="../assets/sheetjs/sheetjs-master/dist/xlsx.full.min.js"></script>
-    <script src="../assets/FileSaver/FileSaver.js-master/FileSaver.min.js"></script>
-    <script src="../assets/TableExport/TableExport-master/src/stable/js/tableexport.min.js"></script>
-    <script src="../assets/table2excel/jquery-table2excel-master/dist/jquery.table2excel.min.js"></script>
+
     <style> 
         th, td { white-space: nowrap;}
     </style>
@@ -115,13 +103,21 @@
                     </div>
                     <div class="row">
                         <div class="col offset-5">
-                            <button class="btn btn-success mt-2" id="get-report" type="button">Check</button>
+                        <button class="btn btn-success mt-2" id="get-report" type="button">Check</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div> 
+    <div class="row mt-3">
+        <div class="col-sm-6">
+            <div id="faculty_header"></div>
+        </div>
+        <div class="col-sm-6" style="text-align: end;">
+            <div id="lecture_header"></div>
+        </div>
+    </div>
     <table id="admin-report" class="stripe row-border order-column" style="width:100%">
         <thead>
             <tr>
@@ -131,11 +127,32 @@
         
         </tbody>
     </table>
+    <button type="button" class="btn btn-success" id="export">Print</button>
+        <div id="tableWrap">
+            <table id="admin-report-adv" class="table table-bordered stripe row-border order-column" style="width:100%">
+                <thead>
+                </thead>   
+                <tbody>
+                </tbody>            
+            </table>
+        </div>
 </main>
 
 <!-- <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
 <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script> -->
 
+<script src="https://cdn.datatables.net/fixedcolumns/3.3.2/js/dataTables.fixedColumns.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
+<script src="../assets/blob.js/Blob.js-master/Blob.js"></script>
+<script src="../assets/sheetjs/sheetjs-master/dist/xlsx.full.min.js"></script>
+<script src="../assets/FileSaver/FileSaver.js-master/FileSaver.min.js"></script>
+<script src="../assets/TableExport/TableExport-master/src/stable/js/tableexport.min.js"></script>
+<script src="../assets/table2excel/jquery-table2excel-master/dist/jquery.table2excel.min.js"></script>
 <script src="../assets/js/admin/script.js"></script>
 
 </body>

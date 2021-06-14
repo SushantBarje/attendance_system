@@ -137,6 +137,17 @@
                 </div>
             </div> -->
         </form>
+        <div class="info">
+            <div class="row mt-3">
+                <div class="col-sm-6">
+                    <div id="faculty_header"></div>
+                </div>
+                <div class="col-sm-6" style="text-align: end;">
+                    <div id="lecture_header"></div>
+                </div>
+            </div>
+        </div>
+        
         <table id="hod-report" class="stripe row-border order-column" style="width:100%">
             <thead>
                 <tr>
@@ -156,8 +167,6 @@
                 </tbody>            
             </table>
         </div>
-        
-
     </main>
 </body>
 

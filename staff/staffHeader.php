@@ -36,6 +36,10 @@
                     <a href="generatereport.php"><span class="las la-clipboard-list"></span>
                         <span> Generate Reports</span></a>
                 </li>
+                <li>
+                    <a href="practical_report.php"><span class="las la-clipboard-list"></span>
+                        <span>Practical Reports</span></a>
+                </li>
                 <!-- 
                 <li>
                     <a href="manageclass.php"><span class="las la-users"></span>

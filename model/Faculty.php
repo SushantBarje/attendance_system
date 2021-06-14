@@ -782,6 +782,24 @@ class Faculty extends Database {
 		}
 	}
 
+	public function getFacultyofClassById($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.class_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)){
+				if($stmt->rowCount() > 0){
+					return $stmt->fetch();
+				}else{
+					return false;
+				}
+			}
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
 	public function classExists($data){
 		try{
 			$con = $this->connect();
@@ -1354,4 +1372,36 @@ class Faculty extends Database {
 		}
     }
 
+	public function getClassBySemesterYearAndAcademic($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*,b.course_name, c.batch_name, d.div_name FROM practical_class as a JOIN courses as b ON a.course_id = b.course_id JOIN batch as c ON a.batch_id = c.batch_id JOIN division as d ON a.div_id = d.div_id WHERE a.academic_id = ? AND a.year_id = ? AND a.sem_id = ? AND a.dept_id = ? AND a.faculty_id = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getPracticalReport($query, $data){
+		try{
+			$con = $this->connect();
+			$con = $this->connect();
+			$con->query("SET @sql = NULL");
+            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'MAX(IF(a.date_time = ''', date_time, ''', a.status, NULL)) AS ', CONCAT(''',date_time,''') ) ) INTO @sql FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no ".$query." ORDER BY c.roll_no+0;");
+            $stmt->execute($data);
+            $stmt = $con->prepare("SET @sql = CONCAT('SELECT a.p_class_id, a.prn_no, c.roll_no, CONCAT(c.last_name, ' ', c.first_name, ' ' ,c.middle_name) as student_Name, ', @sql, ' FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no WHERE a.p_class_id = 8 GROUP BY a.prn_no ORDER BY c.roll_no+0');");
+            $stmt->execute();
+            $stmt = $con->prepare("PREPARE stmt FROM @sql");
+            $stmt->execute();
+            $stmt = $con->prepare("EXECUTE stmt");
+            $stmt->execute();
+            $result = $stmt->fetchAll();
+            $con->query("DEALLOCATE PREPARE stmt");
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
 };
