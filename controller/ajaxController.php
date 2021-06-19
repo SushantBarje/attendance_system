@@ -135,6 +135,6 @@ if($req == "addAcademicYear"){
 }
 else if($req == "get_staff_pract_report"){
     $r = $faculty->showPracticalReport();
-   // die($r);
+   die($r);
 }
 ob_end_flush();
