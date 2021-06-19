@@ -28,18 +28,18 @@
                    
                 </li>
                 <li>
-                    <a href="manageclass.php"><span class="las la-users"></span>
-                        <span>Manage Classes</span></a>
+                    <a href="managestaff.php"><span class="las la-users"></span>
+                        <span>Manage Staff</span></a>
+                   
                 </li>
                 <li>
                     <a href="mangecourses.php"><span class="las la-users"></span>
                         <span>Manage Courses</span></a>
-                   
                 </li>
+                
                 <li>
-                    <a href="managestaff.php"><span class="las la-users"></span>
-                        <span>Manage Staff</span></a>
-                   
+                    <a href="manageclass.php"><span class="las la-users"></span>
+                        <span>Manage Classes</span></a>
                 </li>
                 <!-- <li>
                     <a href="markattendence.php"><span class="las la-shopping-bag"></span>
@@ -60,7 +60,11 @@
 
                 <li>
                     <a href="generatereport.php"><span class="las la-clipboard-list"></span>
-                        <span> Generate Reports</span></a>
+                        <span> Theory Reports</span></a>
+                </li>
+                <li>
+                    <a href="practical_report.php"><span class="las la-users"></span>
+                        <span>Practical Report</span></a>
                 </li>
             </ul>
         </div>

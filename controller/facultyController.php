@@ -990,36 +990,55 @@ class FacultyController extends Faculty {
     }
 
     public function showPracticalReport(){
-        var_dump($_POST);
+     
         $query = " ";
         $data = [];
-        if(!empty($_POST['"academic_year'])){
-            $this->acd = $this->verifyInput($_POST['"academic_year']);
-            $query += "y.academic_id = ?";
-            $data[] = $this->acd;
-        }
-        if(!empty($_POST['year'])){
-            $this->year = $this->verifyInput($_POST['year']);
-            $query += "AND a.year_id = ?";
-            $data[] = $this->year;
-        }
-        if(!empty($_POST['sem'])){
-            $this->sem = $this->verifyInput($_POST['sem']);
-            $query = "AND a.sem_id = ?";
-            $data[] = $this->sem;
-        }
+        if(empty($_POST['class'])) return json_encode(array("error" => "empty"));
+        // if(!empty($_POST['academic_year'])){
+        //     $this->acd = $this->verifyInput($_POST['academic_year']);
+        //     $query .= " b.academic_id = ? ";
+        //     $data[] = $this->acd;
+        // }
+        // if(!empty($_POST['year'])){
+        //     $this->year = $this->verifyInput($_POST['year']);
+        //     $query .= " AND b.year_id = ? ";
+        //     $data[] = $this->year;
+        // }
+        // if(!empty($_POST['sem'])){
+        //     $this->sem = $this->verifyInput($_POST['sem']);
+        //     $query .= " AND b.sem_id = ? ";
+        //     $data[] = $this->sem;
+        // }
         if(!empty($_POST['class'])){
             $this->sem = $this->verifyInput($_POST['class']);
-            $query = "AND a.p_class_id = ?";
+            $query .= " a.p_class_id = ? ";
             $data[] = $this->sem;
         }
         if(!empty($_POST['from-date']) && !empty($_POST['till-date'])){
             $this->from_date = date('Y-m-d', strtotime($this->verifyInput($_POST['from-date'])));
             $this->till_date = date('Y-m-d', strtotime($this->verifyInput($_POST['till-date'])));
-            $query = "AND DATE(date_time) >= ? AND DATE(date_time) <= ?";
+            if($this->from_date > $this->till_date) return json_encode(array("error" => "date"));
+            $query .= " AND DATE(date_time) >= ? AND DATE(date_time) <= ? ";
             $data[] = $this->from_date;
             $data[] = $this->till_date;
+        }else if(!empty($_POST['from-date']) && empty($_POST['till-date'])){
+            $this->from_date = date('Y-m-d', strtotime($this->verifyInput($_POST['from-date'])));
+            $query .= " AND DATE(date_time) >= ? ";
+            $data[] = $this->from_date;
         }
+        else if(empty($_POST['from-date']) && !empty($_POST['till-date'])){
+            $this->till_date = date('Y-m-d', strtotime($this->verifyInput($_POST['till-date'])));
+            $query .= " AND DATE(date_time) <= ? ";
+            $data[] = $this->till_date;
+        }
+ 
+        $result = $this->getPracticalReportDynamicColumn($query, $data);
+        if(!$result || isset($result["e"])){
+            return json_encode(array("error" => "notfound"));
+        }
+        $result = $this->getFinalPracticalReport($query,$data,$result);
+        if(isset($result["e"]) || !$result) return json_encode(array("error" => "notfound"));
+        return json_encode(array("error" => "none" , "data" => $result[0], "total" => $result[1]));
     }
     
     public function getFacultyId(){

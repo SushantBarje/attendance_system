@@ -36,11 +36,11 @@ class Faculty extends Database {
 		}
 	}
 
-	/*
-	#	Function will return a particular academic year using id.
-	#	@params $acad_year_id
-	#	@return array().
-	*/
+	/** 
+	*	Function will return a particular academic year using id.
+	*	@param $acad_year_id
+	*	@return array[].
+	**/
 	public function getAcademicYearById($acd_year_id){
 		try{
 			$sql = "SELECT * FROM academic_year WHERE acedemic_id = ?";
@@ -1387,21 +1387,94 @@ class Faculty extends Database {
 	public function getPracticalReport($query, $data){
 		try{
 			$con = $this->connect();
-			$con = $this->connect();
 			$con->query("SET @sql = NULL");
-            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'MAX(IF(a.date_time = ''', date_time, ''', a.status, NULL)) AS ', CONCAT(''',date_time,''') ) ) INTO @sql FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no ".$query." ORDER BY c.roll_no+0;");
+            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'MAX(IF(a.date_time = ''', date_time, ''', a.status, NULL)) AS ', CONCAT(''',date_time,''') ) ) INTO @sql FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no WHERE ".$query." ORDER BY c.roll_no+0;");
             $stmt->execute($data);
-            $stmt = $con->prepare("SET @sql = CONCAT('SELECT a.p_class_id, a.prn_no, c.roll_no, CONCAT(c.last_name, ' ', c.first_name, ' ' ,c.middle_name) as student_Name, ', @sql, ' FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no WHERE a.p_class_id = 8 GROUP BY a.prn_no ORDER BY c.roll_no+0');");
-            $stmt->execute();
+            $stmt = $con->prepare("SET @sql = CONCAT('SELECT a.p_class_id, a.prn_no, c.roll_no, CONCAT(c.last_name,'' '', c.first_name,'' '', c.middle_name) as student_Name, ', @sql, ' FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no WHERE ".$query." GROUP BY a.prn_no ORDER BY c.roll_no+0');");
+			$stmt->execute();
             $stmt = $con->prepare("PREPARE stmt FROM @sql");
             $stmt->execute();
             $stmt = $con->prepare("EXECUTE stmt");
             $stmt->execute();
             $result = $stmt->fetchAll();
             $con->query("DEALLOCATE PREPARE stmt");
+			return $result;
 		}
 		catch (PDOException $e){
 			return array("e" => $e->getMessage());
 		}
 	}
+
+
+	public function getPractAttendancePrnStudent($query, $data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT  DISTINCT a.prn_no, CONCAT(b.last_name,' ', b.first_name, ' ', b.middle_name) as student_name FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no WHERE ".$query." ORDER BY b.roll_no+0";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+
+		}catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getPracticalAttendanceDates($query, $data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT  DISTINCT a.prn_no, date_time FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no WHERE ".$query." ORDER BY b.roll_no+0";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+
+		}catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+
+	public function getPracticalReportDynamicColumn($query, $data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT GROUP_CONCAT(DISTINCT CONCAT( 'MAX(IF(a.date_time = ''', date_time, ''', a.status, NULL)) AS ', CONCAT('''',date_time,'''') ) ) as string FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no WHERE ".$query." ORDER BY c.roll_no+0;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetch();
+		}catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getFinalPracticalReport($query, $data, $string){
+		try{
+			$each_total = $total = array();
+			$con = $this->connect();
+			$sql = "SELECT a.prn_no, c.roll_no, CONCAT(c.last_name,'"." "."', c.first_name,'"." "."', c.middle_name) as student_name, ".$string['string']." FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no WHERE ".$query." GROUP BY a.prn_no ORDER BY c.roll_no+0;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) $each_total = $stmt->fetchAll();
+
+			$sql = "SELECT SUM(status) as total, (SUM(status)/COUNT(status))*100 as percent FROM pract_attend as a JOIN student on a.prn_no = student.prn_no WHERE ".$query." GROUP BY a.prn_no ORDER BY roll_no+0;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) $total = $stmt->fetchAll();
+
+			// $sql = "SELECT (SUM(status)/COUNT(status))*100 as percent FROM pract_attend as a JOIN student on a.prn_no = student.prn_no WHERE ".$query." GROUP BY a.prn_no ORDER BY roll_no+0;";
+			// $stmt = $con->prepare($sql);
+			// if($stmt->execute($data)) $percent = $stmt->fetchAll();
+
+			return array($each_total, $total);
+		}catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	// public function getFinalPracticalTotalReport($data){
+	// 	try{
+	// 		$con = $this->connect();
+	// 		$sql = "SELECT SUM(status) FROM pract_attend JOIN student on pract_attend.prn_no = student.prn_no WHERE p_class_id = ? GROUP BY pract_attend.prn_no ORDER BY roll_no+0;";
+	// 		$stmt = $con->prepare($sql);
+	// 		if($stmt->execute($data)) return $stmt->fetchAll();
+	// 	}catch (PDOException $e){
+	// 		return array("e" => $e->getMessage());
+	// 	}
+	// }
+
+	
+
 };

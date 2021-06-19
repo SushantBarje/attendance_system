@@ -1,14 +1,13 @@
 <?php
-namespace app\staff;
-require_once __DIR__ . '\..\vendor\autoload.php';
-use app\controller\FacultyController;
-$user = new FacultyController();
-if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 2){
-    echo '<script> alert("Invalid User")</script>';
-    header('Location:../index.php');
-}
+    namespace app\hod;
+    require_once __DIR__ . '\..\vendor\autoload.php';
+    use app\controller\FacultyController;
+    $user = new FacultyController();
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 1){
+        echo '<script> alert("Invalid User")</script>';
+        header('Location:../index.php');
+    }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,7 +29,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
-<script src="../assets/js/staff/script.js"></script>
+<script src="../assets/js/hod/script.js"></script>
 
 <!-- <script>
     // $(document).ready(function() {
@@ -51,7 +50,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
 </style>
 </head>
 <body>
-<?php   include "staffHeader.php" ?>
+<?php   include "hodHeader.php" ?>
 <main>
     <h2 class="head">Report</h2>
     <form id="report-pract">
@@ -96,7 +95,6 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
             </div>
         </div>
         <div class="row">
-           
             <?php date_default_timezone_set("Asia/Kolkata");?>
             <div class="form-group col-sm-4">
                 <label for="from-date">FROM :</label>
@@ -114,7 +112,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
         </div>
     </form>
 
-    <table id="staff-pract-report" class="table table-sm stripe row-border order-column" style="width:100%">
+    <table id="hod-pract-report" class="table table-sm stripe row-border order-column" style="width:100%">
         <thead>
             <tr>
             </tr>

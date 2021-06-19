@@ -61,20 +61,18 @@ function processAttendanceSheet(){
                 var div = $("#check-attend #select-div").val();
                 var sem = $("#check-attend #s_sem").val();
                 console.log(name,year,date,time);
-                ajaxAttendanceList(id,class_id,year,name,date,time,div, sem);
-                
-            }else{
-                console.log("empty");
+                ajaxAttendanceList(id,class_id,year,name,date,time,div, sem);  
             }
-            //id = $(this).val();
+            
             return false;
         });
 
-        $("#report").on("change", "#s_sem" ,function(){
+        $("#s_sem").on("change", function(){
             var acd = $("#select-acd").val();
             var id = $("#select-div").val();
             var year = $("#select-year").val();
             var sem = $(this).val();
+            console.log("hello");
             if(($("#select-acd").val() != "" || $("#select-acd").val() != " ") && ($("#select-div").val() != "" || $("#select-div").val() != " ") && ($("#select-year").val() != "" || $("#select-year").val() != " ")){
                 $.ajax({
                     url : "../controller/ajaxController.php?action=get_class_div_wise",
@@ -756,11 +754,125 @@ function processPracticalReport(){
             type : "post",
             data : $(this).serialize(),
             dataType : "json",
-            success : function(res){
-                console.log(res);
-            },
             error : function(e){
                 console.log(e);
+            },
+            success : function(res){
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                            $("#staff-pract-report").DataTable().destroy();
+                            $("#staff-pract-report thead tr").html(" ");
+                            $("#staff-pract-report tbody").html(" ");
+                        }
+                        alert("Enter all Details...");
+                        break;
+                    case "notfound":
+                        if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                            $("#staff-pract-report").DataTable().destroy();
+                            $("#staff-pract-report thead tr").html(" ");
+                            $("#staff-pract-report tbody").html(" ");
+                        }
+                        alert("No attendance Found")
+                        break;
+                    case "date":
+                        alert("Please Enter Correct Date");
+                        break;
+                    case "none":
+                        if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                            $("#staff-pract-report").DataTable().destroy();
+                            $("#staff-pract-report thead tr").html(" ");
+                            $("#staff-pract-report tbody").html(" ");
+                        }  
+                        var columns = Object.keys(res.data[0]);
+                        console.log(columns);
+                        var datecolumns = columns.slice(3);
+                        var numCol = datecolumns.length;
+                        var th = "";
+                        th += "<th>Roll no.</th>";
+                        th += "<th>Student Name.</th>";
+                        for(var i = 0; i < numCol; i++){
+                            // if(columns[i] == "student_id") continue;
+                            var date = new Date(datecolumns[i]);
+                            var dd = date.getDate();
+
+                            var mm = date.getMonth()+1; 
+                            var yyyy = date.getFullYear();
+                            var hour    = date.getHours();
+                            var minute  = date.getMinutes();
+                            var second  = date.getSeconds(); 
+                            if(dd<10) 
+                            {
+                                dd='0'+dd;
+                            } 
+
+                            if(mm<10) 
+                            {
+                                mm='0'+mm;
+                            } 
+                            if(hour.toString().length == 1) {
+                                hour = '0'+hour;
+                           }
+                           if(minute.toString().length == 1) {
+                                minute = '0'+minute;
+                           }
+                           if(second.toString().length == 1) {
+                                second = '0'+second;
+                           } 
+                            date = dd+'/'+mm+'/'+yyyy;
+                            time = hour+':'+minute+':'+second;
+                            th += "<th>"+date+" </br> "+time+"</th>";
+                        } 
+                        th += "<th>Total</th>"; 
+                        th += "<th>Percentage</th>";
+                        var td = "";
+                        for(var i = 0; i < res.data.length; i++){
+                            td += "<tr>"
+                            td += "<td>"+res.data[i].roll_no+"</td>";
+                            td += "<td>"+res.data[i].student_name+"</td>";
+                            for(var j = 0; j < numCol; j++){
+                                if(res.data[i][datecolumns[j]] == 1){
+                                    td += "<td>P</td>"
+                                }else{
+                                    td += "<td style='color:red'>A</td>"
+                                }
+                            } 
+                            if(res.total[i].total == ""){
+                                td += "<td>NA</td>";
+                                td += '<td style="mso-number-format:0.00%">NA</td>';
+                            }else{
+                                td += "<td>"+res.total[i].total+"</td>";
+                                td += '<td style="mso-number-format:0.00%">'+parseFloat(res.total[i].percent).toFixed(2) +'%'+'</td>';
+                            }
+                            td += "</tr>"
+                        }
+                        $("#staff-pract-report thead tr").html(th);
+                        $("#staff-pract-report tbody").html(td);
+                        var table = $("#staff-pract-report").DataTable(
+                            {
+                                scrollY:        "500px",
+                                scrollX:        true,
+                                scrollCollapse: true,
+                                paging:         false,
+                                autoWidth:  false,
+                                fixedColumns:   {
+                                    leftColumns: 2,
+                                    rightColumns: 1
+                                },
+                                dom: 'Bfrtip',
+                                buttons: [
+                                    {
+                                        extend: 'excel',
+                                        text : 'Export Excel',
+                                        //title : res.dept[0].dept_name+"-"+res.year[0].s_class_name,
+                                       // messageTop: title+" Attendance Academic Year "+academic_year,
+                                    }
+                                ]
+                            }
+                        );
+                        break;
+                }
             }
         })
     })

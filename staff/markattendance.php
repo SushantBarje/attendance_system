@@ -85,7 +85,7 @@
                 <div class="form-group col-sm-3">
                     <label for="select-div">Select Semester :</label>
                     <select class="form-control form-control-sm sheet-input-field" name="sem" id="s_sem">
-                        <option value=""> </option>
+                        <option value=" "> </option>
                     </select>
                 </div>
                 <div class="col-sm-3">
