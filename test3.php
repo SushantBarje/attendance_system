@@ -52,7 +52,7 @@ var_dump($result);
 
 ?>
 
-<div class="d-flex flex-wrap" id="show_pract_class">
+<!-- <div class="d-flex flex-wrap" id="show_pract_class">
     <?php 
         foreach($result as $r){
     ?>
@@ -63,6 +63,43 @@ var_dump($result);
         </a>    
 
     <?php } ?>
-</div>
+</div> -->
+
+<table id="report" class="table">
+    <thead>
+        <tr>
+            <th rowspan="2">Roll no.</th>
+            <th rowspan="2">Name</th>
+            <th>20/20/20</th>
+            <th>20/20/20</th>
+            <th>20/20/20</th>
+            <th>20/20/20</th>
+            <th rowspan="2">Total</th>
+            <th rowspan="2">Percentage</th>
+        </tr>
+        <tr>
+            <th>10</th>
+            <th>20</th>
+            <th>10</th>
+            <th>20</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Sushant</td>
+            <td>A</td>
+            <td>P</td>
+            <td>P</td>
+            <td>A</td>
+            <td>2</td>
+            <td>50%</td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $("#report").dataTable({});
+</script>
 </body>
 </html>

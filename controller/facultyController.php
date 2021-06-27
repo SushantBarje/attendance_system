@@ -956,12 +956,13 @@ class FacultyController extends Faculty {
         $time = $this->verifyInput($_POST['time']);
         $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
         $this->attend = $this->verifyInput($_POST['attend']);
+        $course_id = $this->getPractClassById([$this->class, $_SESSION['faculty_id']]);
         $result = $this->getPracticalAttendance([(int)$this->class,$timestamp]);
         if(count($result) == 0){
             $c = 0;
             foreach((array)$this->attend as $key => $value){
                
-                $result = $this->insertStudentPracticalAttendance([(int)$this->class, $key,(int)$value,$timestamp]);
+                $result = $this->insertStudentPracticalAttendance([(int)$this->class, $key,(int)$value,$timestamp, (int)$course_id['course_id']]);
                 //var_dump($result);
                $c++;
             }
@@ -980,10 +981,11 @@ class FacultyController extends Faculty {
         $this->acd = $this->verifyInput($_POST['acd']);
         $this->year = $this->verifyInput($_POST['year']);
         $this->sem = $this->verifyInput($_POST['sem']);
+        $this->s_div = $this->verifyInput($_POST['div']);
         $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
         $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
 
-        $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->dept, $this->faculty_id]);
+        $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->s_div, $this->dept]);
         if(!$result) return json_encode(array("error" => "notfound"));
         else return json_encode(array("error" => "none", "data" => $result));
     
@@ -993,25 +995,21 @@ class FacultyController extends Faculty {
      
         $query = " ";
         $data = [];
-        if(empty($_POST['class'])) return json_encode(array("error" => "empty"));
-        // if(!empty($_POST['academic_year'])){
-        //     $this->acd = $this->verifyInput($_POST['academic_year']);
-        //     $query .= " b.academic_id = ? ";
-        //     $data[] = $this->acd;
-        // }
-        // if(!empty($_POST['year'])){
-        //     $this->year = $this->verifyInput($_POST['year']);
-        //     $query .= " AND b.year_id = ? ";
-        //     $data[] = $this->year;
-        // }
-        // if(!empty($_POST['sem'])){
-        //     $this->sem = $this->verifyInput($_POST['sem']);
-        //     $query .= " AND b.sem_id = ? ";
-        //     $data[] = $this->sem;
-        // }
-        if(!empty($_POST['class'])){
-            $this->sem = $this->verifyInput($_POST['class']);
-            $query .= " a.p_class_id = ? ";
+        if(empty($_POST['class']) || empty($_POST['academic_year']) || empty($_POST['year']) || empty($_POST['sem'])) return json_encode(array("error" => "empty"));
+        
+        if(!empty($_POST['academic_year'])){
+            $this->acd = $this->verifyInput($_POST['academic_year']);
+            $query .= "b.academic_id = ? ";
+            $data[] = $this->acd;
+        }
+        if(!empty($_POST['year'])){
+            $this->year = $this->verifyInput($_POST['year']);
+            $query .= " AND b.year_id = ? ";
+            $data[] = $this->year;
+        }
+        if(!empty($_POST['sem'])){
+            $this->sem = $this->verifyInput($_POST['sem']);
+            $query .= " AND b.sem_id = ? ";
             $data[] = $this->sem;
         }
         if(!empty($_POST['from-date']) && !empty($_POST['till-date'])){
@@ -1031,14 +1029,31 @@ class FacultyController extends Faculty {
             $query .= " AND DATE(date_time) <= ? ";
             $data[] = $this->till_date;
         }
- 
-        $result = $this->getPracticalReportDynamicColumn($query, $data);
-        if(!$result || isset($result["e"])){
-            return json_encode(array("error" => "notfound"));
+        if(!empty($_POST['class'])){
+            $this->course_id = $this->verifyInput($_POST['class']);
+            $classes = $this->getPracticalClassByCourses([$this->acd, $this->course_id]);
+            $result_arr = array();
+            $query .= " AND a.p_class_id = ?";
+            foreach($classes as $class){
+                $this->class = $class['p_class_id'];
+                
+                $data[] = $this->class;
+                $result = $this->getPracticalReportDynamicColumn($query, $data);
+                //var_dump($result);
+                if(!$result || isset($result["e"])){
+                    continue;
+                    // return json_encode(array("error" => "notfound"));
+                }
+                $result_arr[] = $this->getFinalPracticalReport($query,$data,$result);
+                array_pop($data);
+                //if(isset($result["e"]) || !$result) return json_encode(array("error" => "notfound"));
+                //return json_encode(array("error" => "none" , "data" => $result[0], "total" => $result[1]));
+            } 
+            return json_encode(array("error" => "none" , "data" => $result_arr));
+        }else{
+            $result = $this->getPracticalReportSemester($query, $data);
+            var_dump($result);
         }
-        $result = $this->getFinalPracticalReport($query,$data,$result);
-        if(isset($result["e"]) || !$result) return json_encode(array("error" => "notfound"));
-        return json_encode(array("error" => "none" , "data" => $result[0], "total" => $result[1]));
     }
     
     public function getFacultyId(){

@@ -934,7 +934,7 @@ function processDeleteCourse(){
 
 
 function processHodReport(){
-    $(document).on("change", ".report-select-input", function(e){
+    $("#report-hod").on("change", ".report-select-input", function(e){
         if($("#report-hod #select-acd").val() != "" && $("#report-hod #select-year").val() != "" && $("#report-hod #select-div").val() != "" && $("#report-hod #s_sem").val() != ""){
             var acd = $("#report-hod #select-acd").val();
             var year = $("#report-hod #select-year").val();
@@ -1301,19 +1301,21 @@ function performReport(){
                                     }
                                 )
                                 
-                                // $("#hod-report-adv").tableExport({
-                                //     headers: true, 
-                                //     bootstrap : true,
-                                //     exportButtons: true,                // (Boolean), automatically generate the built-in export buttons for each of the specified formats (default: true)
-                                //     position: "bottom", 
-                                // })
-                                $("#export").on("click", function(){
-                                    $("#hod-report-adv").table2excel({
-                                        name: "Worksheet Name",
-                                        filename: "SomeFile.xls", 
-                                        preserveColors: false
-                                    }); 
+                                $("#hod-report-adv").tableExport({
+                                    headers: true, 
+                                    bootstrap : true,
+                                    exportButtons: [".xlxs"],                // (Boolean), automatically generate the built-in export buttons for each of the specified formats (default: true)
                                 })
+                                const elem = document.querySelector(".tableexport-caption");
+                                const target = document.querySelector("#tableWrap");
+                                target.parentNode.insertBefore(elem, target);
+                                // $("#export").on("click", function(){
+                                //     $("#hod-report-adv").table2excel({
+                                //         name: "Worksheet Name",
+                                //         filename: "SomeFile.xls", 
+                                //         preserveColors: false
+                                //     }); 
+                                // })
                                                              
                     }
                 },
@@ -1465,6 +1467,15 @@ function performReport(){
                                         ]
                                     }
                                 );
+
+                                $("#hod-report").tableExport({
+                                    headers: true, 
+                                    bootstrap : true,
+                                    exportButtons: [".xlxs"],                // (Boolean), automatically generate the built-in export buttons for each of the specified formats (default: true)
+                                })
+                                const elem = document.querySelector(".tableexport-caption");
+                                const target = document.querySelector("#tableWrap");
+                                target.parentNode.insertBefore(elem, target);
                                 break;
                         }
                     },
@@ -1644,23 +1655,27 @@ function processAddPractClass(){
 
 function processPracticalReport(){
     $("#report-pract").on("change", ".report-select-input", function() {
-        if($("#report-pract #select-acd").val() != " " && $("#report-pract #select-year").val() != " " && $("#report-pract #s_sem").val() != " "){
-            var acd = $("#report-pract #select-acd").val();
-            var year = $("#report-pract #select-year").val();
-            var sem = $("#report-pract #s_sem").val();
-            console.log(acd,year,sem);
+        var acd = $("#report-pract #select-acd")
+        var year = $("#report-pract #select-year")
+        var sem = $("#report-pract #s_sem")
+        var div = $("#report-pract #select-div")
+        var class_id = $("#report-pract #select-class")
+        var from_date = $("#report-pract #from-date")
+        var till_date = $("#report-pract #till-date")
+        console.log(acd.val(), year.val(), sem.val(), div.val(), class_id.val(), from_date.val(), till_date.val());
+        if(acd.val() != "" && year.val() != "" && sem.val() != "" &&  div.val() != ""){
             $.ajax({
                 url : "../controller/ajaxController.php?action=get_pract_class_sem_wise",
                 type : "post",
-                data : {"sem" : sem, "acd" : acd, "year" : year},
+                data : {"sem" : sem.val(), "acd" : acd.val(), "year" : year.val(), "div" : div.val()},
                 dataType : "json",
                 success : function(res){
                     console.log(res);
                     switch(res.error){
                         case "empty":
                             $("#report-pract #select-class").prop("disabled", true);
-                            $("#report-pract #select-class").val(" ");
-                            $("#report-pract #select-class").text(" ");
+                            $("#report-pract #select-class").val("");
+                            $("#report-pract #select-class").text("");
                             alert("Please fill all details!");
                             break;
                         case "notfound":
@@ -1669,13 +1684,13 @@ function processPracticalReport(){
                             break;
                         case "none":
                             $("#report-pract #select-class").prop("disabled", false);
-                            $("#report-pract #select-class").val(" ");
-                            $("#report-pract #select-class").text(" ");
+                            $("#report-pract #select-class").val("");
+                            $("#report-pract #select-class").text("");
                             if(res.data.length > 0){
                                 $("#report-pract #select-class").prop("disabled",false);
-                                var html = '<option value=" "> </option>';
+                                var html = '<option value=""></option>';
                                 for(var i = 0; i < res.data.length; i++){
-                                    html += '<option value="'+res.data[i].p_class_id+'" data-class="'+res.data[i].year_id+'">'+res.data[i].course_name+' Batch - '+res.data[i].batch_name+'</option>';
+                                    html += '<option value="'+res.data[i].course_id+'">'+res.data[i].course_name+'</option>';
                                 }
                                 $('#report-pract #select-class').html(html);
                             }
@@ -1716,6 +1731,153 @@ function processPracticalReport(){
                             $("#staff-pract-report tbody").html(" ");
                         }
                         alert("No attendance Found")
+                        $("#report-pract #select-class").val(" ");
+                        break;
+                    case "date":
+                        alert("Please Enter Correct Date");
+                        break;
+                    case "none":
+                        if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                            $(".staff-pract-report").DataTable().destroy()
+                            $(".report-tables").html(" ");
+                        }  
+
+                        var course = $("#report-pract #select-class option:selected").text();
+                        var year = $("#report-pract #select-year option:selected").text();
+                        var table = "";
+                        
+                        Object.keys(res.data).map(function(k){
+                            $('.report-tables').append("<div class='mt-4'></div><h4 style='text-align:center'>Batch - "+res.data[k][0].batch_name+"</h4>")
+                            $('.report-tables').append('<button type="button" class="btn btn-success export" id="'+res.data[k][0].batch_name+'">Print</button>');
+                            var table = $('<table/>').attr({
+                                id : "staff-pract-report_"+res.data[k][0].batch_name,
+                                class : "staff-pract-report table table-striped table-bordered"
+                            });
+                            table.append("<thead></thead><tbody></tbody><tfoot></tfoot>");
+                            var columns = Object.keys(res.data[k][0]);
+                            var datecolumns = columns.slice(7);
+                            var numCol = datecolumns.length;
+                            var th = "<tr>";
+                            th += "<th>Roll no.</th>";
+                            th += '<th>Student Name.</th>';
+                            for(var i = 0; i < numCol; i++){
+                                // if(columns[i] == "student_id") continue;
+                                var date = new Date(datecolumns[i]);
+                                var dd = date.getDate();
+
+                                var mm = date.getMonth()+1; 
+                                var yyyy = date.getFullYear();
+                                var hour    = date.getHours();
+                                var minute  = date.getMinutes();
+                                var second  = date.getSeconds(); 
+                                if(dd<10) 
+                                {
+                                    dd='0'+dd;
+                                } 
+
+                                if(mm<10) 
+                                {
+                                    mm='0'+mm;
+                                } 
+                                if(hour.toString().length == 1) {
+                                    hour = '0'+hour;
+                            }
+                            if(minute.toString().length == 1) {
+                                    minute = '0'+minute;
+                            }
+                            if(second.toString().length == 1) {
+                                    second = '0'+second;
+                            } 
+                                date = dd+'/'+mm+'/'+yyyy;
+                                time = hour+':'+minute+':'+second;
+                                th += "<th>"+date+" </br> "+time+"</th>";
+                            } 
+                            th += "<th>Total</th>"; 
+                            th += "<th>Percentage</th></tr>";
+                            tfoot = "<tr>";
+                            tfoot += "<td colspan='2'>Total Present</td>"
+                            for(var z = 0; z < numCol; z++){
+                                var sum = 0;
+                                for(var x = 0; x < res.data[k].length; x++){
+                                    if(res.data[k][x][datecolumns[z]] == 1){
+                                        sum++;
+                                    }
+                                }
+                                tfoot += "<td>"+sum+"</td>";
+                            }
+                            tfoot += '<td colspan="2">&nbsp</td>'
+                            tfoot += "</tr>";
+                            console.log(tfoot);
+                            var td = "";
+                            for(var i = 0; i < res.data[k].length; i++){
+                                td += "<tr>"
+                                td += "<td>"+res.data[k][i].roll_no+"</td>";
+                                td += "<td>"+res.data[k][i].student_name+"</td>";
+                                for(var j = 0; j < numCol; j++){
+                                    if(res.data[k][i][datecolumns[j]] == 1){
+                                        td += "<td>P</td>"
+                                    }else{
+                                        td += "<td style='color:red'>A</td>"
+                                    }
+                                } 
+                                if(res.data[k][i].total == ""){
+                                    td += "<td>NA</td>";
+                                    td += '<td style="mso-number-format:0.00%">NA</td>';
+                                }else{
+                                    td += "<td>"+res.data[k][i].total+"</td>";
+                                    td += '<td style="mso-number-format:0.00%">'+parseFloat(res.data[k][i].percent).toFixed(2) +'%'+'</td>';
+                                }
+                                td += "</tr>"
+                            }
+                            table.find("thead").html(th);
+                            table.find("tbody").html(td);
+                            table.find("tfoot").html(tfoot);
+                            $(".report-tables").append(table);
+                            
+                        }   );
+                        var table = $(".staff-pract-report").DataTable(
+                            {
+                                scrollY:        "300px",
+                                scrollX:        true,
+                                scrollCollapse: true,
+                                paging:         false,
+                                autoWidth:  false,
+                                fixedColumns:   {
+                                    leftColumns: 2,
+                                    rightColumns: 1
+                                }
+                            }
+                        );
+                        $(".export").on("click", function(){
+                            var id = $(this).attr('id');
+                            console.log(id);
+                            $("#staff-pract-report_"+id).table2excel({
+                                name: "Worksheet Name",
+                                filename: "SomeFile.xls",
+                                fileext: ".xls",
+                                preserveColors: false
+                            }); 
+                        })
+                        break;
+                }
+                
+                /*switch(res.error){
+                    case "empty":
+                        if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                            $("#staff-pract-report").DataTable().destroy();
+                            $("#staff-pract-report thead tr").html(" ");
+                            $("#staff-pract-report tbody").html(" ");
+                        }
+                        alert("Enter all Details...");
+                        break;
+                    case "notfound":
+                        if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                            $("#staff-pract-report").DataTable().destroy();
+                            $("#staff-pract-report thead tr").html(" ");
+                            $("#staff-pract-report tbody").html(" ");
+                        }
+                        alert("No attendance Found")
+                        $("#report-pract #select-class").val(" ");
                         break;
                     case "date":
                         alert("Please Enter Correct Date");
@@ -1813,8 +1975,10 @@ function processPracticalReport(){
                             }
                         );
                         break;
-                }
+                }*/
             }
-        })
-    })
+        });
+    });
+
+    
 }
