@@ -40,6 +40,10 @@
     <title>Generate Reports</title>
     <style> 
         th, td { white-space: nowrap;}
+       .btn-toolbar{
+           position: relative;
+            
+       }
     </style>
     
 </head>

@@ -7,19 +7,23 @@
         echo '<script> alert("Invalid User")</script>';
         header('Location:../index.php');
     }
+    $dept_name = $user->getDepartmentById([isset($_SESSION['dept']) ? $_SESSION['dept'] : '']);
+    echo '<script> var dept_name = "'.$dept_name[0]['dept_name'].'"</script>';
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css" />
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script type="text/javascript"  src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.3.2/css/fixedColumns.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.3.2/css/fixedColumns.dataTables.min.css" />
 <script src="https://cdn.datatables.net/fixedcolumns/3.3.2/js/dataTables.fixedColumns.min.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.10.24/api/sum().js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
@@ -29,6 +33,11 @@
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
+<script src="../assets/blob.js/Blob.js-master/Blob.js"></script>
+<script src="../assets/sheetjs/sheetjs-master/dist/xlsx.core.min.js"></script>
+<script src="../assets/FileSaver/FileSaver.js-master/FileSaver.min.js"></script>
+<script src="../assets/TableExport/TableExport-master/src/stable/js/tableexport.min.js"></script>
+<script src="../assets/table2excel/jquery-table2excel-master/dist/jquery.table2excel.min.js"></script>
 <script src="../assets/js/hod/script.js"></script>
 
 <!-- <script>
@@ -58,10 +67,10 @@
             <div class="form-group col-sm-2">
                 <label for="acd-year">Academic Year</label>
                 <select class="form-control form-control-sm report-select-input" name="academic_year" id="select-acd">
-                    <option value=" "> </option>
+                    <option value=""></option>
                     <?php 
                         $data = $user->getAcademicYear();
-                        if(!$data) echo '<option value=" ">Nothing Found</option>';
+                        if(!$data) echo '<option value=">Nothing Found</option>';
                         foreach($data as $d){
                             echo '<option value="'.$d['acedemic_id'].'">'.$d['academic_descr'].'</option>';
                         }
@@ -71,26 +80,39 @@
             <div class="col-sm-2">
                 <label for="select-year" class="mr-sm-2">Year: </label>
                 <select id="select-year" name="year" class="form-control form-control-sm mr-3 report-select-input"> 
-                    <option value=" "> </option>
+                    <option value=""></option>
                     <?php 
                         $data = $user->getYearBelongsDept([$_SESSION['dept']]);
-                        if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                        if(!$data) echo '<option value="">Nothing Found</option>';
                         foreach($data as $d){
                             echo '<option value="'.$d['year_id'].'" >'.$d['s_class_name'].'</option>';
                         }
                     ?>  
                 </select>
             </div>
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-2">
                 <label for="select-class">Select Semester :</label>
                 <select class="form-control form-control-sm report-select-input" name="sem" id="s_sem" disabled>
-                    <option value=" "> </option>
+                    <option value=""></option>
                 </select>
             </div>  
+            <div class="form-group col-sm-2">
+                <label for="select-div">Select Division :</label>
+                <select class="form-control form-control-sm report-select-input" name="div_id" id="select-div">
+                    <option value=""></option>
+                    <?php 
+                        $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                        if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                        foreach($data as $d){
+                            echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
+                        }
+                    ?>
+                </select>
+            </div>
             <div class="form-group col-sm-4">
                 <label for="select-class">Select Class :</label>
                 <select class="form-control form-control-sm" name="class" id="select-class" disabled>
-                    <option value=" "> </option>
+                    <option value=""></option>
                 </select>
             </div>
         </div>
@@ -112,15 +134,9 @@
         </div>
     </form>
 
-    <table id="hod-pract-report" class="table table-sm stripe row-border order-column" style="width:100%">
-        <thead>
-            <tr>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="report-tables">
         
-        </tbody>
-    </table>
+    </div>
 </main>
 </body>
 </html>

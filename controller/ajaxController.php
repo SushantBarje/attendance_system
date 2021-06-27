@@ -2,8 +2,6 @@
 namespace app\controller;
 require_once __DIR__ . '\..\vendor\autoload.php';
 use app\controller\FacultyController;
-use app\model\Faculty;
-
 
 $faculty = new FacultyController();
 
