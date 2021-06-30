@@ -82,18 +82,32 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
                     ?>  
                 </select>
             </div>
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-2">
                 <label for="select-class">Select Semester :</label>
                 <select class="form-control form-control-sm report-select-input" name="sem" id="s_sem" disabled>
                     <option value=" "> </option>
                 </select>
             </div>  
+            <div class="form-group col-sm-2">
+                <label for="select-div">Select Division :</label>
+                <select class="form-control form-control-sm report-select-input" name="div_id" id="select-div">
+                    <option value=""></option>
+                    <?php 
+                        $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                        if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                        foreach($data as $d){
+                            echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
+                        }
+                    ?>
+                </select>
+            </div>
             <div class="form-group col-sm-4">
                 <label for="select-class">Select Class :</label>
                 <select class="form-control form-control-sm" name="class" id="select-class" disabled>
                     <option value=" "> </option>
                 </select>
             </div>
+            
         </div>
         <div class="row">
            
@@ -114,15 +128,9 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
         </div>
     </form>
 
-    <table id="staff-pract-report" class="table table-sm stripe row-border order-column" style="width:100%">
-        <thead>
-            <tr>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="report-tables">
         
-        </tbody>
-    </table>
+    </div>
 </main>
 </body>
 </html>

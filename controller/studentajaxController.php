@@ -12,6 +12,9 @@ $req = $_GET['action'];
 if($req == "get_student_class_report"){
     $r = $student->getStudentReportClass();
     die($r);
+}else if($req == "get_student_class_pract_report"){
+    $r = $student->getStudentReportClassPractical();
+    die($r);
 }
 
 ?>

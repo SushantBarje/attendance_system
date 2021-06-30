@@ -135,4 +135,12 @@ else if($req == "get_staff_pract_report"){
     $r = $faculty->showPracticalReport();
    die($r);
 }
+else if($req == "get_pract_report"){
+    $r = $faculty->showPracticalReport();
+   die($r);
+}
+// }else if($req == "perform_hod_report_pract"){
+//     $r = $faculty->showHodReport();
+//     die($r);
+// }
 ob_end_flush();

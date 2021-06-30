@@ -23,6 +23,7 @@ $(document).ready(function(){
     processAjaxClass();
     processAdminReport();
     processAjaxYear()
+    processPracticalReport()
     //processAdminAdvReport()
 });
 
@@ -720,7 +721,7 @@ function processAjaxClass(){
 
 
 function processAdminReport(){
-    $(document).on("change", ".report-select-input-report", function(e){
+    $("#report").on("change", ".report-select-input-report", function(e){
         if($("#report #select-acd-report").val() != "" && $("#report #select-year-report").val() != "" && $("#report #select-div-report").val() != "" && $("#report #select-dept-report").val() != ""){
             var acd = $("#report #select-acd-report").val();
             var year = $("#report #select-year-report").val();
@@ -1111,6 +1112,735 @@ function processAjaxYear(){
     })
 }
 
- 
+
+
+function processPracticalReport(){
+    var acd = year = sem = div = class_id = from_date = till_date = " "; 
+    function takePractReportInput(){
+        acd = $("#report-pract #select-acd-report")
+        dept = $("#report-pract #select-dept-report")
+        year = $("#report-pract #select-year-report")
+        sem = $("#report-pract #select-sem-report")
+        div = $("#report-pract #select-div-report")
+        class_id = $("#report-pract #select-class-report")
+        from_date = $("#report-pract #from-date")
+        till_date = $("#report-pract #till-date")
+        dept_id = $("#report-pract #select-dept-report")
+    }
+    $("#report-pract").on("change", ".report-select-input-report", function(){
+        takePractReportInput();
+        console.log(acd.val(), year.val(), sem.val(), div.val(), class_id.val(), from_date.val(), till_date.val());
+        if(acd.val() != "" && year.val() != "" && sem.val() != "" &&  div.val() != "" && dept.val() != ""){
+            $.ajax({
+                url : "../controller/ajaxController.php?action=get_pract_class_sem_wise",
+                type : "post",
+                data : {"sem" : sem.val(), "acd" : acd.val(), "year" : year.val(), "div" : div.val(), "dept_id" : dept.val()},
+                dataType : "json",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            class_id.prop("disabled", true);
+                            class_id.val("");
+                            class_id.text("");
+                            alert("Please fill all details!");
+                            break;
+                        case "notfound":
+                            class_id.val(" ");
+                            class_id.text("No class found");
+                            break;
+                        case "none":
+                            class_id.prop("disabled", false);
+                            class_id.val("");
+                            class_id.text("");
+                            if(res.data.length > 0){
+                                $("#report-pract #select-class").prop("disabled",false);
+                                var html = '<option value=""></option>';
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<option value="'+res.data[i].course_id+'">'+res.data[i].course_name+'</option>';
+                                }
+                                class_id.html(html);
+                            }
+                            break;
+                    }
+                }
+            })
+        }else{
+            console.log("empty");
+        }
+    });
+
+    $("#report-pract").on("submit", function(e){
+        e.preventDefault();
+        takePractReportInput();
+
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_pract_report",
+            type : "post",
+            data : $(this).serialize(),
+            dataType : 'json',
+            success : function(res){
+                console.log(res);
+                if(acd.val() != "" && year.val() != "" && div.val() != "" && sem.val() != "" && class_id.val() == ""){
+                    DrawpracticalReportTableOfCombinedClass(res);
+                }else if(acd.val() != "" && year.val() != "" && div.val() != "" && sem.val() != "" && class_id.val() != ""){
+                    DrawpracticalReportTableOfParticularClass(res);
+                }
+            }
+        })
+
+        function DrawpracticalReportTableOfCombinedClass(res){
+            switch(res.error){
+                case "empty":
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
+                    alert("Please Fill Required Fields!");
+                
+                case "none":
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
+
+                    var columns = Object.keys(res.data[0]);
+                    var class_columns = columns.slice(6);
+                    var numColClass = class_columns.length;
+                    var table_header_1 = '<tr>\
+                                            <th colspan="2">Class :</th>\
+                                            <th colspan="'+numColClass+'">Intersaction Session</th>\
+                                            <th colspan="2">Total</th>\
+                                        </tr>';
+                    var th_body =      '<tr>\
+                                            <th>Roll no.</th>\
+                                            <th>Name of Student</th>';
+                    var th_1 = " ";
+                    for(var i = 0; i < numColClass; i++){
+                        th_1 += '<th>'+class_columns[i]+'</th>'
+                    }
+                    var total_th = "<th>Total</th><th>%</th></tr>"
+
+                    var tbody = "<tr>";
+                    for(var i = 0; i < res.data.length; i++){
+                        tbody += '<td>'+res.data[i].roll_no+'</td>';
+                        tbody += '<td>'+res.data[i].student_name+'</td>';
+                        var sum = 0;
+                        for(var j = 0; j < numColClass; j++){
+                            if(res.data[i][class_columns[j]] != null){
+                                sum += parseInt(res.data[i][class_columns[j]]);
+                                tbody += '<td>'+res.data[i][class_columns[j]]+'</td>' 
+                            }else{
+                                tbody += '<td>-</td>'
+                            }
+                        }
+                        total_percent = (sum)*100;
+                        tbody += '<td>'+sum+'</td>'
+                        tbody += '<td style="mso-number-format:"'+0.00+'%">'+total_percent.toFixed(2)+'%</td></tr>';
+                    }
+                    var concat_header = table_header_1+th_body+th_1+total_th;
+                    $("#hod-report-adv thead").html(concat_header);
+                    $("#hod-report-adv tbody").html(tbody);
+                    $('#hod-report-adv thead th[colspan]').wrapInner( '<span/>' ).append( '&nbsp;' );
+                    $("#faculty_header").html(" ");
+                    $("#lecture_header").html(" ");
+                    $("#hod-report-adv").DataTable(
+                        {
+                            scrollY:        "500px",
+                            scrollX:        true,
+                            scrollCollapse: true,
+                            paging:         false,
+                            autoWidth:  false,
+                            fixedColumns:   {
+                                leftColumns: 2,
+                                rightColumns: 1
+                            },
+                        }
+                    )
+                    
+                    
+                    $("#export").on("click", function(){
+                        $("#hod-report-adv").table2excel({
+                            name: "Worksheet Name",
+                            filename: "SomeFile.xls", 
+                            preserveColors: false
+                        }); 
+                    })                                        
+            }
+        }
+
+        function DrawpracticalReportTableOfParticularClass(res){
+            switch(res.error){
+                case "empty":
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
+                    alert("Enter all Details...");
+                    break;
+                case "notfound":
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
+                    alert("No attendance Found")
+                    $("#report-pract #select-class-report").val(" ");
+                    break;
+                case "date":
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
+                    alert("Please Enter Correct Date");
+                    break;
+                case "none":
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    }  
+                    
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                        $("#hod-report-adv tbody").attr("hidden","true");
+                    } 
+
+                    var course = $("#report-pract #select-class option:selected").text();
+                    var year = $("#report-pract #select-year option:selected").text();
+                    var table = "";
+                    
+                    Object.keys(res.data).map(function(k){
+                        $('.report-tables').append("<div class='mt-4'></div><h4 style='text-align:center'>Batch - "+res.data[k][0].batch_name+"</h4>")
+                        $('.report-tables').append('<button type="button" class="btn btn-success export" id="'+res.data[k][0].batch_name+'">Print</button>');
+                        var table = $('<table/>').attr({
+                            id : "staff-pract-report_"+res.data[k][0].batch_name,
+                            class : "staff-pract-report stripe row-border order-column cell-border"
+                        });
+                        table.append("<thead></thead><tbody></tbody><tfoot></tfoot>");
+                        var columns = Object.keys(res.data[k][0]);
+                        var datecolumns = columns.slice(7);
+                        var numCol = datecolumns.length;
+                        var th = "<tr>";
+                        th += "<th>Roll no.</th>";
+                        th += '<th>Student Name.</th>';
+                        for(var i = 0; i < numCol; i++){
+                            // if(columns[i] == "student_id") continue;
+                            var date = new Date(datecolumns[i]);
+                            var dd = date.getDate();
+
+                            var mm = date.getMonth()+1; 
+                            var yyyy = date.getFullYear();
+                            var hour    = date.getHours();
+                            var minute  = date.getMinutes();
+                            var second  = date.getSeconds(); 
+                            if(dd<10) 
+                            {
+                                dd='0'+dd;
+                            } 
+
+                            if(mm<10) 
+                            {
+                                mm='0'+mm;
+                            } 
+                            if(hour.toString().length == 1) {
+                                hour = '0'+hour;
+                        }
+                        if(minute.toString().length == 1) {
+                                minute = '0'+minute;
+                        }
+                        if(second.toString().length == 1) {
+                                second = '0'+second;
+                        } 
+                            date = dd+'/'+mm+'/'+yyyy;
+                            time = hour+':'+minute+':'+second;
+                            th += "<th>"+date+" </br> "+time+"</th>";
+                        } 
+                        th += "<th>Total</th>"; 
+                        th += "<th>Percentage</th></tr>";
+                        tfoot = "<tr>";
+                        tfoot += "<td colspan='2'><b>Total Present</b></td>"
+                        for(var z = 0; z < numCol; z++){
+                            var sum = 0;
+                            for(var x = 0; x < res.data[k].length; x++){
+                                if(res.data[k][x][datecolumns[z]] == 1){
+                                    sum++;
+                                }
+                            }
+                            tfoot += "<td><b>"+sum+"</b></td>";
+                        }
+                        tfoot += '<td colspan="2">&nbsp</td>'
+                        tfoot += "</tr>";
+                        console.log(tfoot);
+                        var td = "";
+                        for(var i = 0; i < res.data[k].length; i++){
+                            td += "<tr>"
+                            td += "<td>"+res.data[k][i].roll_no+"</td>";
+                            td += "<td>"+res.data[k][i].student_name+"</td>";
+                            for(var j = 0; j < numCol; j++){
+                                if(res.data[k][i][datecolumns[j]] == 1){
+                                    td += "<td>P</td>"
+                                }else{
+                                    td += "<td style='color:red'>A</td>"
+                                }
+                            } 
+                            if(res.data[k][i].total == ""){
+                                td += "<td>NA</td>";
+                                td += '<td style="mso-number-format:0.00%">NA</td>';
+                            }else{
+                                td += "<td>"+res.data[k][i].total+"</td>";
+                                td += '<td style="mso-number-format:0.00%">'+parseFloat(res.data[k][i].percent).toFixed(2) +'%'+'</td>';
+                            }
+                            td += "</tr>"
+                        }
+                        table.find("thead").html(th);
+                        table.find("tbody").html(td);
+                        table.find("tfoot").html(tfoot);
+                        $(".report-tables").append(table);
+                        table.DataTable(
+                            {
+                                scrollY:        "300px",
+                                scrollX:        true,
+                                scrollCollapse: true,
+                                paging:         false,
+                                autoWidth:  false,
+                                fixedColumns:   {
+                                    leftColumns: 2,
+                                    rightColumns: 1
+                                }
+                            }
+                        );
+                    }   );
+                    
+                    // $(".export").on("click", function(){
+                    //     var id = $(this).attr('id');
+                    //     console.log(id);
+                    //     $("#staff-pract-report_"+id).table2excel({
+                    //         name: "Worksheet Name",
+                    //         filename: "SomeFile.xlsx",
+                    //         fileext: ".xlsx",
+                    //         preserveColors: false
+                    //     }); 
+                    // })
+                    // var wb = XLSX.utils.table_to_book(document.getElementById('mytable'), {sheet:"Sheet JS"});
+                    // var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:true, type: 'binary'});
+                    function s2ab(s) {
+                        var buf = new ArrayBuffer(s.length);
+                        var view = new Uint8Array(buf);
+                        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                        return buf;
+                    }
+                    $(".export").click(function(){
+                        var id = $(this).attr("id");
+                        var wb = XLSX.utils.table_to_book(document.getElementById("staff-pract-report_"+id), {sheet:"Sheet JS"});
+                        var wbout = XLSX.write(wb, {bookType:'xlsx', bookSST:true, type: 'binary'});
+                        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+                    });
+                    break;
+            }
+        }
+        
+        // if(acd.val() != "" && year.val() != "" && div.val() != "" && sem.val() != "" && class_id.val() == ""){
+        //     console.log("sushant");
+        //     $.ajax({
+        //         url : "../controller/ajaxController.php?action=get_pract_report",
+        //         type : "post",
+        //         data : $(this).serialize(),
+        //         dataType : 'json',
+        //         success : function(res){
+        //             console.log(res);
+        //             switch(res.error){
+        //                 case "none":
+        //                     if($.fn.dataTable.isDataTable("#hod-report-adv")){
+        //                         $("#hod-report-adv").DataTable().destroy();
+        //                         $("#hod-report-adv thead").html(" ");
+        //                         $("#hod-report-adv tbody").html(" ");
+        //                     } 
+        //                     if($.fn.dataTable.isDataTable("#hod-report")){
+        //                         $("#hod-report").DataTable().destroy();
+        //                         $("#hod-report thead").html(" ");
+        //                         $("#hod-report tbody").html(" ");
+        //                     } 
+
+        //                     var columns = Object.keys(res.data[0]);
+        //                     var class_columns = columns.slice(3);
+        //                     var numColClass = class_columns.length;
+        //                     var table_header_1 = '<tr>\
+        //                                             <th colspan="2">Class :</th>\
+        //                                             <th colspan="'+numColClass+'">Intersaction Session</th>\
+        //                                             <th colspan="2">Total</th>\
+        //                                         </tr>';
+        //                     var th_body =      '<tr>\
+        //                                             <th rowspan="2">Roll no.</th>\
+        //                                             <th>Name of Student</th>';
+
+        //                     var th_1;
+        //                     for(var i = 0; i < numColClass; i++){
+        //                         th_1 += '<th>'+class_columns[i]+'</th>'
+        //                     }
+        //                     var total_th = "<th>Total</th><th>%</th></tr>"
+
+        //                     var total_header = "<tr><th>Total No. of Lectures</th>";
+        //                     var columns = Object.values(res.lectures);
+        //                     var numColTotal = class_columns.length;
+        //                     var th_2;
+        //                     var total_sum_lectures = 0;
+        //                     for(var i = 0; i < numColTotal; i++){
+        //                         total_sum_lectures += parseInt(columns[i]);
+        //                         th_2 += '<th>'+columns[i]+'</th>' 
+        //                     }
+        //                     th_2 += '<th>'+total_sum_lectures+'</th>'
+        //                     th_2 += "<th>-</th></tr>";
+        //                     var tbody = "<tr>";
+        //                     for(var i = 0; i < res.data.length; i++){
+        //                         tbody += '<td>'+res.data[i].roll_no+'</td>';
+        //                         tbody += '<td>'+res.data[i].student_name+'</td>';
+        //                         var sum = 0;
+        //                         for(var j = 0; j < numColClass; j++){
+        //                             if(res.data[i][class_columns[j]] != null){
+        //                                 sum += parseInt(res.data[i][class_columns[j]]);
+        //                                 tbody += '<td>'+res.data[i][class_columns[j]]+'</td>' 
+        //                             }else{
+        //                                 tbody += '<td>-</td>'
+        //                             }
+        //                         }
+        //                         total_percent = (sum/total_sum_lectures)*100;
+        //                         tbody += '<td>'+sum+'</td>'
+        //                         tbody += '<td style="mso-number-format:"'+0.00+'%">'+total_percent.toFixed(2)+'%</td></tr>';
+        //                     }
+        //                     var concat_header = table_header_1+th_body+th_1+total_th+total_header+th_2;
+                            
+        //                     $("#hod-report-adv thead").html(concat_header);
+        //                     $("#hod-report-adv tbody").html(tbody);
+        //                     $('#hod-report-adv thead th[colspan]').wrapInner( '<span/>' ).append( '&nbsp;' );
+        //                     $("#faculty_header").html(" ");
+        //                     $("#lecture_header").html(" ");
+        //                     $("#hod-report-adv").DataTable(
+        //                         {
+        //                             scrollY:        "500px",
+        //                             scrollX:        true,
+        //                             scrollCollapse: true,
+        //                             paging:         false,
+        //                             autoWidth:  false,
+        //                             fixedColumns:   {
+        //                                 leftColumns: 2,
+        //                                 rightColumns: 1
+        //                             },
+        //                         }
+        //                     )
+                            
+                            
+        //                     $("#export").on("click", function(){
+        //                         $("#hod-report-adv").table2excel({
+        //                             name: "Worksheet Name",
+        //                             filename: "SomeFile.xls", 
+        //                             preserveColors: false
+        //                         }); 
+        //                     })                                        
+        //             }
+        //         },
+        //         error : function(e){
+        //             console.log(e);
+        //         }
+        //     })
+        // }
+        // else if(acd.val() != "" && year.val() != "" && div.val() != "" && sem.val() != "" && class_id.val() != ""){
+        //     $.ajax({
+        //         url : "../controller/ajaxController.php?action=get_pract_report",
+        //         type : "post",
+        //         data : $(this).serialize(),
+        //         dataType : "json",
+        //         error : function(e){
+        //             console.log(e);
+        //         },
+        //         success : function(res){
+        //             console.log(res);
+        //             switch(res.error){
+        //                 case "empty":
+        //                     if($.fn.dataTable.isDataTable("#staff-pract-report")){
+        //                         $("#staff-pract-report").DataTable().destroy();
+        //                         $("#staff-pract-report thead tr").html(" ");
+        //                         $("#staff-pract-report tbody").html(" ");
+        //                     }
+        //                     alert("Enter all Details...");
+        //                     break;
+        //                 case "notfound":
+        //                     if($.fn.dataTable.isDataTable("#staff-pract-report")){
+        //                         $("#staff-pract-report").DataTable().destroy();
+        //                         $("#staff-pract-report thead tr").html(" ");
+        //                         $("#staff-pract-report tbody").html(" ");
+        //                     }
+        //                     alert("No attendance Found")
+        //                     $("#report-pract #select-class").val(" ");
+        //                     break;
+        //                 case "date":
+        //                     alert("Please Enter Correct Date");
+        //                     break;
+        //                 case "none":
+        //                     if($.fn.dataTable.isDataTable(".staff-pract-report")){
+        //                         $(".staff-pract-report").DataTable().destroy()
+        //                         $(".report-tables").html(" ");
+        //                     }  
+
+        //                     var course = $("#report-pract #select-class option:selected").text();
+        //                     var year = $("#report-pract #select-year option:selected").text();
+        //                     var table = "";
+                            
+        //                     Object.keys(res.data).map(function(k){
+        //                         $('.report-tables').append("<div class='mt-4'></div><h4 style='text-align:center'>Batch - "+res.data[k][0].batch_name+"</h4>")
+        //                         $('.report-tables').append('<button type="button" class="btn btn-success export" id="'+res.data[k][0].batch_name+'">Print</button>');
+        //                         var table = $('<table/>').attr({
+        //                             id : "staff-pract-report_"+res.data[k][0].batch_name,
+        //                             class : "staff-pract-report table table-striped table-bordered"
+        //                         });
+        //                         table.append("<thead></thead><tbody></tbody><tfoot></tfoot>");
+        //                         var columns = Object.keys(res.data[k][0]);
+        //                         var datecolumns = columns.slice(7);
+        //                         var numCol = datecolumns.length;
+        //                         var th = "<tr>";
+        //                         th += "<th>Roll no.</th>";
+        //                         th += '<th>Student Name.</th>';
+        //                         for(var i = 0; i < numCol; i++){
+        //                             // if(columns[i] == "student_id") continue;
+        //                             var date = new Date(datecolumns[i]);
+        //                             var dd = date.getDate();
+
+        //                             var mm = date.getMonth()+1; 
+        //                             var yyyy = date.getFullYear();
+        //                             var hour    = date.getHours();
+        //                             var minute  = date.getMinutes();
+        //                             var second  = date.getSeconds(); 
+        //                             if(dd<10) 
+        //                             {
+        //                                 dd='0'+dd;
+        //                             } 
+
+        //                             if(mm<10) 
+        //                             {
+        //                                 mm='0'+mm;
+        //                             } 
+        //                             if(hour.toString().length == 1) {
+        //                                 hour = '0'+hour;
+        //                         }
+        //                         if(minute.toString().length == 1) {
+        //                                 minute = '0'+minute;
+        //                         }
+        //                         if(second.toString().length == 1) {
+        //                                 second = '0'+second;
+        //                         } 
+        //                             date = dd+'/'+mm+'/'+yyyy;
+        //                             time = hour+':'+minute+':'+second;
+        //                             th += "<th>"+date+" </br> "+time+"</th>";
+        //                         } 
+        //                         th += "<th>Total</th>"; 
+        //                         th += "<th>Percentage</th></tr>";
+        //                         tfoot = "<tr>";
+        //                         tfoot += "<td colspan='2'>Total Present</td>"
+        //                         for(var z = 0; z < numCol; z++){
+        //                             var sum = 0;
+        //                             for(var x = 0; x < res.data[k].length; x++){
+        //                                 if(res.data[k][x][datecolumns[z]] == 1){
+        //                                     sum++;
+        //                                 }
+        //                             }
+        //                             tfoot += "<td>"+sum+"</td>";
+        //                         }
+        //                         tfoot += '<td colspan="2">&nbsp</td>'
+        //                         tfoot += "</tr>";
+        //                         console.log(tfoot);
+        //                         var td = "";
+        //                         for(var i = 0; i < res.data[k].length; i++){
+        //                             td += "<tr>"
+        //                             td += "<td>"+res.data[k][i].roll_no+"</td>";
+        //                             td += "<td>"+res.data[k][i].student_name+"</td>";
+        //                             for(var j = 0; j < numCol; j++){
+        //                                 if(res.data[k][i][datecolumns[j]] == 1){
+        //                                     td += "<td>P</td>"
+        //                                 }else{
+        //                                     td += "<td style='color:red'>A</td>"
+        //                                 }
+        //                             } 
+        //                             if(res.data[k][i].total == ""){
+        //                                 td += "<td>NA</td>";
+        //                                 td += '<td style="mso-number-format:0.00%">NA</td>';
+        //                             }else{
+        //                                 td += "<td>"+res.data[k][i].total+"</td>";
+        //                                 td += '<td style="mso-number-format:0.00%">'+parseFloat(res.data[k][i].percent).toFixed(2) +'%'+'</td>';
+        //                             }
+        //                             td += "</tr>"
+        //                         }
+        //                         table.find("thead").html(th);
+        //                         table.find("tbody").html(td);
+        //                         table.find("tfoot").html(tfoot);
+        //                         $(".report-tables").append(table);
+                                
+        //                     }   );
+        //                     var table = $(".staff-pract-report").DataTable(
+        //                         {
+        //                             scrollY:        "300px",
+        //                             scrollX:        true,
+        //                             scrollCollapse: true,
+        //                             paging:         false,
+        //                             autoWidth:  false,
+        //                             fixedColumns:   {
+        //                                 leftColumns: 2,
+        //                                 rightColumns: 1
+        //                             }
+        //                         }
+        //                     );
+        //                     $(".export").on("click", function(){
+        //                         var id = $(this).attr('id');
+        //                         console.log(id);
+        //                         $("#staff-pract-report_"+id).table2excel({
+        //                             name: "Worksheet Name",
+        //                             filename: "SomeFile.xls",
+        //                             fileext: ".xls",
+        //                             preserveColors: false
+        //                         }); 
+        //                     })
+        //                     break;
+        //             }
+                    
+                    /*switch(res.error){
+                        case "empty":
+                            if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                                $("#staff-pract-report").DataTable().destroy();
+                                $("#staff-pract-report thead tr").html(" ");
+                                $("#staff-pract-report tbody").html(" ");
+                            }
+                            alert("Enter all Details...");
+                            break;
+                        case "notfound":
+                            if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                                $("#staff-pract-report").DataTable().destroy();
+                                $("#staff-pract-report thead tr").html(" ");
+                                $("#staff-pract-report tbody").html(" ");
+                            }
+                            alert("No attendance Found")
+                            $("#report-pract #select-class").val(" ");
+                            break;
+                        case "date":
+                            alert("Please Enter Correct Date");
+                            break;
+                        case "none":
+                            if($.fn.dataTable.isDataTable("#staff-pract-report")){
+                                $("#staff-pract-report").DataTable().destroy();
+                                $("#staff-pract-report thead tr").html(" ");
+                                $("#staff-pract-report tbody").html(" ");
+                            }  
+                            var columns = Object.keys(res.data[0]);
+                            console.log(columns);
+                            var datecolumns = columns.slice(3);
+                            var numCol = datecolumns.length;
+                            var th = "";
+                            th += "<th>Roll no.</th>";
+                            th += "<th>Student Name.</th>";
+                            for(var i = 0; i < numCol; i++){
+                                // if(columns[i] == "student_id") continue;
+                                var date = new Date(datecolumns[i]);
+                                var dd = date.getDate();
+
+                                var mm = date.getMonth()+1; 
+                                var yyyy = date.getFullYear();
+                                var hour    = date.getHours();
+                                var minute  = date.getMinutes();
+                                var second  = date.getSeconds(); 
+                                if(dd<10) 
+                                {
+                                    dd='0'+dd;
+                                } 
+
+                                if(mm<10) 
+                                {
+                                    mm='0'+mm;
+                                } 
+                                if(hour.toString().length == 1) {
+                                    hour = '0'+hour;
+                            }
+                            if(minute.toString().length == 1) {
+                                    minute = '0'+minute;
+                            }
+                            if(second.toString().length == 1) {
+                                    second = '0'+second;
+                            } 
+                                date = dd+'/'+mm+'/'+yyyy;
+                                time = hour+':'+minute+':'+second;
+                                th += "<th>"+date+" </br> "+time+"</th>";
+                            } 
+                            th += "<th>Total</th>"; 
+                            th += "<th>Percentage</th>";
+                            var td = "";
+                            for(var i = 0; i < res.data.length; i++){
+                                td += "<tr>"
+                                td += "<td>"+res.data[i].roll_no+"</td>";
+                                td += "<td>"+res.data[i].student_name+"</td>";
+                                for(var j = 0; j < numCol; j++){
+                                    if(res.data[i][datecolumns[j]] == 1){
+                                        td += "<td>P</td>"
+                                    }else{
+                                        td += "<td style='color:red'>A</td>"
+                                    }
+                                } 
+                                if(res.total[i].total == ""){
+                                    td += "<td>NA</td>";
+                                    td += '<td style="mso-number-format:0.00%">NA</td>';
+                                }else{
+                                    td += "<td>"+res.total[i].total+"</td>";
+                                    td += '<td style="mso-number-format:0.00%">'+parseFloat(res.total[i].percent).toFixed(2) +'%'+'</td>';
+                                }
+                                td += "</tr>"
+                            }
+                            $("#staff-pract-report thead tr").html(th);
+                            $("#staff-pract-report tbody").html(td);
+                            var table = $("#staff-pract-report").DataTable(
+                                {
+                                    scrollY:        "500px",
+                                    scrollX:        true,
+                                    scrollCollapse: true,
+                                    paging:         false,
+                                    autoWidth:  false,
+                                    fixedColumns:   {
+                                        leftColumns: 2,
+                                        rightColumns: 1
+                                    },
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        {
+                                            extend: 'excel',
+                                            text : 'Export Excel',
+                                            //title : res.dept[0].dept_name+"-"+res.year[0].s_class_name,
+                                        // messageTop: title+" Attendance Academic Year "+academic_year,
+                                        }
+                                    ]
+                                }
+                            );
+                            break;
+                    }*/
+                //}
+    //         });
+    //     }
+    }); 
+}
+
 
 

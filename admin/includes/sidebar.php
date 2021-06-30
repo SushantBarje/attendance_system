@@ -31,7 +31,12 @@
             
             <li>
                 <a href=""><span class="las la-clipboard-list"></span>
-                    <span>Reports</span></a>
+                    <span>Theory Reports</span></a>
+            </li>
+
+            <li>
+                <a href=""><span class="las la-clipboard-list"></span>
+                    <span>Practical Report</span></a>
             </li>
         </ul>
     </div>

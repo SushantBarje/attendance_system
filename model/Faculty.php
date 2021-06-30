@@ -1083,7 +1083,7 @@ class Faculty extends Database {
 	public function getPractClassByDept($data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT a.faculty_id, a.dept_id, a.year_id, a.sem_id, d.div_name , group_concat(a.p_class_id) as p_class_ids, group_concat(a.batch_id) as batch_ids, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE a.dept_id = ? GROUP BY a.faculty_id, a.year_id, a.sem_id, a.dept_id";			
+			$sql = "SELECT a.faculty_id, a.dept_id, a.year_id, a.sem_id, d.div_name , group_concat(a.p_class_id) as p_class_ids, group_concat(a.batch_id) as batch_ids, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE a.dept_id = ? GROUP BY a.faculty_id,a.course_id";			
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}
@@ -1291,7 +1291,6 @@ class Faculty extends Database {
 		}
 	}
 
-
 	public function getStaffPracticalClassByAcademicYearAndFacultyID($data){
 		try{
 			$con = $this->connect();
@@ -1375,6 +1374,7 @@ class Faculty extends Database {
 	public function getClassBySemesterYearAndAcademic($data){
 		try{
 			$con = $this->connect();
+
 			//$sql = "SELECT a.*,b.course_name, c.batch_name, d.div_name FROM practical_class as a JOIN courses as b ON a.course_id = b.course_id JOIN batch as c ON a.batch_id = c.batch_id JOIN division as d ON a.div_id = d.div_id WHERE a.academic_id = ? AND a.year_id = ? AND a.sem_id = ? AND a.dept_id = ? AND a.div_id = ? ORDER BY b.course_name,a.batch_id;";
 			$sql = "SELECT DISTINCT a.course_id, b.course_name FROM practical_class as a JOIN courses as b ON a.course_id = b.course_id WHERE  a.academic_id = ? AND a.year_id = ? AND a.sem_id = ? AND a.div_id = ? AND a.dept_id = ? ORDER BY a.p_class_id;";
 			$stmt = $con->prepare($sql);
@@ -1385,11 +1385,11 @@ class Faculty extends Database {
 		}
 	}
 
-	public function getPracticalClassByCourses($data){
+	public function getPracticalClassByCourses($query,$data){
 		try{
 			$con = $this->connect();
 			//$sql = "SELECT a.*,b.course_name, c.batch_name, d.div_name FROM practical_class as a JOIN courses as b ON a.course_id = b.course_id JOIN batch as c ON a.batch_id = c.batch_id JOIN division as d ON a.div_id = d.div_id WHERE a.academic_id = ? AND a.year_id = ? AND a.sem_id = ? AND a.dept_id = ? AND a.div_id = ? ORDER BY b.course_name,a.batch_id;";
-			$sql = "SELECT a.p_class_id FROM practical_class as a WHERE a.academic_id = ? AND a.course_id = ? ORDER BY a.p_class_id;";
+			$sql = "SELECT a.p_class_id FROM practical_class as a WHERE a.academic_id = ? AND a.course_id = ? ".$query." ORDER BY a.p_class_id;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}
@@ -1452,11 +1452,12 @@ class Faculty extends Database {
 	public function getPracticalReportSemester($query, $data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT b.course_id, GROUP_CONCAT(DISTINCT CONCAT('SUM(IF(a.course_id = ''', a.course_id , ''', a.status, 0)) AS ', CONCAT('`',c.course_name,'`') ) ) as string FROM pract_attend as a RIGHT JOIN practical_class as b ON a.p_class_id = b.p_class_id RIGHT JOIN courses as c ON b.course_id = c.course_id WHERE ".$query.";";
+			$arr = array();
+			$sql = "SELECT GROUP_CONCAT(DISTINCT CONCAT('SUM(IF(a.course_id = ''', a.course_id , ''', a.status, 0)) AS ', CONCAT('`',c.course_name,'`') ) ) as string FROM pract_attend as a RIGHT JOIN practical_class as b ON a.p_class_id = b.p_class_id RIGHT JOIN courses as c ON b.course_id = c.course_id WHERE ".$query.";";
 			$stmt = $con->prepare($sql);
-			if($stmt->execute($data)) {
+			if($stmt->execute($data)) { 
 				$string = $stmt->fetch()['string'];
-				$sql = "SELECT a.prn_no, c.roll_no, CONCAT(c.first_name,' ',c.middle_name,' ',c.last_name) as student_name, ".$string." ,SUM(a.status) as total, (SUM(a.status)/COUNT(a.status))*100 as percent FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no WHERE ".$query." GROUP BY a.prn_no ORDER BY c.roll_no+0;";
+				$sql = "SELECT batch_name,a.prn_no, c.roll_no, CONCAT(c.first_name,' ',c.middle_name,' ',c.last_name) as student_name, SUM(a.status) as total, (SUM(a.status)/COUNT(a.status))*100 as percent, ".$string." FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no JOIN batch as d on b.batch_id = d.batch_id WHERE ".$query." GROUP BY a.prn_no ORDER BY d.batch_id,c.roll_no+0;";
 				$stmt = $con->prepare($sql);
 				if($stmt->execute($data)) return $stmt->fetchAll();
 			}
