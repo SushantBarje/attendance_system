@@ -71,17 +71,30 @@ class StudentController extends Student {
         
             $result = $this->getStudentReport([$_SESSION['prn_no']]);
             if($result) return array("error" => "none", "data" => $result);
-        
+
       
         //if($this->checkEmpty()) return $errors["empty"] = "Please enter valid PRN no.";
-        
     }
 
+    public function showGrandReportPractical(){
+        $result = $this->getStudentReportPractical([$_SESSION['prn_no']]);
+        if($result) return array("error" => "none", "data" => $result);
+    }
 
     public function getStudentReportClass(){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $data = $this->verifyInput($_POST['data']);
         $result = $this->getClassReport([$data, $_SESSION['prn_no']]);
+        
+        if(!$result) return json_encode(array("error" => "notfound"));
+        else if(isset($result["e"])) return json_encode(array("error" => "sql" , "msg" => $result["e"]));
+        else return json_encode(array("error" => "none", "data" => $result));
+    }
+
+    public function getStudentReportClassPractical(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $data = $this->verifyInput($_POST['data']);
+        $result = $this->getClassReportPractical([$data, $_SESSION['prn_no']]);
         
         if(!$result) return json_encode(array("error" => "notfound"));
         else if(isset($result["e"])) return json_encode(array("error" => "sql" , "msg" => $result["e"]));
