@@ -7,8 +7,3 @@
     <title>Document</title>
 </head>
 <body>
-  <h1>Hello I`M Sushant😎</h1>
-
-<h2>Dasdfa</h2>
-</body>
-</html>
