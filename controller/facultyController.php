@@ -81,7 +81,7 @@ class FacultyController extends Faculty {
             $_SESSION['role_id'] = $result[0]['role_id'];
             if($result[0]['role_id'] == 0) header("Location:admin/admindash.php");
             if($result[0]['role_id'] == 1) header("Location:hod/home.php");
-            if($result[0]['role_id'] == 2) header("Location:staff/staffHeader.php");
+            if($result[0]['role_id'] == 2) header("Location:staff/attendance.php");
         }
         else{
             $this->errors["invalid"] = "Invalid Faculty Id or Password";
@@ -731,7 +731,6 @@ class FacultyController extends Faculty {
         else if(isset($_POST['id'])) $this->s_div = (int)$this->verifyInput($_POST['id']);
         else $this->s_div = 1;
 
-        
         $this->acd_year = (int)$this->verifyInput($_POST['acd']);
         //$this->sem = (int)$this->verifyInput($_POST['sem']);
 
@@ -949,12 +948,19 @@ class FacultyController extends Faculty {
     }
 
     public function savePracticalAttendance(){
+        if($_POST['date'] == "" || $_POST['time'] == "") return json_encode(array("error" => "empty"));
         if($this->checkEmpty()) return array("error" => "empty");
         $this->class = $this->verifyInput($_POST['class']);
         date_default_timezone_set("Asia/Kolkata");
         $date = $this->verifyInput($_POST['date']);
         $time = $this->verifyInput($_POST['time']);
+        
+        // if(count($date) == 0 || count($time) == 0){
+        //     var_dump("hello");
+        //     return array("error" => "empty");
+        // }
         $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
+
         $this->attend = $this->verifyInput($_POST['attend']);
         $course_id = $this->getPractClassById([$this->class, $_SESSION['faculty_id']]);
         $result = $this->getPracticalAttendance([(int)$this->class,$timestamp]);
@@ -983,7 +989,11 @@ class FacultyController extends Faculty {
         $this->sem = $this->verifyInput($_POST['sem']);
         $this->s_div = $this->verifyInput($_POST['div']);
         $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
-        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        if($_SESSION['role_id'] != 2){
+            $this->faculty_id = $this->verifyInput($_POST['faculty_id']);
+            $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->s_div, $this->dept]);
+        }
+        $this->faculty_id = isset($_POST['faculty_id']) ?  : $_SESSION['faculty_id'];
 
         $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->s_div, $this->dept]);
         if(!$result) return json_encode(array("error" => "notfound"));
@@ -1073,6 +1083,14 @@ class FacultyController extends Faculty {
             if(!$result || isset($result["e"])) return json_encode(array("error" => "e", "msg" => $result["e"]));
             else return json_encode(array("error" => "none", "data"=>$result));
         }
+    }
+
+    public function showPracticalClassByAcademicYear(){
+        if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $id = $this->verifyInput($_POST['id']);
+        $result = $this->getStaffPracticalClassByAcademicYearAndFacultyID([$id, $_SESSION['faculty_id']]);
+        if(!$result || isset($result["e"])) return json_encode(array("error" => "notfound"));
+        return json_encode(array("error" => "none", "data" => $result));
     }
 
     // public function showPracticalReportOfAllClass(){

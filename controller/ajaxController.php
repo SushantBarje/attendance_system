@@ -139,8 +139,8 @@ else if($req == "get_pract_report"){
     $r = $faculty->showPracticalReport();
    die($r);
 }
-// }else if($req == "perform_hod_report_pract"){
-//     $r = $faculty->showHodReport();
-//     die($r);
-// }
+else if($req == "get_pract_class_by_acd"){
+    $r = $faculty->showPracticalClassByAcademicYear();
+    die($r);
+}
 ob_end_flush();
