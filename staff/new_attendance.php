@@ -8,7 +8,7 @@
         header('Location:../index.php');
     }
 
-    
+    $last_academic_year = $user->getLastAcademicYear();
 ?>
 
 <!DOCTYPE html>
@@ -40,9 +40,35 @@
 <body>
 <?php   include "staffHeader.php" ?>
     <main>
-        <h2 class="head">Attendance</h2>
+        <div class="row">
+            <div class="col-12 col-sm-12">
+                <h2 class="head">Attendance</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <form id="attend-class">
+                    <div class="form-group">
+                        <label for="acd_id">Academic Year</label>
+                        <select class="form-control" name="academic_year" id="acd_id">
+                            <option value="<?php echo isset($last_academic_year["acedemic_id"]) ?? '' ?>" selected disabled hidden><?php echo $last_academic_year['academic_descr'] ?? ''?></option>
+                            <?php 
+                                    $result = $user->getAcademicYear();
+                                    if(!$result){
+                                        echo "<option value=''>Nothing Found</option>";
+                                    }
+                                    foreach($result as $r){
+                            ?>
+                            <option value="<?php echo $r['acedemic_id']?>"><?php echo $r['academic_descr'] ?></option>
+                            <?php
+                                    }
+                            ?>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
         <?php
-            $last_academic_year = $user->getLastAcademicYear();
             $result = $user->getStaffPracticalClassByAcademicYearAndFacultyID([$last_academic_year["acedemic_id"], $_SESSION['faculty_id']]);
             ?>
 
@@ -61,6 +87,7 @@
     </main>
 
     <script src="../assets/js/staff/script.js"></script>
+
 </body>
 
 </html>

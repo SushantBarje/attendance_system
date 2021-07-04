@@ -28,6 +28,7 @@
 <body>
     <?php include "adminHeader.php"; ?>
     <main>
+        <h2 class="head">Report</h2>
         <div class="cards">
             <div class="container">
                 <!-- Button to Open the Modal -->

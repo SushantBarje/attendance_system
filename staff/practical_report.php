@@ -30,6 +30,8 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
+<script src="../assets/sheetjs/sheetjs-master/dist/xlsx.core.min.js"></script>
+<script src="../assets/FileSaver/FileSaver.js-master/FileSaver.min.js"></script>
 <script src="../assets/js/staff/script.js"></script>
 
 <!-- <script>

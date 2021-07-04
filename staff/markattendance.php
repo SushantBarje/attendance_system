@@ -173,7 +173,7 @@
             <tbody>
                 <?php
                     $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
-                    if(!$data) echo "<tr><td>Nothing Found</td</tr>";
+                    if(!$data) echo "<tr><td>Nothing Found</td></tr>";
                     foreach($data as $d){
                         echo '<tr>
                                 <td>'.$d['class_id'].'</td>
