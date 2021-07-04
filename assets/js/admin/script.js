@@ -7,8 +7,8 @@ $(document).ready(function(){
     processAddAcademicYear();
     processDeleteAcademicYear()
     processAddDepartment();
-    inputDeptPlaceholder();
-    processEditDepartment();
+
+
     processDeleteDepartment();
     processAddHod();
     processDeleteHod();
@@ -133,7 +133,12 @@ function processAddDepartment() {
                         case "none":
                             var html = "";
                             for(var i = 0; i < res.data.length; i++){
-                                html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-4" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+                                html += '<tr>\
+                                            <td class="dept-name">'+res.data[i].dept_name+'</td>\
+                                            <td>'+res.data[i].s_class_name+'</td>\
+                                            <td>'+res.data[i].div_name+'</td>\
+                                            <td><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td>\
+                                        </tr>';
                             }
                             $('#dept-table tbody').html(html)
                             
@@ -144,54 +149,54 @@ function processAddDepartment() {
     })
 }
 
-function inputDeptPlaceholder(){
-    $("#dept-table").on("click","#edit-btn",function(){
-        var c = $(this).closest("tr").find('.dept-name').text();
-        $("#editModal input").val(c);
-    })
-}
+// function inputDeptPlaceholder(){
+//     $("#dept-table").on("click","#edit-btn",function(){
+//         var c = $(this).closest("tr").find('.dept-name').text();
+//         $("#editModal input").val(c);
+//     })
+// }
 
-function processEditDepartment(){
-    var id;
-    $('#dept-table').on("click","#edit-btn", function(){
-        id = $(this).attr("data-control");
-        console.log(id);
-    });
+// function processEditDepartment(){
+//     var id;
+//     $('#dept-table').on("click","#edit-btn", function(){
+//         id = $(this).attr("data-control");
+//         console.log(id);
+//     });
 
-    $("#edit-dept").on("submit", function(){
-        var data = {};
-        $("#edit-dept input").each(function(){
-            data[$(this).attr('name')] = $(this).val();
-        });
-        data['dept_id'] = id;
-        console.log(data);
-        $('#editModal').modal('hide');
-        $.ajax({
-            url : "../controller/ajaxController.php?action=editDept",
-            type : "post",
-            data : data,
-            dataType : 'json',
-            success : function(res){
-                console.log(res);
-                switch(res.error){
-                    case "empty":
-                        alert("Please Fill all the fields");
-                        break;
-                    case "notedit":
-                        alert("Data Not Inserted");
-                        break;
-                    case "none":
-                        var html = "";
-                        for(var i = 0; i < res.data.length; i++){
-                            html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
-                        }
-                        $('#dept-table tbody').html(html);     
-                }
-            }
-        });
-        return false;
-    });
-}
+//     $("#edit-dept").on("submit", function(){
+//         var data = {};
+//         $("#edit-dept input").each(function(){
+//             data[$(this).attr('name')] = $(this).val();
+//         });
+//         data['dept_id'] = id;
+//         console.log(data);
+//         $('#editModal').modal('hide');
+//         $.ajax({
+//             url : "../controller/ajaxController.php?action=editDept",
+//             type : "post",
+//             data : data,
+//             dataType : 'json',
+//             success : function(res){
+//                 console.log(res);
+//                 switch(res.error){
+//                     case "empty":
+//                         alert("Please Fill all the fields");
+//                         break;
+//                     case "notedit":
+//                         alert("Data Not Inserted");
+//                         break;
+//                     case "none":
+//                         var html = "";
+//                         for(var i = 0; i < res.data.length; i++){
+//                             html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+//                         }
+//                         $('#dept-table tbody').html(html);     
+//                 }
+//             }
+//         });
+//         return false;
+//     });
+// }
 
 function processDeleteDepartment(){
     $('#dept-table').on("click", "#del-btn",function(){
@@ -221,8 +226,14 @@ function processDeleteDepartment(){
                             if(res.data.length < 1) {
                                 $('#dept-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
                             }else{
+                                html = "";
                                 for(var i = 0; i < res.data.length; i++){
-                                    html += '<tr><td class="dept-name">'+res.data[i].dept_name+'</td><td><button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'+res.data[i].dept_id+'" data-toggle="modal" data-target="#editModal">Edit</button><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td></tr>';
+                                    html += '<tr>\
+                                            <td class="dept-name">'+res.data[i].dept_name+'</td>\
+                                            <td>'+res.data[i].s_class_name+'</td>\
+                                            <td>'+res.data[i].div_name+'</td>\
+                                            <td><button type="button" class="btn btn-danger" id="del-btn" data-control="'+res.data[i].dept_id+'">Delete</button></td>\
+                                        </tr>';
                                 }
                                 $('#dept-table tbody').html(html);
                             }

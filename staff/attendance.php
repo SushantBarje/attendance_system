@@ -51,7 +51,7 @@
             <div class="col-sm-*">
             </div>
         </div>
-        
+        <h2 class="head mt-4 mb-4">History</h2>
         <form id="attend-details">
             <div class="row mt-3">
                 <div class="col-sm-4">

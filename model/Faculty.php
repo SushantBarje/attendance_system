@@ -405,7 +405,13 @@ class Faculty extends Database {
 	*/
 	public function getDepartment(){
 		try {
-			$sql = "SELECT * FROM department";
+			$sql = "SELECT a.dept_id, dept_name, GROUP_CONCAT(DISTINCT s_class_name SEPARATOR ', ') as s_class_name ,GROUP_CONCAT(DISTINCT div_name SEPARATOR ', ') as div_name FROM department as a 
+						JOIN year_belongs_dept as b ON a.dept_id = b.dept_id 
+						JOIN div_belongs_dept as  c ON a.dept_id = c.dept_id
+						JOIN student_class as d ON b.year_id = d.s_class_id
+						JOIN division as e ON e.div_id= c.div_id
+						GROUP BY a.dept_id
+						ORDER BY a.dept_id;";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();

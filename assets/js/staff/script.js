@@ -12,6 +12,7 @@ $(document).ready(function(){
     processOnChangeClass()
     processPracticalAttendance()
     processPracticalReport()
+    processPracticalClassByAcademicYear()
     //processSubmitAttendance();
 });
 
@@ -49,6 +50,7 @@ $(document).ready(function(){
 // }
 
 function processAttendanceSheet(){
+        var id = class_id = name = year = date = time = div = sem = " ";
         $(".sheet-input-field").on("change" ,function(){
             console.log($(this).val());
             if($("#check-attend #select-acd").val() != " " && $("#check-attend #select-class").val() != " " && $("#check-attend #date").val() != "" && $("#check-attend #time").val() != ""){
@@ -79,16 +81,18 @@ function processAttendanceSheet(){
 
         
         $("#check-attend #s_sem").on("change", function(){
-            var acd = $("check-attend #select-acd")
-            var id = $("check-attend #select-div")
-            var year = $("check-attend #select-year")
+            var acd = $("#check-attend #select-acd");
+            var id = $("#check-attend #select-div")
+            var year = $("#check-attend #select-year")
             var sem = $(this)
+            console.log(acd.val());
             if((acd.val() != "" || acd.val() != " ") && (id.val() != "" || id.val() != " ") && (year.val() != "" || year.val() != " ") && (sem.val() != "" || sem.val() != " ")){
                 showClassBySem(id.val(), acd.val(), year.val(), sem.val());
             }
         });
 
         function showClassBySem(id, acd, year, sem){
+            console.log(id,acd,sem,year);
             $.ajax({
                 url : "../controller/ajaxController.php?action=get_class_div_wise",
                 type : "post",
@@ -705,9 +709,11 @@ function processPracticalAttendance(){
                         break;
                     case "none":
                         alert("Attendance Submitted");
+                        //  location.href = window.location.href+"/.../new_attendance.php";
+                        history.go(-1);
                         break;
                 }
-                window.location.href = "";
+                return false;
             },
             error : function(e){
                 console.log(e);
@@ -740,8 +746,8 @@ function processPracticalReport(){
                             alert("Please fill all details!");
                             break;
                         case "notfound":
-                            $("#report-pract #select-class").val(" ");
-                            $("#report-pract #report #select-class").text("No class found");
+                            $("#report-pract #select-class").html("<option>No class Found</option>");
+                            //$("#report-pract #report #select-class").text("No class found");
                             break;
                         case "none":
                             $("#report-pract #select-class").prop("disabled", false);
@@ -942,4 +948,44 @@ function processPracticalReport(){
                 break;
         }
     }
+}
+
+function processPracticalClassByAcademicYear(){
+    
+    $("#attend-class #acd_id").on("change", function(){
+        var id = $(this).val();
+        var prev_acd_id = $("#attend-class #acd_id option:selected").val()
+        console.log(prev_acd_id)
+        var acd_select = $(this);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_pract_class_by_acd",
+            type : "POST",
+            data : {"id" : id},
+            dataType : "json",
+            success : function(res){
+                switch(res.error){
+                    case "empty":
+                        alert("Please Select Academic Year");
+                        break;
+                    case "notfound":
+                        alert("No class found !");
+                        $("#attend-class #acd_id").val(prev_acd_id);
+                        break;
+                    case "none":
+                        var html = " ";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<a href="mark_pract_attendance_demo.php?practical_class='+res.data[i].p_class_id+'" class="shadow p-3 mb-5 bg-white rounded">\
+                                    <div><strong>Course: </strong>'+res.data[i].course_name+'</div>\
+                                    <div><strong>Class: </strong>'+res.data[i].s_class_name+' <strong>Div: </strong> '+res.data[i].div_name+'</div>\
+                                    <div><strong>Batch: </strong>'+res.data[i].batch_name+'</div>'
+                        }
+                        $("#show_pract_class").html(html);
+                        break;
+                }
+            },
+            error : function(err){
+                console.log(err);
+            }
+        })
+    })
 }

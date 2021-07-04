@@ -31,6 +31,7 @@
 <body>
     <?php include "adminHeader.php";?>
     <main>
+        <h2 class="head mb-3">Department</h2>
         <div class="cards">
             <div class="container">
                 <!-- Button to Open the Modal -->
@@ -83,7 +84,7 @@
                                     </div>  
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
-                                        <button type="submit" class="btn btn-success">ADD</button>
+                                        <button type="submit" class="btn btn-success">Add</button>
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                     </div>
                                     <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
@@ -98,7 +99,9 @@
             <thead>
                 <tr>
                     <th>Department Name</th>
-                    <th>Edit</th>
+                    <th>Year</th>
+                    <th>Division</th>
+                    <th>&nbsp;</th>
                 </tr>
             </thead>
             <tbody>
@@ -108,9 +111,11 @@
                     foreach($data as $d){
                         echo '<tr>
                                 <td class="dept-name">'.$d['dept_name'].'</td>
+                                <td>'.$d['s_class_name'].'</td>
+                                <td>'.$d['div_name'].'</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'.$d['dept_id'].'" data-toggle="modal" data-target="#editModal">Edit</button>
-                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['dept_id'].'">Delete</button>
+                                    <!-- <button type="button" class="btn btn-primary mr-1" id="edit-btn" data-control="'.$d['dept_id'].'" data-toggle="modal" data-target="#editModal">Edit</button> -->
+                                    <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['dept_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
                                 </td>
                             </tr>';
                     }
