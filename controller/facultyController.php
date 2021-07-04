@@ -730,7 +730,7 @@ class FacultyController extends Faculty {
         if(isset($_POST['div'])) $this->s_div = $this->verifyInput($_POST['div']);
         else if(isset($_POST['id'])) $this->s_div = (int)$this->verifyInput($_POST['id']);
         else $this->s_div = 1;
-
+        
         $this->acd_year = (int)$this->verifyInput($_POST['acd']);
         //$this->sem = (int)$this->verifyInput($_POST['sem']);
 
