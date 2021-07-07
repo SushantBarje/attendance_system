@@ -8,19 +8,35 @@
     grid-auto-flow: column;
 } */
 
-.grid-item{
+.mark-attend{
     display: flex;
-    height : 40px;
+    
     width: 150px;
     border: 1px solid black;
     margin: 1px;
     position: relative;
-    align-items: center;
+    text-align: center;
+    padding: 3px;
+    display: flex;
     justify-content: center;
-    
+    align-items: center;
 }
 
-.grid-item button{
-    position : absolute;
-    right: 0;
+.roll_no{
+    height: 38px;
+    width: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 2px;
+}
+
+.grid-item .present{
+    width: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 2px;
 }

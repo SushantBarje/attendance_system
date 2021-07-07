@@ -43,7 +43,7 @@
         <h2 class="head">Attendance</h2>
         <div class="row mt-3">
             <div class="col-sm-3">
-                <a href="markattendance.php" class="btn btn-secondary"> + New Theory Attendance</a>
+                <a href="theory_class_list.php" class="btn btn-secondary"> + New Theory Attendance</a>
             </div>
             <div class="col-sm-3">
                 <a href="new_attendance.php" class="btn btn-secondary"> + New Practical Attendance</a>

@@ -968,7 +968,7 @@ class Faculty extends Database {
 
 	public function getStudentByDeptDivisionAndYear($data){
 		try{
-			$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name FROM student WHERE dept_id = ? AND year_id = ? AND div_id = ? ORDER BY roll_no+0 ASC";
+			$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name, SUM(b.status) as total_present FROM student as a LEFT JOIN attendance as b ON a.prn_no = b.student_id WHERE dept_id = ? AND year_id = ? AND div_id = ? AND b.class_id = ? GROUP BY a.prn_no ORDER BY roll_no+0 ASC ";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($data);
 			return $stmt->fetchAll();
@@ -981,7 +981,8 @@ class Faculty extends Database {
 	public function getTheoryAttendance($data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT * FROM attendance as a JOIN student as b ON a.student_id = b.prn_no WHERE a.class_id = ? AND a.date_time = ?  ORDER BY b.roll_no+0;";
+			//$sql = "SELECT a.*,b.*, FROM attendance as a JOIN student as b ON a.student_id = b.prn_no WHERE a.class_id = ? AND a.date_time = ? GROUP BY a.student_id ORDER BY b.roll_no+0;";
+			$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name, SUM(b.status) as total_present FROM student as a LEFT JOIN attendance as b ON a.prn_no = b.student_id WHERE b.class_id = ? AND date_time = ? GROUP BY a.prn_no ORDER BY roll_no+0 ASC ";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)){
 				return $stmt->fetchAll();
@@ -1341,16 +1342,16 @@ class Faculty extends Database {
 		}
 	}
 
-	public function getPracticalAttendance($data){
-		try{
-			$con = $this->connect();
-			$sql = "SELECT a.*, b.* FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no WHERE p_class_id = ? AND date_time = ? ORDER BY b.roll_no+0";
-			$stmt = $con->prepare($sql);
-			if($stmt->execute($data)) return $stmt->fetchAll();
-		}catch(PDOException $e){
-			return array("e" => $e->getMessage());
-		}
-	}
+ 	// public function getPracticalAttendance($data){
+	// 	try{
+	// 		$con = $this->connect();
+	// 		$sql = "SELECT a.*, b.* FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no WHERE p_class_id = ? AND date_time = ? ORDER BY b.roll_no+0";
+	// 		$stmt = $con->prepare($sql);
+	// 		if($stmt->execute($data)) return $stmt->fetchAll();
+	// 	}catch(PDOException $e){
+	// 		return array("e" => $e->getMessage());
+	// 	}
+	// } 
 
 	public function insertStudentPracticalAttendance($data){
 		try{
@@ -1471,4 +1472,28 @@ class Faculty extends Database {
 			return array("e" => $e->getMessage());
 		}
 	}
+
+
+	public function getStaffTheoryClassByAcademicYearAndFacultyID($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.academic_id = ? AND a.faculty_id = ? ORDER BY a.class_id, a.s_class_id, a.sem_id, a.academic_id";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getTheoryClassById($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, j.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as j ON a.div_id = j.div_id WHERE class_id = ? AND a.faculty_id = ?;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetch();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+	
 };

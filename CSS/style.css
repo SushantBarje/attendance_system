@@ -12,6 +12,22 @@
     text-decoration: none;
     font-family: 'Poppins', sans-serif;
 }
+.class-box{
+    margin: 0;
+    padding: 0;
+    height:130px;
+    width: 340px; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center;
+}
+
+
+.class-box:hover{
+    background-color: var(--main-color);
+    color:white;
+    transition: 0.2s;
+} 
 
 .head{
 

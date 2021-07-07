@@ -79,7 +79,7 @@ if($req == "addAcademicYear"){
 }else if($req == "get_acd_class"){
     $r = $faculty->getClassForStaffAcademic();
     die($r);
-}else if($req == "attendanceSheet"){
+}else if($req == "check_theory_attend"){
     $r = $faculty->showStudentByClassForAttendance();
     die($r);
 }else if($req == "save_attend"){
@@ -141,6 +141,10 @@ else if($req == "get_pract_report"){
 }
 else if($req == "get_pract_class_by_acd"){
     $r = $faculty->showPracticalClassByAcademicYear();
+    die($r);
+}
+else if($req == "get_theory_class_by_acd"){
+    $r = $faculty->showTheroyClassByAcademicYear();
     die($r);
 }
 ob_end_flush();

@@ -22,11 +22,21 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  
+    <script>
+    function shorthand(str){
+        var strArr = str.split(" ")
+        str = " "
+        for(i in strArr){
+            if(strArr[i] === "and") continue;
+            str += strArr[i][0]
+        }
+        return str.toUpperCase();
+    }
+</script>
     <title>Mark Attendence</title>
 
     <style>
-        #show_pract_class{
+         #show_pract_class{
             text-align: center;
         }
         
@@ -34,9 +44,9 @@
         #show_pract_class a{
             color :black;
             text-decoration: none;
-            margin-left : 10px;
+            margin-left : 1.5rem;
             padding: 0 !important;
-            
+            border: 1px solid black;
         }
     </style>
 </head>
@@ -50,7 +60,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <form id="attend-class">
+                <form id="attend-class-theory">
                     <div class="form-group">
                         <label for="acd_id">Academic Year</label>
                         <select class="form-control" name="academic_year" id="acd_id">
@@ -72,19 +82,19 @@
             </div>
         </div>
         <?php
-            $result = $user->getStaffPracticalClassByAcademicYearAndFacultyID([$last_academic_year["acedemic_id"], $_SESSION['faculty_id']]);
+            $result = $user->getStaffTheoryClassByAcademicYearAndFacultyID([$last_academic_year["acedemic_id"], $_SESSION['faculty_id']]);
             ?>
 
             <div class="d-flex flex-wrap" id="show_pract_class">
                 <?php 
                     foreach($result as $r){
                 ?>
-                    <a href="mark_pract_attendance.php?practical_class=<?php echo $r['p_class_id']; ?>" class="shadow p-3 mb-5 bg-white rounded">
+                    <a href="theory_mark_attend.php?theory_class=<?php echo $r['class_id']; ?>" class="shadow p-3 mb-4 bg-white rounded">
                         <div class="class-box">
                             <div class="div">
                                 <div><strong>Course: </strong><?php echo $r['course_name'] ?></div>
                                 <div><strong>Class: </strong><?php echo $r['s_class_name'] .' <strong>Div: </strong>'. $r['div_name']?></div>
-                                <div><strong>Batch: </strong><?php echo $r['batch_name']?></div>
+                                <div><strong>Dept: </strong><?php echo $r['dept_name']; ?></div>
                             </div>
                         </div>
                     </a>    
