@@ -13,7 +13,8 @@ $(document).ready(function(){
     processPracticalAttendance()
     processPracticalReport()
     processPracticalClassByAcademicYear()
-    //processSubmitAttendance();
+    processTheoryClassByAcademicYear()
+    processSubmitAttendance();
 });
 
 // function getClassAcademic(){
@@ -50,7 +51,7 @@ $(document).ready(function(){
 // }
 
 function processAttendanceSheet(){
-        var id = class_id = name = year = date = time = div = sem = " ";
+        var id = class_id = year = date = time = div = sem = " ";
         $(".sheet-input-field").on("change" ,function(){
             console.log($(this).val());
             if($("#check-attend #select-acd").val() != " " && $("#check-attend #select-class").val() != " " && $("#check-attend #date").val() != "" && $("#check-attend #time").val() != ""){
@@ -253,6 +254,8 @@ function processMarkAttendance(){
             selector.addClass("btn btn-danger");
             selector.attr("data-control",0);
             selector.parent().find('input').val(0); 
+            var count = parseInt(selector.parent().find('.present').text());
+            selector.parent().find('.present').text(count - 1);
         }else{
             selector.text("P");
             selector.removeClass("btn btn-danger");
@@ -260,36 +263,96 @@ function processMarkAttendance(){
             selector.attr("data-control",1);
             selector.find('input').val(1);
             selector.parent().find('input').val(1)
+            var count = parseInt(selector.parent().find('.present').text());
+            selector.parent().find('.present').text(count + 1);
         }
     }
+
+
 }
 
-// function processSubmitAttendance(){
-//     $("#check-attend").on("submit",function(e){
-//         e.preventDefault();
-//         var data = $(this).serialize();
-//         $.ajax({
-//             type: 'POST',
-//             url: '../controller/ajaxController.php?action=save_attend',
-//             data: {"data" : data},
-//             dataType: 'json',
-//             contentType: false,
-//             processData: false,
-//             success: function(res){
-//                 console.log(res);
-//                 switch(res.error){
-//                     case "none":
-//                         alert("Attendence Submitted");
-//                         break;
-//                 }
-//             },
-//             error : function(e){
-//                 console.log(e);
-//             }
-//         })
+function processSubmitAttendance(){
+    $("#check-attend-theory").on("change",".sheet-input-field-pract" ,function(){
+        var date = $("#date-theory");
+        var time = $("#time-theory");
+        var class_id = $("#class_id");
+        console.log(class_id);
+        if(date.val() != "" && time.val() != ""){
+            $.ajax({
+                url : "../controller/ajaxController.php?action=check_theory_attend",
+                type : "POST",
+                data : {"class_id" : class_id.val(), "date" : date.val(), "time" : time.val()},
+                dataType : "json",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please fill all details.");
+                            break;
+                        case "notfound":
+                            break;
+                        case "none":
+                            if(!confirm("Already Attendance Take Do you want to edit!")){
+                                break;
+                            }else{
+                                var html = "";
+                                for(var i = 0; i < res.data.length; i++){
+                                    var present = parseInt(res.data[i].total_present+1);
+                                    if(res.data[i].status == 0){
+                                        html += '<div class="grid-item m-2 mark-attend">\
+                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
+                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                                <span class="btn roll_no"><a href="#?prn_no='+res.data[i].prn_no+'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'+res.data[i].roll_no+'</b></a></span> : <span class="present">'+present+'</span>\
+                                                <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
+                                            </div>'
+                                    }else{
+                                        html += '<div class="grid-item m-2 mark-attend">\
+                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
+                                                <span class="btn roll_no"><a href="#?prn_no='+res.data[i].prn_no+'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'+res.data[i].roll_no+'</b></a></span> : <span class="present">'+present+'</span>\
+                                                <button type="button" class="btn btn-success rounded-0 marker">P</button>\
+                                            </div>'
+                                    } 
+                                }
+                                $("#theory-attend-list").html(" ");
+                                $("#theory-attend-list").html(html);
+                            }
+                            break;
+                    }
+                }
+            });
+        }
+    })
     
-//     })
-// }
+    $("#check-attend-theory").on("submit",function(e){
+        e.preventDefault();
+        $.ajax({
+            url: '../controller/ajaxController.php?action=save_attend',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(res){
+                console.log(res);
+                switch(res.error){
+                    case "empty":
+                        alert("Please fill date and time");
+                        break;
+                    case "update":
+                        alert("Attendance Updated!");
+                        break;
+                    case "none":
+                        alert("Attendance Submitted");
+                        history.go(-1);
+                        break;
+                }
+                return false;
+            },
+            error : function(e){
+                console.log(e);
+            }
+        })
+    
+    })
+}
 
 
 function generateStaffReport(){
@@ -476,7 +539,6 @@ function generateStaffReport(){
                             );
                             break;
                     }
-                    
                 },
                 error : function(e){
                     console.log(e);
@@ -987,5 +1049,101 @@ function processPracticalClassByAcademicYear(){
                 console.log(err);
             }
         })
+    })
+}
+
+
+function processTheoryClassByAcademicYear(){
+    $("#attend-class-theory #acd_id").on("change", function(){
+        var id = $(this).val();
+        var prev_acd_id = $("#attend-class-theory #acd_id option:selected").val()
+        console.log(prev_acd_id)
+        var acd_select = $(this);
+        $.ajax({
+            url : "../controller/ajaxController.php?action=get_theory_class_by_acd",
+            type : "POST",
+            data : {"id" : id},
+            dataType : "json",
+            success : function(res){
+                switch(res.error){
+                    case "empty":
+                        alert("Please Select Academic Year");
+                        break;
+                    case "notfound":
+                        alert("No class found !");
+                        $("#attend-class-theory #acd_id").val(prev_acd_id);
+                        break;
+                    case "none":
+                        var html = " ";
+                        for(var i = 0; i < res.data.length; i++){
+                            html += '<a href="theory_mark_attend.php?theory_class='+res.data[i].class_id+'" class="shadow p-3 mb-5 bg-white rounded">\
+                                    <div class="class-box">\
+                                        <div class="div">\
+                                            <div><strong>Course: </strong>'+res.data[i].course_name+'</div>\
+                                            <div><strong>Class: </strong>'+res.data[i].s_class_name+' <strong>Div: </strong> '+res.data[i].div_name+'</div>\
+                                            <div><strong>Dept: </strong>'+res.data[i].dept_name+'</div>\
+                                        </div>\
+                                    </div>'
+                        }
+                        $("#show_pract_class").html(html);
+                        break;
+                }
+            },
+            error : function(err){
+                console.log(err);
+            }
+        })
+    })
+}
+
+
+function processTheoryAttendance(){
+    $("#check-attend-theory").on("change",".sheet-input-field-theory" ,function(){
+        var date = $("#date-theory");
+        var time = $("#time-theory");
+        var class_id = $("#class_id");
+        console.log(class_id);
+        if(date.val() != "" && time.val() != ""){
+            $.ajax({
+                url : "../controller/ajaxController.php?action=check_theory_attend",
+                type : "POST",
+                data : {"class_id" : class_id.val(), "date" : date.val(), "time" : time.val()},
+                dataType : "json",
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Please fill all details.");
+                            break;
+                        case "notfound":
+                            break;
+                        case "none":
+                            if(!confirm("Already Attendance Take Do you want to edit!")){
+                                break;
+                            }else{
+                                var html = "";
+                                for(var i = 0; i < res.data.length; i++){
+                                    if(res.data[i].status == 0){
+                                        html += '<div class="grid-item m-2 mark-attend">\
+                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
+                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                                <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
+                                            </div>'
+                                    }else{
+                                        html += '<div class="grid-item m-2 mark-attend">\
+                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
+                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                                <button type="button" class="btn btn-success rounded-0 marker">P</button>\
+                                            </div>'
+                                    } 
+                                }
+                                $("#pract-attend-list").html(" ");
+                                $("#pract-attend-list").html(html);
+                            }
+                            break;
+                    }
+                }
+            });
+        }
     })
 }

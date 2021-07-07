@@ -21,6 +21,9 @@
             echo '<script> alert("Attendance Updated...")</script>';
         }
     }
+
+    $pract_class_id = $_GET['practical_class'];
+    $class_info = $user->getPractClassById([$pract_class_id, $_SESSION['faculty_id']]);
 ?>
 
 <!DOCTYPE html>
@@ -42,92 +45,19 @@
     <main>
         <h2 class="head">Take Practical Attendance</h2>
         <form class="pract-form mt-3" method="post" id="check-attend-pract">
-            <div class="row">
-                <div class="col-sm-3">
-                    <label for="select-acd" class="mr-sm-2">Academic Year: </label>
-                    <select id="select-acd-pract" name="academic_year" class="form-control form-control-sm mr-3 sheet-input-field"> 
-                        <option value=""></option>
-                        <?php 
-                            $data = $user->getAcademicYear();
-                            if(!$data) echo '<option value="">Nothing Found</option>';
-                            foreach($data as $d){
-                                echo '<option value="'.$d['acedemic_id'].'" >'.$d['academic_descr'].'</option>';
-                            }
-                        ?>  
-                    </select>
-                </div>
-                <div class="col-sm-3">
-                    <label for="select-year" class="mr-sm-2">Year: </label>
-                    <select id="select-year-pract" name="year_id" class="form-control form-control-sm mr-3 sheet-input-field"> 
-                        <option value=""></option>
-                        <?php 
-                            $data = $user->getYearBelongsDept([$_SESSION['dept']]);
-                            if(!$data) echo '<option value="">Nothing Found</option>';
-                            foreach($data as $d){
-                                echo '<option value="'.$d['year_id'].'" >'.$d['s_class_name'].'</option>';
-                            }
-                        ?>  
-                    </select>
-                </div>
-                <div class="col-sm-3">
-                    <label for="select-div" class="mr-sm-2">Division: </label>
-                    <select id="select-div-pract" name="div_id" class="form-control form-control-sm mr-3 sheet-input-field"> 
-                        <option value=""></option>
-                        <?php 
-                            $data = $user->getDivBelongsDept([$_SESSION['dept']]);
-                            if(!$data) echo '<option value="">Nothing Found</option>';
-                            foreach($data as $d){
-                                echo '<option value="'.$d['div_id'].'" >'.$d['div_name'].'</option>';
-                            }
-                        ?>  
-                    </select>
-                </div>
-                <div class="form-group col-sm-3">
-                    <label for="select-div">Select Semester :</label>
-                    <select class="form-control form-control-sm sheet-input-field" name="sem" id="s_sem-pract">
-                        <option value=""> </option>
-                    </select>
-                </div>
-                
-            </div>
-            <div class="row">
-                <div class="col-sm-3">
-                    <label for="class" class="mr-sm-2">Class:</label>
-                    <select id="select-class-pract" name="class" class="form-control form-control-sm" disabled> 
-                        <option value="" data-class=""> </option>
-                        <!-- <?php 
-                            $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
-                            if(!$data) echo '<option value="">Nothing Found</option>';
-                            foreach($data as $d){
-                                echo '<option value="'.$d['class_id'].'" data-class="'.$d['s_class_id'].'">'.$d['course_name'].'</option>';
-                            }
-                        ?>   -->
-                    </select>
-                </div>
-                <div class="col-sm-3">
-                    <label for="class" class="mr-sm-2">Batch:</label>
-                    <select id="select-class-pract" name="class" class="form-control form-control-sm" disabled> 
-                        <option value="" data-class=""> </option>
-                        <!-- <?php 
-                            $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
-                            if(!$data) echo '<option value="">Nothing Found</option>';
-                            foreach($data as $d){
-                                echo '<option value="'.$d['class_id'].'" data-class="'.$d['s_class_id'].'">'.$d['course_name'].'</option>';
-                            }
-                        ?>   -->
-                    </select>
-                </div>
+            <div class="row offset-0">
                 <?php date_default_timezone_set("Asia/Kolkata");?>
-                <div class="col-sm-2">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-5">
                     <label for="date" class="mr-sm-2">Date</label>
-                    <input type="date" class="form-control form-control-sm sheet-input-field" id="date-pract" max="<?php echo date("Y-m-d") ?>" name="date">
+                    <input type="date" class="form-control form-control-sm sheet-input-field-pract" id="date-pract" max="<?php echo date("Y-m-d") ?>" name="date">
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-5">
                     <label for="time" class="mr-sm-2">Time</label>
-                    <input type="time" class="form-control form-control-sm sheet-input-field" id="time-pract" name="time">
+                    <input type="time" class="form-control form-control-sm sheet-input-field-pract" id="time-pract" name="time">
                 </div>
+                <div class="col-sm-1"></div>
             </div>
-            
             <!-- <table id="attendance-table" class="table mt-4" hidden>
                 <thead>
                     <tr>
@@ -144,36 +74,47 @@
             <button class="btn btn-primary" id="save-btn" type="submit" hidden>Save</button>  -->
             <div class="row">
                 <div class="container">
-                    <div class="col">
-                        <div class="row mt-5 offset-0">
-                            <div class="col-sm-2">
-                                <button class="btn btn-primary ml-5" id="save-btn" type="submit" name="submit-attend" hidden>Save</button>
+                    <div class="row mt-5">
+                        <div class="col">
+                            <div class="row offset-1">
+                                <div class="col-sm-3" id="class-header">
+                                    <input type="hidden" value = <?php echo $class_info['p_class_id'];?> name="class" id="class_id_pract">
+                                    <h5><b>Class- </b><?php echo $class_info["s_class_name"]?></h5>
+                                </div>
+                                <div class="col-sm-5" id="class-header">
+                                    <h5><b>Course:- </b><?php echo $class_info["course_name"]?></h5>
+                                </div>
+                                <div class="col-sm-4" id="date-header">
+                                    <!-- <h5><b>Date:- </b><?php echo date('d-m-Y', $class_info['date_time'])?></h5>-->
+                                    <h5><b>Div:- </b> <?php echo $class_info['div_name'] .' <b>Batch:- </b>'. $class_info['batch_name']?></h5>
+                                </div>
                             </div>
-                            <div class="col-sm-6 offset-1" id="class-header">
-                                
+                            <div class="row">
+                                <div class="col-sm-1 offset-5 mt-3">
+                                    <button class="btn btn-primary" id="save-btn" type="submit" >Save</button>
+                                </div>
                             </div>
-                            <div class="col-sm-3" id="date-header">
-                                
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="d-flex justify-content-center flex-wrap mt-2" id="attend-list" hidden>
-                                <?php 
-                                    // $data = $user->getStudentByDept([$_SESSION['dept']]);
-                                    // foreach($data as $d){
-                                    //     echo '<div class="grid-item m-2 mark-attend">
-                                    //             <input type="hidden" name="attend['.$d['prn_no'].']" value="1" data-id="'.$d['prn_no'].'"/>
-                                    //             <p>'.$d['roll_no'].'</p>
-                                    //             <button type="button" class="btn btn-success rounded-0 marker">P</button>
-                                    //         </div>';
-                                    // }
-                                    //<p>'.$user->getCountAttendanceByClassAndRoll([$_SESSION['class_id'],$d['roll_no']]).'</p>
-                                ?>
-                            </div>
-                        </div>    
+                        </div> 
                     </div>
-                </div>
-                    
+                    <div class="row">
+                        <div class="d-flex justify-content-center flex-wrap mt-2" id="pract-attend-list">
+                            <?php 
+                                $data = $user->getStudentForPractAttendanceBatchWise([$pract_class_id]);
+                                if(!$data){
+                                    echo "<h3>No student found!</h3>";
+                                }
+                                foreach($data as $d){
+                                    echo '<div class="grid-item m-2 mark-attend">
+                                            <input type="hidden" name="attend['.$d['prn_no'].']" value="1" data-id="'.$d['prn_no'].'"/>
+                                            <p>'.$d['roll_no'].'</p>
+                                            <button type="button" class="btn btn-success rounded-0 marker">P</button>
+                                        </div>';
+                                }
+                                //echo '<p>'.$user->getCountAttendanceByClassAndRoll([$_SESSION['class_id'],$d['roll_no']]).'</p>';
+                            ?>
+                        </div>
+                    </div>   
+                </div>    
             </div> 
         </form>
         
@@ -188,18 +129,18 @@
             </thead>
             <tbody>
                 <?php
-                    $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
-                    if(!$data) echo "<tr><td>Nothing Found</td</tr>";
-                    foreach($data as $d){
-                        echo '<tr>
-                                <td>'.$d['class_id'].'</td>
-                                <td>'.$d['course_name'].'</td>
-                                <td>'.$d['s_class_name'].'</td>
-                                <td>
-                                    <a href="attendance_sheet.php?dept='.$_SESSION['dept'].'&class='.$d['s_class_id'].'" class="btn btn-primary">Take Attendance</a>
-                                </td>        
-                            </tr>';
-                    }
+                    // $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
+                    // if(!$data) echo "<tr><td>Nothing Found</td</tr>";
+                    // foreach($data as $d){
+                    //     echo '<tr>
+                    //             <td>'.$d['class_id'].'</td>
+                    //             <td>'.$d['course_name'].'</td>
+                    //             <td>'.$d['s_class_name'].'</td>
+                    //             <td>
+                    //                 <a href="attendance_sheet.php?dept='.$_SESSION['dept'].'&class='.$d['s_class_id'].'" class="btn btn-primary">Take Attendance</a>
+                    //             </td>        
+                    //         </tr>';
+                    // }
                 ?>
             </tbody>
         </table> -->
