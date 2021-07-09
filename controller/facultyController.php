@@ -694,18 +694,25 @@ class FacultyController extends Faculty {
         else return json_encode(array("error" => "none", "data" => $result));
     }
 
-    public function showStudentByClassForAttendance(){
+    public function showStudentByClassForAttendance($classdefault = null, $timestamp=null){
         if($this->checkEmpty()) return json_encode(array("error" => "empty"));
-        $this->class = $this->verifyInput($_POST['class_id']);
+        $this->class = $classdefault === null ? $this->verifyInput($_POST['class_id']) : $classdefault;
+        //$this->class = $this->verifyInput($_POST['class_id']);
         $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
-        $date = $this->verifyInput($_POST['date']);
-        $time = $this->verifyInput($_POST['time']);
-        $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
+        if($timestamp === null){
+            $date = $this->verifyInput($_POST['date']);
+            $time = $this->verifyInput($_POST['time']);
+            $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
+        }else{
+            $timestamp = $timestamp;
+        }
+        
         $result = $this->getTheoryAttendance([(int)$this->class,$timestamp]);
         if(!$result){
             return json_encode(array("error" => "notfound"));
         } 
-        else return json_encode(array("error" => "none", "data" => $result));
+        $totalResult = $this->getAttendanceTotalofEachStudentByClass([$this->class]);
+        return json_encode(array("error" => "none", "data" => $result, "total"=> $totalResult));
     }
 
     public function showYearBelongsDept(){
@@ -931,7 +938,8 @@ class FacultyController extends Faculty {
         $timestamp = date('Y-m-d H:i:s', strtotime("$date $time"));
         $result = $this->getFullPracticalAttendanceByClassDateAndTime([$this->class, $timestamp]);
         if($result){
-            return json_encode(array("error" => "none" , "data" => $result));
+            $totalResult = $this->getTotalOfEachStudentOfPracticalAttendanceByClass([$this->class]);
+            return json_encode(array("error" => "none" , "data" => $result, "total" => $totalResult));
         }else{
             return json_encode(array("error" => "notfound"));
         }

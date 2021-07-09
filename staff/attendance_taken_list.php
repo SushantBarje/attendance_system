@@ -8,19 +8,6 @@
         header('Location:../index.php');
     }
 
-    if(isset($_REQUEST['submit-attend'])){
-        unset($_POST['submit-attend']);
-        $result = $user->saveAttendance();
-        if($result['error'] == "none"){
-            echo '<script> alert("Attendance Submitted")</script>';
-        }else if($result['error'] == "already"){
-            echo '<script> alert("Attendance Already Taken...")</script>';
-        }else if($result['error'] == "empty"){
-            echo '<script> alert("Fill all details...")</script>';
-        }else if($result['error'] == "update"){
-            echo '<script> alert("Attendance Updated...")</script>';
-        }
-    }
 
     $class_id = $_GET['class_id'];
     $date_time = $_GET['datetime'];
@@ -46,12 +33,10 @@
 <?php   include "staffHeader.php" ?>
     <main>
         <h2 class="head">Take Attendance</h2>
-        <form class="form mt-3" method="post" id="check-attend">
-            <input type="text" name="class" value="<?php echo $class_id?>" hidden>
-            <input type="text" name="academic_year" value="<?php echo $info['academic_id']?>" hidden>
-            <input type="text" name="div_id" value="<?php echo $info['div_id']?>" hidden>
-            <input type="date" name="date" value="<?php echo date("Y-m-d" , strtotime($date_time));?>" hidden>
-            <input type="time" name="time" value="<?php echo date("H:i:s" , strtotime($date_time));?>" hidden>
+        <form class="form mt-3" method="post" id="check-attend-theory">
+            <input type="hidden" value = <?php echo $class_id;?> name="class" id="class_id">
+            <input type="date" class="form-control form-control-sm sheet-input-field-pract" id="date-pract" value="<?php echo date('Y-m-d', strtotime($date_time));;?>" name="date" hidden>
+            <input type="time" class="form-control form-control-sm sheet-input-field-theory" id="time-theory" name="time" value="<?php echo date('H:i:s', strtotime($date_time));;?>" hidden>
             <div class="row">
                 <div class="container">
                     <div class="col">
@@ -68,28 +53,34 @@
                         </div>
                         <div class="row mt-1 offset-5">
                             <div class="col-sm-2">
-                                <button class="btn btn-primary ml-5" id="save-btn" type="submit" name="submit-attend">Save</button>
+                                <button class="btn btn-primary" id="save-btn" type="submit" >Save</button>
                             </div> 
                         </div>
                         <div class="row">
                             <div class="d-flex justify-content-center flex-wrap mt-2" id="attend-list" hidden>
                                 <?php 
-                                    $data = $user->getTheoryAttendance([$class_id, $date_time]);
-                                    foreach($data as $d){
-                                        if($d['status'] == 0){
+                                    //$data = $user->getTheoryAttendance([$class_id, $date_time]);
+                                    // $total = $user->getAttendanceTotalofEachStudentByClass([$class_id]);
+                                    // var_dump($total);
+                                    //$c = array_combine($data,$total);
+                                    //var_dump($c);
+                                    $data = json_decode($user->showStudentByClassForAttendance($class_id, $date_time), TRUE);
+                                    
+                                    for($i = 0; $i < count($data["total"]); $i++){
+                                        $present = (int)$data["total"][$i]['total_present'];
+                                        if($data["data"][$i]['status'] == 0){
                                             echo '<div class="grid-item m-2 mark-attend">
-                                                <input type="hidden" name="attend['.$d['prn_no'].']" value="0" data-id="'.$d['prn_no'].'"/>
-                                                <p>'.$d['roll_no'].'</p>
+                                                <input type="hidden" name="attend['.$data["data"][$i]['prn_no'].']" value="0" data-id="'.$data["data"][$i]['prn_no'].'"/>
+                                                <span class="btn roll_no"><a href="#?prn_no='.$data["data"][$i]['prn_no'].'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'.$data["data"][$i]['roll_no'].'</b></a></span> : <span class="present">'.$present.'</span>
                                                 <button type="button" class="btn btn-danger rounded-0 marker">A</button>
                                             </div>';
                                         }else{
                                             echo '<div class="grid-item m-2 mark-attend">
-                                                <input type="hidden" name="attend['.$d['prn_no'].']" value="1" data-id="'.$d['prn_no'].'"/>
-                                                <p>'.$d['roll_no'].'</p>
+                                                <input type="hidden" name="attend['.$data["data"][$i]['prn_no'].']" value="1" data-id="'.$data["data"][$i]['prn_no'].'"/>
+                                                <span class="btn roll_no"><a href="#?prn_no='.$data["data"][$i]['prn_no'].'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'.$data["data"][$i]['roll_no'].'</b></a></span> : <span class="present">'.$present.'</span>
                                                 <button type="button" class="btn btn-success rounded-0 marker">P</button>
                                             </div>';
                                         }
-                                        
                                     }
                                 ?>
                             </div>

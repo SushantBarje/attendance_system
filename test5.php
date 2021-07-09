@@ -6,4 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
+<?php
+    function foo($c, $a = "i", $b = null){
+        echo "\n".$a;
+        echo "\n".$b;
+    }
+
+    foo("c");
+
+    function travel($place = "Sweden")
+    {
+        return "Traveling to $place.\n";
+    }
+    echo travel();
+    echo travel("Australia");
+    echo travel("Tokyo");
+
+?>
 <body>
