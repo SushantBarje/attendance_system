@@ -22,26 +22,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-    function shorthand(str){
-        var strArr = str.split(" ")
-        str = " "
-        for(i in strArr){
-            if(strArr[i] === "and") continue;
-            str += strArr[i][0]
-        }
-        return str.toUpperCase();
-    }
-</script>
+
     <title>Mark Attendence</title>
 
     <style>
-         #show_pract_class{
+         #show_class{
             text-align: center;
         }
         
 
-        #show_pract_class a{
+        #show_class a{
             color :black;
             text-decoration: none;
             margin-left : 1.5rem;
@@ -85,7 +75,7 @@
             $result = $user->getStaffTheoryClassByAcademicYearAndFacultyID([$last_academic_year["acedemic_id"], $_SESSION['faculty_id']]);
             ?>
 
-            <div class="d-flex flex-wrap" id="show_pract_class">
+            <div class="d-flex flex-wrap" id="show_class">
                 <?php 
                     foreach($result as $r){
                 ?>

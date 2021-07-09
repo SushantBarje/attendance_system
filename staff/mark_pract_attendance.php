@@ -104,10 +104,11 @@
                                     echo "<h3>No student found!</h3>";
                                 }
                                 foreach($data as $d){
+                                    $present = (int)$d['total_present']+1;
                                     echo '<div class="grid-item m-2 mark-attend">
                                             <input type="hidden" name="attend['.$d['prn_no'].']" value="1" data-id="'.$d['prn_no'].'"/>
-                                            <p>'.$d['roll_no'].'</p>
-                                            <button type="button" class="btn btn-success rounded-0 marker">P</button>
+                                            <span class="btn roll_no"><a href="#?prn_no='.$d['prn_no'].'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'.$d['roll_no'].'</b></a></span> : <span class="present">'.$present.'</span>
+                                            <button type="button" class="btn btn-success marker">P</button>
                                         </div>';
                                 }
                                 //echo '<p>'.$user->getCountAttendanceByClassAndRoll([$_SESSION['class_id'],$d['roll_no']]).'</p>';
@@ -117,33 +118,6 @@
                 </div>    
             </div> 
         </form>
-        
-        <!-- <table id="class-table">
-            <thead>
-                <tr>
-                    <th>Class ID</th>
-                    <th>Course</th>
-                    <th>Class</th>
-                    <th> </th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                    // $data = $user->getClassByStaff([$_SESSION['faculty_id']]);
-                    // if(!$data) echo "<tr><td>Nothing Found</td</tr>";
-                    // foreach($data as $d){
-                    //     echo '<tr>
-                    //             <td>'.$d['class_id'].'</td>
-                    //             <td>'.$d['course_name'].'</td>
-                    //             <td>'.$d['s_class_name'].'</td>
-                    //             <td>
-                    //                 <a href="attendance_sheet.php?dept='.$_SESSION['dept'].'&class='.$d['s_class_id'].'" class="btn btn-primary">Take Attendance</a>
-                    //             </td>        
-                    //         </tr>';
-                    // }
-                ?>
-            </tbody>
-        </table> -->
     </main>
 
     <script src="../assets/js/staff/script.js"></script>

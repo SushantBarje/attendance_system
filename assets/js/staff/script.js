@@ -247,6 +247,10 @@ function processMarkAttendance(){
         marker($(this))
     }); 
 
+    $('#theory-attend-list').on("click", '.marker', function(){
+        marker($(this))
+    }); 
+
     function marker(selector){
         if(selector.text() == "P"){
             selector.text("A");
@@ -272,9 +276,9 @@ function processMarkAttendance(){
 }
 
 function processSubmitAttendance(){
-    $("#check-attend-theory").on("change",".sheet-input-field-pract" ,function(){
-        var date = $("#date-theory");
-        var time = $("#time-theory");
+    $("#check-attend-theory").on("change",".sheet-input-field-theory" ,function(){
+        var date = $("#check-attend-theory #date-theory");
+        var time = $("#check-attend-theory #time-theory");
         var class_id = $("#class_id");
         console.log(class_id);
         if(date.val() != "" && time.val() != ""){
@@ -284,7 +288,7 @@ function processSubmitAttendance(){
                 data : {"class_id" : class_id.val(), "date" : date.val(), "time" : time.val()},
                 dataType : "json",
                 success : function(res){
-                    console.log(res);
+                    console.log(res.total);
                     switch(res.error){
                         case "empty":
                             alert("Please fill all details.");
@@ -297,11 +301,10 @@ function processSubmitAttendance(){
                             }else{
                                 var html = "";
                                 for(var i = 0; i < res.data.length; i++){
-                                    var present = parseInt(res.data[i].total_present+1);
+                                    var present = parseInt(res.total[i].total_present);
                                     if(res.data[i].status == 0){
                                         html += '<div class="grid-item m-2 mark-attend">\
                                                 <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
-                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
                                                 <span class="btn roll_no"><a href="#?prn_no='+res.data[i].prn_no+'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'+res.data[i].roll_no+'</b></a></span> : <span class="present">'+present+'</span>\
                                                 <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
                                             </div>'
@@ -315,6 +318,8 @@ function processSubmitAttendance(){
                                 }
                                 $("#theory-attend-list").html(" ");
                                 $("#theory-attend-list").html(html);
+
+                                window
                             }
                             break;
                     }
@@ -338,6 +343,7 @@ function processSubmitAttendance(){
                         break;
                     case "update":
                         alert("Attendance Updated!");
+                        history.go(-1);
                         break;
                     case "none":
                         alert("Attendance Submitted");
@@ -729,16 +735,17 @@ function processPracticalAttendance(){
                             }else{
                                 var html = "";
                                 for(var i = 0; i < res.data.length; i++){
+                                    var present = parseInt(res.total[i].total_present);
                                     if(res.data[i].status == 0){
                                         html += '<div class="grid-item m-2 mark-attend">\
                                                 <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
-                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                                <span class="btn roll_no"><a href="#?prn_no='+res.data[i].prn_no+'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'+res.data[i].roll_no+'</b></a></span> : <span class="present">'+present+'</span>\
                                                 <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
                                             </div>'
                                     }else{
                                         html += '<div class="grid-item m-2 mark-attend">\
                                                 <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
-                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
+                                                <span class="btn roll_no"><a href="#?prn_no='+res.data[i].prn_no+'" data-toggle="tooltip" data-placement="top" title="Tooltip on top"><b>'+res.data[i].roll_no+'</b></a></span> : <span class="present">'+present+'</span>\
                                                 <button type="button" class="btn btn-success rounded-0 marker">P</button>\
                                             </div>'
                                     } 
@@ -768,6 +775,7 @@ function processPracticalAttendance(){
                         break;
                     case "update":
                         alert("Attendance Updated!");
+                        history.go(-1);
                         break;
                     case "none":
                         alert("Attendance Submitted");
@@ -1085,7 +1093,7 @@ function processTheoryClassByAcademicYear(){
                                         </div>\
                                     </div>'
                         }
-                        $("#show_pract_class").html(html);
+                        $("#show_class").html(html);
                         break;
                 }
             },
@@ -1097,53 +1105,53 @@ function processTheoryClassByAcademicYear(){
 }
 
 
-function processTheoryAttendance(){
-    $("#check-attend-theory").on("change",".sheet-input-field-theory" ,function(){
-        var date = $("#date-theory");
-        var time = $("#time-theory");
-        var class_id = $("#class_id");
-        console.log(class_id);
-        if(date.val() != "" && time.val() != ""){
-            $.ajax({
-                url : "../controller/ajaxController.php?action=check_theory_attend",
-                type : "POST",
-                data : {"class_id" : class_id.val(), "date" : date.val(), "time" : time.val()},
-                dataType : "json",
-                success : function(res){
-                    console.log(res);
-                    switch(res.error){
-                        case "empty":
-                            alert("Please fill all details.");
-                            break;
-                        case "notfound":
-                            break;
-                        case "none":
-                            if(!confirm("Already Attendance Take Do you want to edit!")){
-                                break;
-                            }else{
-                                var html = "";
-                                for(var i = 0; i < res.data.length; i++){
-                                    if(res.data[i].status == 0){
-                                        html += '<div class="grid-item m-2 mark-attend">\
-                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
-                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
-                                                <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
-                                            </div>'
-                                    }else{
-                                        html += '<div class="grid-item m-2 mark-attend">\
-                                                <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
-                                                <p class="mt-2">'+res.data[i].roll_no+'</p>\
-                                                <button type="button" class="btn btn-success rounded-0 marker">P</button>\
-                                            </div>'
-                                    } 
-                                }
-                                $("#pract-attend-list").html(" ");
-                                $("#pract-attend-list").html(html);
-                            }
-                            break;
-                    }
-                }
-            });
-        }
-    })
-}
+// function processTheoryAttendance(){
+//     $("#check-attend-theory").on("change",".sheet-input-field-theory" ,function(){
+//         var date = $("#date-theory");
+//         var time = $("#time-theory");
+//         var class_id = $("#class_id");
+//         console.log(class_id);
+//         if(date.val() != "" && time.val() != ""){
+//             $.ajax({
+//                 url : "../controller/ajaxController.php?action=check_theory_attend",
+//                 type : "POST",
+//                 data : {"class_id" : class_id.val(), "date" : date.val(), "time" : time.val()},
+//                 dataType : "json",
+//                 success : function(res){
+//                     console.log(res);
+//                     switch(res.error){
+//                         case "empty":
+//                             alert("Please fill all details.");
+//                             break;
+//                         case "notfound":
+//                             break;
+//                         case "none":
+//                             if(!confirm("Already Attendance Take Do you want to edit!")){
+//                                 break;
+//                             }else{
+//                                 var html = "";
+//                                 for(var i = 0; i < res.data.length; i++){
+//                                     if(res.data[i].status == 0){
+//                                         html += '<div class="grid-item m-2 mark-attend">\
+//                                                 <input type="hidden" name="attend['+res.data[i].prn_no+']" value="0" data-id="'+res.data[i].prn_no+'"/>\
+//                                                 <p class="mt-2">'+res.data[i].roll_no+'</p>\
+//                                                 <button type="button" class="btn btn-danger rounded-0 marker">A</button>\
+//                                             </div>'
+//                                     }else{
+//                                         html += '<div class="grid-item m-2 mark-attend">\
+//                                                 <input type="hidden" name="attend['+res.data[i].prn_no+']" value="1" data-id="'+res.data[i].prn_no+'"/>\
+//                                                 <p class="mt-2">'+res.data[i].roll_no+'</p>\
+//                                                 <button type="button" class="btn btn-success rounded-0 marker">P</button>\
+//                                             </div>'
+//                                     } 
+//                                 }
+//                                 $("#pract-attend-list").html(" ");
+//                                 $("#pract-attend-list").html(html);
+//                             }
+//                             break;
+//                     }
+//                 }
+//             });
+//         }
+//     })
+// }

@@ -981,8 +981,22 @@ class Faculty extends Database {
 	public function getTheoryAttendance($data){
 		try{
 			$con = $this->connect();
-			//$sql = "SELECT a.*,b.*, FROM attendance as a JOIN student as b ON a.student_id = b.prn_no WHERE a.class_id = ? AND a.date_time = ? GROUP BY a.student_id ORDER BY b.roll_no+0;";
-			$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name, SUM(b.status) as total_present FROM student as a LEFT JOIN attendance as b ON a.prn_no = b.student_id WHERE b.class_id = ? AND date_time = ? GROUP BY a.prn_no ORDER BY roll_no+0 ASC ";
+			$sql = "SELECT a.*,b.* FROM attendance as a JOIN student as b ON a.student_id = b.prn_no WHERE a.class_id = ? AND a.date_time = ? GROUP BY a.student_id ORDER BY b.roll_no+0;";
+			//$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name, SUM(b.status) as total_present FROM student as a LEFT JOIN attendance as b ON a.prn_no = b.student_id WHERE b.class_id = ? AND date_time = ? GROUP BY a.prn_no ORDER BY roll_no+0 ASC ";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)){
+				return $stmt->fetchAll();
+			}	
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getAttendanceTotalofEachStudentByClass($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT b.roll_no, SUM(a.status) as total_present FROM attendance as a JOIN student as b ON a.student_id = b.prn_no WHERE a.class_id = ? GROUP BY a.student_id ORDER BY b.roll_no+0;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)){
 				return $stmt->fetchAll();
@@ -1312,7 +1326,7 @@ class Faculty extends Database {
 	public function getStudentForPractAttendanceBatchWise($data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT a.*, p_class_id FROM student as a JOIN practical_class as b ON a.year_id = b.year_id AND a.div_id = b.div_id AND a.batch_id = b.batch_id WHERE b.p_class_id = ? ORDER BY roll_no+0;";
+			$sql = "SELECT a.*, b.p_class_id, SUM(c.status) as total_present FROM student as a JOIN practical_class as b ON a.year_id = b.year_id AND a.div_id = b.div_id AND a.batch_id = b.batch_id JOIN pract_attend as c ON a.prn_no = c.prn_no WHERE b.p_class_id = ? GROUP BY a.prn_no ORDER BY roll_no+0;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}catch(PDOException $e){
@@ -1335,6 +1349,17 @@ class Faculty extends Database {
 		try{
 			$con = $this->connect();
 			$sql = "SELECT b.* ,a.*, dept_name, s_class_name, div_name, batch_name FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no JOIN department as c ON b.dept_id = c.dept_id JOIN student_class as d ON b.year_id = d.s_class_id JOIN division as e ON e.div_id = b.div_id JOIN batch as f ON f.batch_id = b.batch_id WHERE a.p_class_id = ? AND a.date_time = ? ORDER BY b.roll_no+0;";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return $stmt->fetchAll();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function getTotalOfEachStudentOfPracticalAttendanceByClass($data){
+		try{
+			$con = $this->connect();
+			$sql = "SELECT b.roll_no, SUM(a.status) as total_present FROM pract_attend as a JOIN student as b ON a.prn_no = b.prn_no WHERE a.p_class_id = ? GROUP BY a.prn_no  ORDER BY b.roll_no+0;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}catch(PDOException $e){

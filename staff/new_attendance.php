@@ -34,9 +34,9 @@
         #show_pract_class a{
             color :black;
             text-decoration: none;
-            margin-left : 10px;
+            margin-left : 1.5rem;
             padding: 0 !important;
-            
+            border: 1px solid black; 
         }
     </style>
 </head>
@@ -88,7 +88,6 @@
                             </div>
                         </div>
                     </a>    
-
                 <?php } ?>
             </div>
     </main>
