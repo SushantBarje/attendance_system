@@ -79,12 +79,13 @@
                 <?php 
                     foreach($result as $r){
                 ?>
-                    <a href="mark_pract_attendance.php?practical_class=<?php echo $r['p_class_id']; ?>" class="shadow p-3 mb-5 bg-white rounded">
+                    <a href="mark_pract_attendance.php?practical_class=<?php echo $r['p_class_id']; ?>" class="shadow p-3 mb-4 bg-white rounded">
                         <div class="class-box">
                             <div class="div">
                                 <div><strong>Course: </strong><?php echo $r['course_name'] ?></div>
                                 <div><strong>Class: </strong><?php echo $r['s_class_name'] .' <strong>Div: </strong>'. $r['div_name']?></div>
                                 <div><strong>Batch: </strong><?php echo $r['batch_name']?></div>
+                                <div><strong>Dept: </strong><?php echo $r['dept_name']?></div>
                             </div>
                         </div>
                     </a>    

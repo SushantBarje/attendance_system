@@ -1,3 +1,11 @@
+window.start_load = function(){
+    $('body').prepend('<di id="preloader2"></di>')
+}
+window.end_load = function(){
+    $('#preloader2').fadeOut('fast', function() {
+        $(this).remove();
+    })
+}
 $(document).ready(function(){
     $('#student-table').DataTable();
     $('#class-table').DataTable();
@@ -6,6 +14,7 @@ $(document).ready(function(){
     $('#pract-class-table').DataTable({
  
     });
+    
     //$("#hod-report-adv").DataTable();
     // $("#export").on("click", function(){
     //     $("table").tableExport({
@@ -289,6 +298,7 @@ function processDeleteStudent(){
 function processAddStaff(){
     $('#add-staff').on("submit",function(e){
         e.preventDefault();
+        start_load();
         var data = {};
         $('#add-staff input').each(function(k,v){
             data[$(this).attr('name')] = $(this).val();
@@ -330,13 +340,15 @@ function processAddStaff(){
                                 </td>\
                             </tr>'
                             }
-                            $.when($('#staff-table tbody').html(html)).then(alert("Staff successfully Added..."));
+                            $('#staff-table tbody').html(html)
+                            // $.when().then(alert("Staff successfully Added..."));
                         }
                         
                         break;     
                 }
             }
         })
+        end_load();
     })
 }
 
@@ -1716,12 +1728,10 @@ function processPracticalReport(){
                         $("#hod-report-adv").DataTable().destroy();
                         $("#hod-report-adv thead").html(" ");
                         $("#hod-report-adv tbody").html(" ");
-                        $("#hod-report-adv tbody").attr("hidden","true");
                     } 
 
                     if($.fn.dataTable.isDataTable(".staff-pract-report")){
-                        $(".staff-pract-report").DataTable().destroy();
-                        $(".repot-tables").html(" ");
+                        $(".report-tables").html(" ");
                     } 
                     alert("Please Fill Required Fields!");
 
@@ -1730,11 +1740,10 @@ function processPracticalReport(){
                         $("#hod-report-adv").DataTable().destroy();
                         $("#hod-report-adv thead").html(" ");
                         $("#hod-report-adv tbody").html(" ");
-                        $("#hod-report-adv tbody").attr("hidden","true");
                     } 
+
                     if($.fn.dataTable.isDataTable(".staff-pract-report")){
-                        $(".staff-pract-report").DataTable().destroy();
-                        $(".repot-tables").html(" ");
+                        $(".report-tables").html(" ");
                     } 
 
                     var columns = Object.keys(res.data[0]);
@@ -1805,31 +1814,52 @@ function processPracticalReport(){
         function DrawpracticalReportTableOfParticularClass(res){
             switch(res.error){
                 case "empty":
-                    if($.fn.dataTable.isDataTable("#staff-pract-report")){
-                        $("#staff-pract-report").DataTable().destroy();
-                        $("#staff-pract-report thead tr").html(" ");
-                        $("#staff-pract-report tbody").html(" ");
-                    }
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
                     alert("Enter all Details...");
                     break;
                 case "notfound":
-                    if($.fn.dataTable.isDataTable("#staff-pract-report")){
-                        $("#staff-pract-report").DataTable().destroy();
-                        $("#staff-pract-report thead tr").html(" ");
-                        $("#staff-pract-report tbody").html(" ");
-                    }
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+    
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
                     alert("No attendance Found")
                     $("#report-pract #select-class").val(" ");
                     break;
                 case "date":
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+    
+                    if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                        $(".report-tables").html(" ");
+                    } 
                     alert("Please Enter Correct Date");
                     break;
                 case "none":
+                    if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                        $("#hod-report-adv").DataTable().destroy();
+                        $("#hod-report-adv thead").html(" ");
+                        $("#hod-report-adv tbody").html(" ");
+                    } 
+    
                     if($.fn.dataTable.isDataTable(".staff-pract-report")){
-                        $(".staff-pract-report").DataTable().destroy()
                         $(".report-tables").html(" ");
-                    }  
-                    
+                    } 
                     var course = $("#report-pract #select-class option:selected").text();
                     var year = $("#report-pract #select-year option:selected").text();
                     var table = "";

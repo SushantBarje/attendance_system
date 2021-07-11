@@ -7,8 +7,6 @@ $(document).ready(function(){
     processAddAcademicYear();
     processDeleteAcademicYear()
     processAddDepartment();
-
-
     processDeleteDepartment();
     processAddHod();
     processDeleteHod();
@@ -16,7 +14,7 @@ $(document).ready(function(){
     processOnChangeClass()
     processAddCourse();
     processEditCourse();
-    processDeleteCourse()
+    processDeleteCourse();
     inputCoursePlaceholder();
     inputHodPlaceholder();
     processReport();
