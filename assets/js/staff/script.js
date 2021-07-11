@@ -827,7 +827,7 @@ function processPracticalReport(){
                                 $("#report-pract #select-class").prop("disabled",false);
                                 var html = '<option value=" "> </option>';
                                 for(var i = 0; i < res.data.length; i++){
-                                    html += '<option value="'+res.data[i].course_id+'" data-class="'+res.data[i].year_id+'">'+res.data[i].course_name+' Batch - '+res.data[i].batch_name+'</option>';
+                                    html += '<option value="'+res.data[i].course_id+'" data-class="'+res.data[i].year_id+'">'+res.data[i].course_name+'</option>';
                                 }
                                 $('#report-pract #select-class').html(html);
                             }
@@ -860,19 +860,27 @@ function processPracticalReport(){
     function DrawpracticalReportTableOfParticularClass(res){
         switch(res.error){
             case "empty":
-                if($.fn.dataTable.isDataTable("#staff-pract-report")){
-                    $("#staff-pract-report").DataTable().destroy();
-                    $("#staff-pract-report thead tr").html(" ");
-                    $("#staff-pract-report tbody").html(" ");
-                }
+                if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                    $("#hod-report-adv").DataTable().destroy();
+                    $("#hod-report-adv thead").html(" ");
+                    $("#hod-report-adv tbody").html(" ");
+                } 
+
+                if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                    $(".report-tables").html(" ");
+                } 
                 alert("Enter all Details...");
                 break;
             case "notfound":
-                if($.fn.dataTable.isDataTable("#staff-pract-report")){
-                    $("#staff-pract-report").DataTable().destroy();
-                    $("#staff-pract-report thead tr").html(" ");
-                    $("#staff-pract-report tbody").html(" ");
-                }
+                if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                    $("#hod-report-adv").DataTable().destroy();
+                    $("#hod-report-adv thead").html(" ");
+                    $("#hod-report-adv tbody").html(" ");
+                } 
+
+                if($.fn.dataTable.isDataTable(".staff-pract-report")){
+                    $(".report-tables").html(" ");
+                } 
                 alert("No attendance Found")
                 $("#report-pract #select-class").val(" ");
                 break;
@@ -880,11 +888,15 @@ function processPracticalReport(){
                 alert("Please Enter Correct Date");
                 break;
             case "none":
+                if($.fn.dataTable.isDataTable("#hod-report-adv")){
+                    $("#hod-report-adv").DataTable().destroy();
+                    $("#hod-report-adv thead").html(" ");
+                    $("#hod-report-adv tbody").html(" ");
+                } 
+
                 if($.fn.dataTable.isDataTable(".staff-pract-report")){
-                    $(".staff-pract-report").DataTable().destroy()
                     $(".report-tables").html(" ");
-                }  
-                
+                } 
                 var course = $("#report-pract #select-class option:selected").text();
                 var year = $("#report-pract #select-year option:selected").text();
                 var table = "";
@@ -1044,10 +1056,15 @@ function processPracticalClassByAcademicYear(){
                     case "none":
                         var html = " ";
                         for(var i = 0; i < res.data.length; i++){
-                            html += '<a href="mark_pract_attendance_demo.php?practical_class='+res.data[i].p_class_id+'" class="shadow p-3 mb-5 bg-white rounded">\
-                                    <div><strong>Course: </strong>'+res.data[i].course_name+'</div>\
-                                    <div><strong>Class: </strong>'+res.data[i].s_class_name+' <strong>Div: </strong> '+res.data[i].div_name+'</div>\
-                                    <div><strong>Batch: </strong>'+res.data[i].batch_name+'</div>'
+                            html += '<a href="mark_pract_attendance_demo.php?practical_class='+res.data[i].p_class_id+'" class="shadow p-3 mb-4 bg-white rounded">\
+                                        <div class="class-box">\
+                                            <div class="div">\
+                                                <div><strong>Course: </strong>'+res.data[i].course_name+'</div>\
+                                                <div><strong>Class: </strong>'+res.data[i].s_class_name+' <strong>Div: </strong> '+res.data[i].div_name+'</div>\
+                                                <div><strong>Batch: </strong>'+res.data[i].batch_name+'</div>\
+                                            </div>\
+                                        </div>\
+                                    </a>'
                         }
                         $("#show_pract_class").html(html);
                         break;

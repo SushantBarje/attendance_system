@@ -987,13 +987,12 @@ class FacultyController extends Faculty {
         $this->sem = $this->verifyInput($_POST['sem']);
         $this->s_div = $this->verifyInput($_POST['div']);
         $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        $result = "";
         if($_SESSION['role_id'] != 2){
-            $this->faculty_id = $this->verifyInput($_POST['faculty_id']);
             $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->s_div, $this->dept]);
-        }
-        $this->faculty_id = isset($_POST['faculty_id']) ?  : $_SESSION['faculty_id'];
-
-        $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->s_div, $this->dept]);
+        }else{
+            $result = $this->getClassBySemesterYearAndAcademic([$this->acd, $this->year, $this->sem, $this->s_div, $this->dept, $_SESSION['faculty_id']], " AND faculty_id = ?");
+        }  
         if(!$result) return json_encode(array("error" => "notfound"));
         else return json_encode(array("error" => "none", "data" => $result));
     
@@ -1052,7 +1051,9 @@ class FacultyController extends Faculty {
             $this->faculty_id = $_SESSION['faculty_id'];
             $data[] = $_SESSION['faculty_id'];
         }
-        if(!empty($_POST['class'])){
+        
+        if($_SESSION['role_id'] == 2 && $_POST['class'] == " ") return json_encode(array("error" => "empty"));
+        if($_POST['class'] != " "){
             $this->course_id = $this->verifyInput($_POST['class']);
             $classes = ($_SESSION['role_id'] == 2) ? $this->getPracticalClassByCourses(' AND faculty_id = ? ',[$this->acd, $this->course_id, $this->faculty_id]) : $this->getPracticalClassByCourses(' ',[$this->acd, $this->course_id]);
             $result_arr = array();
@@ -1062,7 +1063,6 @@ class FacultyController extends Faculty {
                 $data[] = $this->class;
                
                 $result = $this->getPracticalReportDynamicColumn($query, $data);
-                
                 if(!$result || ($result["string"] === null) || isset($result["e"])){
                     array_pop($data);
                     continue;
@@ -1074,10 +1074,11 @@ class FacultyController extends Faculty {
                 //if(isset($result["e"]) || !$result) return json_encode(array("error" => "notfound"));
                 //return json_encode(array("error" => "none" , "data" => $result[0], "total" => $result[1]));
             } 
-            return json_encode(array("error" => "none" , "data" => $result_arr));
+            
+            if(count($result_arr) > 0) return json_encode(array("error" => "none" , "data" => $result_arr));
+            else return json_encode(array("error" => "notfound"));
         }else{
             $result = $this->getPracticalReportSemester($query, $data);
-            
             if(!$result || isset($result["e"])) return json_encode(array("error" => "e", "msg" => $result["e"]));
             else return json_encode(array("error" => "none", "data"=>$result));
         }

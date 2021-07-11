@@ -130,20 +130,16 @@ if($req == "addAcademicYear"){
 }else if($req == "get_pract_class_sem_wise"){
     $r = $faculty->showPractClassBySemester();
     die($r);
-}
-else if($req == "get_staff_pract_report"){
+}else if($req == "get_staff_pract_report"){
     $r = $faculty->showPracticalReport();
    die($r);
-}
-else if($req == "get_pract_report"){
+}else if($req == "get_pract_report"){
     $r = $faculty->showPracticalReport();
    die($r);
-}
-else if($req == "get_pract_class_by_acd"){
+}else if($req == "get_pract_class_by_acd"){
     $r = $faculty->showPracticalClassByAcademicYear();
     die($r);
-}
-else if($req == "get_theory_class_by_acd"){
+}else if($req == "get_theory_class_by_acd"){
     $r = $faculty->showTheroyClassByAcademicYear();
     die($r);
 }

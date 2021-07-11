@@ -47,10 +47,21 @@
                 <h2 class="head">View Attendance</h2>
             </div>
         </div>
-        <div class="row mt-5">
+        <!-- <div class="row">
+            <div class="col-sm-12">
+                <div class="spin">
+                    <div class="d-flex justify-content-center align-item-center">
+                        <div class="spinner-border" style="height:100px; width:100px;" role="status">
+                            <span class="sr-only">Loading..</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <div class="row mt-5" id="theory-content">
             <div class="col-12">
                 <div class="table-section">
-                    <table id="student-report" class="display" >
+                    <table id="student-report" class="display">
                         <thead>
                             <tr>
                                 <th colspan="6">Theory</th>
@@ -85,10 +96,10 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-5">
+        <div class="row mt-5" id="practical-content">
             <div class="col-12">
                 <div class="table-section">
-                    <table id="student-report-practical" class="display" >
+                    <table id="student-report-practical">
                         <thead>
                             <tr>
                                 <th colspan="6">Practical</th>
@@ -131,6 +142,7 @@
         $(document).ready(function() {
             var table1 = $("#student-report").DataTable();
             var table2 = $("#student-report-practical").DataTable();
+           
             function formatDates(date){
                 var date = new Date(date);
                 var dd = date.getDate();

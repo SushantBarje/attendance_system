@@ -68,8 +68,8 @@ class StudentController extends Student {
     } 
 
     public function showGrandReport(){
-        
-            $result = $this->getStudentReport([$_SESSION['prn_no']]);
+
+            $result = $this->getStudentReport([$_SESSION['prn_no'],$_SESSION['year_id']]);
             if($result) return array("error" => "none", "data" => $result);
 
       

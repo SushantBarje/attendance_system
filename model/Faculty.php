@@ -1403,12 +1403,12 @@ class Faculty extends Database {
 		}
     }
 
-	public function getClassBySemesterYearAndAcademic($data){
+	public function getClassBySemesterYearAndAcademic($data, $query=" "){
 		try{
 			$con = $this->connect();
 
 			//$sql = "SELECT a.*,b.course_name, c.batch_name, d.div_name FROM practical_class as a JOIN courses as b ON a.course_id = b.course_id JOIN batch as c ON a.batch_id = c.batch_id JOIN division as d ON a.div_id = d.div_id WHERE a.academic_id = ? AND a.year_id = ? AND a.sem_id = ? AND a.dept_id = ? AND a.div_id = ? ORDER BY b.course_name,a.batch_id;";
-			$sql = "SELECT DISTINCT a.course_id, b.course_name FROM practical_class as a JOIN courses as b ON a.course_id = b.course_id WHERE  a.academic_id = ? AND a.year_id = ? AND a.sem_id = ? AND a.div_id = ? AND a.dept_id = ? ORDER BY a.p_class_id;";
+			$sql = "SELECT DISTINCT a.course_id, b.course_name  FROM practical_class as a JOIN courses as b ON a.course_id = b.course_id WHERE  a.academic_id = ? AND a.year_id = ? AND a.sem_id = ? AND a.div_id = ? AND a.dept_id = ? ".$query." ORDER BY a.p_class_id;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}

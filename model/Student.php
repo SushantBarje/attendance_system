@@ -19,7 +19,7 @@ class Student extends Database {
 
     public function getStudentReport($data){
         try{
-            $sql = "SELECT  a.class_id, c.course_name , SUM(status) as present, (COUNT(status) - SUM(status)) as absent, COUNT(status) as total_lectures, (SUM(status)/COUNT(status))*100 as percent FROM attendance as a JOIN class as b ON a.class_id = b.class_id JOIN courses as c ON b.course_id = c.course_id WHERE a.student_id = ? GROUP BY a.class_id;";
+            $sql = "SELECT  a.class_id, c.course_name , SUM(status) as present, (COUNT(status) - SUM(status)) as absent, COUNT(status) as total_lectures, (SUM(status)/COUNT(status))*100 as percent FROM attendance as a JOIN class as b ON a.class_id = b.class_id JOIN courses as c ON b.course_id = c.course_id WHERE a.student_id = ? AND b.s_class_id = ? GROUP BY a.class_id ORDER BY b.s_class_id;";
             $stmt = $this->connect()->prepare($sql);
             $stmt->execute($data);
             return $stmt->fetchAll();
@@ -43,7 +43,7 @@ class Student extends Database {
 
     public function getStudentReportPractical($data){
         try{
-            $sql = "SELECT  a.p_class_id, c.course_name , SUM(status) as present, (COUNT(status) - SUM(status)) as absent, COUNT(status) as total_lectures, (SUM(status)/COUNT(status))*100 as percent FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN courses as c ON b.course_id = c.course_id WHERE a.prn_no= ? GROUP BY a.p_class_id;";
+            $sql = "SELECT  a.p_class_id, c.course_name , SUM(status) as present, (COUNT(status) - SUM(status)) as absent, COUNT(status) as total_lectures, (SUM(status)/COUNT(status))*100 as percent FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN courses as c ON b.course_id = c.course_id WHERE a.prn_no= ? GROUP BY b.year_id, a.p_class_id;";
             $stmt = $this->connect()->prepare($sql);
             $stmt->execute($data);
             return $stmt->fetchAll();
