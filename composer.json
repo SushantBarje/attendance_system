@@ -16,5 +16,8 @@
         "phpoffice/phpspreadsheet": "^1.17",
         "components/font-awesome": "^5.15",
         "datatables/datatables": "^1.10"
-    }
+    },
+    "devDependencies": {
+        "gulp": "^4.0.2"
+      }
 }

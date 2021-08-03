@@ -130,7 +130,7 @@
                                 <td class="s-class-name" id="'.$d['s_class_id'].'">'.$d['s_class_name'].'</td>
                                 <td class="sem-name" id="'.$d['sem_id'].'">'.$d['sem_name'].'</td>
                                 <td>
-                                    <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'.$d['course_id'].'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>
+                                    <!--<button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'.$d['course_id'].'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button> -->
                                     <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['course_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
                                 </td>
                             </tr>';

@@ -76,7 +76,7 @@
                 <?php 
                     $data = $user->getAcademicYear();
                     foreach($data as $d){
-                        echo '<tr><td>'.$d['academic_descr'].'</td><td><button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['acedemic_id'].'">Delete</button></td></tr>';
+                        echo '<tr><td>'.$d['academic_descr'].'</td><td><button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['acedemic_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button></td></tr>';
                     }
                 ?>
             </tbody>

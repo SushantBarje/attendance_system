@@ -1,5 +1,6 @@
 <?php
-    require_once __DIR__ . '\vendor\autoload.php';
+    require_once __DIR__ .'\vendor\autoload.php';
+    require_once __DIR__.'\links\links.php';
     use app\controller\FacultyController;
     use app\controller\StudentController;
     $user = new FacultyController();
@@ -26,6 +27,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="CSS/login.css">
+    <?php
+        OfflineStylesFiles();
+    ?>
 </head>
 <body>
     <div class="container-fluid" id="heading">
@@ -83,6 +87,10 @@
         <input type="text" name="pwd">
         <button type="submit" name="log">Submit</button>
     </form> -->
+
+    <?php
+        OfflineJsFiles();
+    ?>
 </body>
 </html>
 <?php

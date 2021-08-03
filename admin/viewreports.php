@@ -34,8 +34,9 @@
     include "adminHeader.php"; 
 ?>  
 <main style="background-color:white">
+    <h2 class="head">Theory Report</h2>
     <div class="container">
-        <div class="row">
+        <div class="row mt-3">
             <div class="col-sm-12">
                 <form id="report" method="post">
                     <div class="row">
@@ -127,7 +128,7 @@
         
         </tbody>
     </table>
-    <button type="button" class="btn btn-success" id="export">Print</button>
+    <button type="button" class="btn btn-success" id="export" hidden>Print</button>
         <div id="tableWrap">
             <table id="admin-report-adv" class="table table-bordered stripe row-border order-column" style="width:100%">
                 <thead>
