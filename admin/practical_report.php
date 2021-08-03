@@ -33,7 +33,7 @@
     include "adminHeader.php"; 
 ?>  
 <main style="background-color:white">
-    <h2 class="head">Report</h2>
+    <h2 class="head">Practical Report</h2>
     <div class="container">
         <div class="row  mt-3">
             <div class="col-sm-12">
@@ -121,7 +121,7 @@
     <div class="report-tables">
         
     </div>
-    <button type="button" class="btn btn-success" id="export">Print</button hidden>
+    <button type="button" class="btn btn-success" id="export">Print</button>
     <div id="tableWrap">
         <table id="hod-report-adv" class="table cell-border stripe row-border order-column" style="width:100%">
             <thead>

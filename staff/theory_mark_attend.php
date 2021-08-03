@@ -107,6 +107,7 @@
                         <div class="d-flex justify-content-center flex-wrap mt-2" id="theory-attend-list">
                             <?php 
                                 $data = $user->getStudentByDeptDivisionAndYear([$class_info['dept_id'],$class_info['s_class_id'], $class_info['div_id'], $class_id]);
+                            
                                 if(!$data){
                                     echo "<h3>No student found!</h3>";
                                 }

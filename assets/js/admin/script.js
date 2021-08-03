@@ -1,3 +1,11 @@
+window.start_load = function(){
+    $('body').prepend('<di id="preloader2"></di>')
+}
+window.end_load = function(){
+    $('#preloader2').fadeOut('fast', function() {
+        $(this).remove();
+    })
+}
 
 $(document).ready(function(){
     $("#acad-table").DataTable();
@@ -457,7 +465,8 @@ function processOnChangeClass(){
 }
 
 function processAddCourse(){
-    $('#add-course').on("submit",function(e){
+    $('#add-course').on("submit",async function(e){
+        start_load();
         e.preventDefault();
         var data = {};
         $('#add-course input').each(function(k,v){
@@ -500,18 +509,20 @@ function processAddCourse(){
                                 <td class="s-class-name" id="'+res.data[i].s_class_id+'">'+res.data[i].s_class_name+'</td>\
                                 <td class="sem-name" id="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</td>\
                                 <td>\
-                                    <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                    <!--<button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>-->\
                                     <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].course_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
                                 </td>\
                             </tr>'
                             }
-                            $('#course-table tbody').html(html);
+                            $('#course-table tbody').html(html); 
+                            alert("Course Added...");
                         }
                         
                         break;     
                 }
             }
         })
+        end_load();
     })
 }
 
@@ -617,6 +628,7 @@ function processEditCourse(){
 function processDeleteCourse(){
     $('#course-table').on("click","#del-btn",function(){
         if(confirm("Are you sure you want to delete ?")){
+            start_load();
             var id;
             id = $(this).attr("data-control");
             console.log(id);
@@ -654,7 +666,7 @@ function processDeleteCourse(){
                                     <td class="s-class-name" id="'+res.data[i].s_class_id+'">'+res.data[i].s_class_name+'</td>\
                                     <td class="sem-name" id="'+res.data[i].sem_id+'">'+res.data[i].sem_name+'</td>\
                                     <td>\
-                                        <button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>\
+                                        <!--<button type="button" class="btn btn-success btn-sm" id="edit-btn" data-control="'+res.data[i].course_id+'" data-toggle="modal" data-target="#courseEditModal"><span> <i class="fas fa-edit"></i></span> Edit</button>-->\
                                         <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].course_id+'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>\
                                     </td>\
                                 </tr>'
@@ -668,6 +680,7 @@ function processDeleteCourse(){
                     console.log(err);
                 }
             })
+            end_load();
         }
     })
 }
@@ -782,23 +795,40 @@ function processAdminReport(){
 
 
     $("#report").on("click", "#get-report",function(){
+        var data = {};
+        data[$("#report #select-acd-report").attr("name")] = $("#report #select-acd-report").val();
+        data[$("#report #select-dept-report").attr("name")] = $("#report #select-dept-report").val();
+        data[$("#report #select-year-report").attr("name")] = $("#report #select-year-report").val();
+        data[$("#report #select-class-report").attr("name")] = $("#report #select-class-report").val();
+        data[$("#report #select-sem-report").attr("name")] = $("#report #select-sem-report").val();
+        data[$("#report #from-date").attr("name")] = $("#report #from-date").val();
+        data[$("#report #till-date").attr("name")] = $("#report #till-date").val();
+        data[$("#report #select-div-report").attr("name")] = $("#report #select-div-report").val();
+        title = $("#report #select-class-report option:selected").text();
+        year = $("#report #select-year-report option:selected").text();
+        acd = $("#report #select-acd-report option:selected").text();
+        div = $("#report #select-div-report option:selected").text();
+        academic_year = $("#report #select-acd-report option:selected").text();
         if($("#report #select-acd-report").val() != "" && $("#report #select-year-report").val() != "" && $("#report #select-div-report").val() != "" && $("#report #select-sem-report").val() != "" && $("#report #select-dept-report").val() != "" && $("#report #select-class-report").val() == ""){
-            console.log("sushant");
+            start_load();
             $.ajax({
                 url : "../controller/ajaxController.php?action=perform_hod_report",
                 type : "post",
-                data : {"academic_year" : $("#report #select-acd-report").val(), "s_class_year" : $("#report #select-year-report").val(), "div_id" : $("#report #select-div-report").val(), "sem" : $("#report #select-sem-report").val(), "dept_id" : $("#report #select-dept-report").val()},
+                data : data,
+                //data : {"academic_year" : $("#report #select-acd-report").val(), "s_class_year" : $("#report #select-year-report").val(), "div_id" : $("#report #select-div-report").val(), "sem" : $("#report #select-sem-report").val(), "dept_id" : $("#report #select-dept-report").val()},
                 dataType : 'json',
                 success : function(res){
+                    $("#export").attr("hidden", true);
                     console.log(res);
                     switch(res.error){
                         case "none":
+                                $("#export").show();
                                 if($.fn.dataTable.isDataTable("#admin-report-adv")){
                                     $("#admin-report-adv").DataTable().destroy();
                                     $("#admin-report-adv thead").html(" ");
                                     $("#admin-report-adv tbody").html(" ");
                                 } 
-
+                                $("#export").attr("hidden", false);
                                 if($.fn.dataTable.isDataTable("#admin-report")){
                                     $("#admin-report").DataTable().destroy();
                                     $("#admin-report thead").html(" ");
@@ -889,8 +919,10 @@ function processAdminReport(){
                     console.log(e);
                 }
             })
+            end_load();
         }
         else if($("#report #select-acd-report").val() != "" && $("#report #select-year-report").val() != "" && $("#report #select-div-report").val() != "" && $("#report #select-sem-report").val() != "" && $("#report #select-class-report").val() != ""){
+            start_load();
             var data = {};
             var title = "";
             $.when(
@@ -918,6 +950,9 @@ function processAdminReport(){
                     dataType : "JSON",
                     success : function(res){
                         console.log(res);
+                        $("#faculty_header").html("");
+                        $("#lecture_header").html("");
+                        $("#export").hide();
                         switch(res.error){
                             case "empty":
                                 if($.fn.dataTable.isDataTable("#admin-report")){
@@ -939,6 +974,7 @@ function processAdminReport(){
                                 alert("Please Enter Correct Date");
                                 break;
                             case "none":
+                                $("#export").show();
                                 if($.fn.dataTable.isDataTable("#admin-report")){
                                     $("#admin-report").DataTable().destroy();
                                     $("#admin-report thead tr").html(" ");
@@ -1045,6 +1081,7 @@ function processAdminReport(){
                     }
                 })
             }
+            end_load();
         }
     })
 }
@@ -1181,6 +1218,7 @@ function processPracticalReport(){
 
     $("#report-pract").on("submit", function(e){
         e.preventDefault();
+        start_load();
         takePractReportInput();
 
         $.ajax({
@@ -1197,7 +1235,7 @@ function processPracticalReport(){
                 }
             }
         })
-
+        end_load();
         function DrawpracticalReportTableOfCombinedClass(res){
             switch(res.error){
                 case "empty":

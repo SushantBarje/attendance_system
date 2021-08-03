@@ -34,156 +34,230 @@
 <body>
 <?php   include "hodHeader.php" ?>
     <main>
-        <div class="cards">
-            <div class="container">
-                <!-- Button to Open the Modal -->
+        <h2 class="head">Manage Class</h2>
+        <div class="container">
+            <div class="row mt-3">
+                <div class="col-sm-12">
+                    <form>
+                        <div class="form-group">
+                            <label for="select-acd">Select Academic Year</label>
+                            <select name="academic_year" class="form-control" id="select-acd">
+                                <option value=""></option>
+                                <?php
+                                    $result = $user->getAcademicYear();
+                                    if(!$result) echo '<option>No Academic Year</option>';
+                                    foreach($result as $r){
+                                        echo '<option values="'.$r['acedemic_id'].'">'.$r['academic_descr'].'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row mt-3 mb-3">
+                <div class="col-12 col-sm-12">
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#manageClassModal">
-                   + Allocate Theory Class
+                    + Allocate Theory Class
                 </button>
-
-                <!-- The Modal -->
-                <div class="modal" id="manageClassModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-
-                            <!-- Modal Header -->
-                            <div class="modal-header">
-                                <h2>Allocate Class</h2>
-
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-
-                            <!-- Modal body -->
-                            <div class="modal-body">
-                                <form id="add-class-form">
-                                    <div class="form-group">
-                                        <label for="acd_year">Academic Year</label>
-                                        <select name="acd_year" id="acd_year" class="form-control form-control-sm">
-                                            <option value=" "></option>
-                                            <?php
-                                                $data = $user->getAcademicYear();
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['acedemic_id'].'">'.$d['academic_descr'].'</option>';
-                                                }
-                                            ?>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="faculty_S">Select Faculty</label>
-                                        <select name="faculty_s" class="form-control form-control-sm" id="faculty_s">
-                                            <option value=" "> </option>
-                                            <?php 
-                                                $data = $user->getFacultyByDept([$_SESSION['dept']]);
-                                                if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['faculty_id'].'">'.$d['first_name'].' '.$d['last_name'].'</option>';
-                                                }
-                                                echo '<option value="other">Select From Other Department</option>';
-                                            ?>
-                                        </select>
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-sm-6" id="foreign-select-dept" hidden="true">
-                                            <label for="dept_s">Select Department</label>
-                                            <select name="dept_id" class="form-control form-control-sm" id="foreign_dept_s">
-                                                <option value=" "> </option>
-                                                <?php 
-                                                    $data = $user->getDepartment();
-                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                    foreach($data as $d){
-                                                        echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
-                                                    }
-                                                ?>
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-sm-6" id="foreign-select-faculty" hidden="true">
-                                            <label for="dept_s">Select Other Faculty</label>
-                                            <select name="faculty_s" class="form-control form-control-sm" id="foreign_faculty_s">
-                                                <option value=" "> </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-sm-12" id="select-div">
-                                            <label for="div_s">Select Division</label>
-                                            <select class="form-control selectpicker " name="div_id[]" id="div_s" multiple data-live-search="true">
-                                                <?php 
-                                                    $data = $user->getDivBelongsDept([$_SESSION['dept']]);
-                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                    foreach($data as $d){
-                                                        echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
-                                                    }
-                                                ?>
-                                            </select>
-                                        </div>
-                                    </div>
+                </div>
+            </div>
+            <!-- Button to Open the Modal -->
+            <div class="row">
+                <div class="col-12 col-sm-12">
+                    <table id="class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th colspan="6">Theroy</th>
+                            </tr>
+                            <tr>
+                                <th>Class ID</th>
+                                <th>Course Name</th>
+                                <th>Faculty</th>
+                                <th>Class</th>
+                                <th>Div</th>
+                                <th> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                $last_acd = $user->getLastAcademicYear();
+                                $data = $user->getClassByDeptAndAcademicYear([$_SESSION['dept'], $last_acd['acedemic_id']]);
+                                foreach($data as $d){
+                                    echo '<tr>
+                                            <td>'.$d['class_id'].'</td>
+                                            <td>'.$d['course_name'].'</td>
+                                            <td>'.$d['first_name'].' '.$d['last_name'].'</td>
+                                            <td>'.$d['s_class_name'].'</td>
+                                            <td>'.$d['div_name'].'</td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['class_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
+                                            </td>        
+                                        </tr>';
+                                }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <hr/>
+            <div class="row">
+                <div class="col-12 mt-3 mb-3">
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#managePracticalClassModal">
+                    + Allocate Practical Class
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <table id="pract-class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th colspan="7">Practical</th>
+                            </tr>
+                            <tr>
+                                <th hidden>Class ID</th>
+                                <th>Course Name</th>
+                                <th>Faculty</th>
+                                <th>Class</th>
+                                <th>Div</th>
+                                <th>Batch</th>
+                                <th> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                $data = $user->getPractClassByDept([$_SESSION['dept']]);
+                            
+                                foreach($data as $d){
+                                    echo '<tr>
+                                            <td hidden>'.$d['p_class_ids'].'</td>
                                     
-                                    <div class="form-group">
-                                        <label for="courses_s">Select Courses</label>
-                                        <select class="form-control selectpicker " name="courses[]" id="courses_s" multiple data-live-search="true">
-                                            <?php 
-                                                $data = $user->getCoursesByDept([$_SESSION['dept']]);
-                                                if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['course_id'].'">'.$d['course_name'].'</option>';
-                                                }
-                                            ?>
-                                        </select>
-                                    </div>
-                                    <!-- Modal footer -->
-                                    <div class="modal-footer">
+                                            <td>'.$d['course_name'].'</td>
+                                            <td>'.$d['faculty_name'].'</td>
+                                            <td>'.$d['s_class_name'].'</td>
+                                            <td>'.$d['div_name'].'</td>
+                                            <td>'.$d['batch_name'].'</td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['p_class_ids'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
+                                            </td>        
+                                        </tr>';
+                                }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- The Modal -->
+            <div class="modal" id="manageClassModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
 
-                                        <button type="button" id="add-class" class="btn btn-success">ADD</button>
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                    </div>
-                                    <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
-                                </form>
-                            </div>
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h2>Allocate Class</h2>
+
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
 
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <form id="add-class-form">
+                                <div class="form-group">
+                                    <label for="acd_year">Academic Year</label>
+                                    <select name="acd_year" id="acd_year" class="form-control form-control-sm">
+                                        <option value=" "></option>
+                                        <?php
+                                            $data = $user->getAcademicYear();
+                                            foreach($data as $d){
+                                                echo '<option value="'.$d['acedemic_id'].'">'.$d['academic_descr'].'</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="faculty_S">Select Faculty</label>
+                                    <select name="faculty_s" class="form-control form-control-sm" id="faculty_s">
+                                        <option value=" "> </option>
+                                        <?php 
+                                            $data = $user->getFacultyByDept([$_SESSION['dept']]);
+                                            if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                            foreach($data as $d){
+                                                echo '<option value="'.$d['faculty_id'].'">'.$d['first_name'].' '.$d['last_name'].'</option>';
+                                            }
+                                            echo '<option value="other">Select From Other Department</option>';
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-sm-6" id="foreign-select-dept" hidden="true">
+                                        <label for="dept_s">Select Department</label>
+                                        <select name="dept_id" class="form-control form-control-sm" id="foreign_dept_s">
+                                            <option value=" "> </option>
+                                            <?php 
+                                                $data = $user->getDepartment();
+                                                if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                                foreach($data as $d){
+                                                    echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
+                                                }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-6" id="foreign-select-faculty" hidden="true">
+                                        <label for="dept_s">Select Other Faculty</label>
+                                        <select name="faculty_s" class="form-control form-control-sm" id="foreign_faculty_s">
+                                            <option value=" "> </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-sm-12" id="select-div">
+                                        <label for="div_s">Select Division</label>
+                                        <select class="form-control selectpicker " name="div_id[]" id="div_s" multiple data-live-search="true">
+                                            <?php 
+                                                $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                                                if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                                foreach($data as $d){
+                                                    echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
+                                                }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="courses_s">Select Courses</label>
+                                    <select class="form-control selectpicker " name="courses[]" id="courses_s" multiple data-live-search="true">
+                                        <?php 
+                                            $data = $user->getCoursesByDept([$_SESSION['dept']]);
+                                            if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
+                                            foreach($data as $d){
+                                                echo '<option value="'.$d['course_id'].'">'.$d['course_name'].'</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <!-- Modal footer -->
+                                <div class="modal-footer">
+
+                                    <button type="button" id="add-class" class="btn btn-success">ADD</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                </div>
+                                <!-- <button type="button" class="btn cancel" onclick="closeForm()">Close</button> -->
+                            </form>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
-
-        <table id="class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th colspan="6">Theroy</th>
-                </tr>
-                <tr>
-                    <th>Class ID</th>
-                    <th>Course Name</th>
-                    <th>Faculty</th>
-                    <th>Class</th>
-                    <th>Div</th>
-                    <th> </th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                    $data = $user->getClassByDept([$_SESSION['dept']]);
-                    foreach($data as $d){
-                        echo '<tr>
-                                <td>'.$d['class_id'].'</td>
-                                <td>'.$d['course_name'].'</td>
-                                <td>'.$d['first_name'].' '.$d['last_name'].'</td>
-                                <td>'.$d['s_class_name'].'</td>
-                                <td>'.$d['div_name'].'</td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['class_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
-                                </td>        
-                            </tr>';
-                    }
-                ?>
-            </tbody>
-        </table>
+        
+        
         <div class="cards">
             <div class="container">
                 <!-- Button to Open the Modal -->
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#managePracticalClassModal">
-                   + Allocate Practical Class
-                </button>
+                
 
                 <!-- The Modal -->
                 <div class="modal" id="managePracticalClassModal">
@@ -316,43 +390,7 @@
                 </div>
             </div>
         </div>
-        <table id="pract-class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th colspan="7">Practical</th>
-                </tr>
-                <tr>
-                    <th hidden>Class ID</th>
-            
-                    <th>Course Name</th>
-                    <th>Faculty</th>
-                    <th>Class</th>
-                    <th>Div</th>
-                    <th>Batch</th>
-                    <th> </th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                    $data = $user->getPractClassByDept([$_SESSION['dept']]);
-                   
-                    foreach($data as $d){
-                        echo '<tr>
-                                <td hidden>'.$d['p_class_ids'].'</td>
-                           
-                                <td>'.$d['course_name'].'</td>
-                                <td>'.$d['faculty_name'].'</td>
-                                <td>'.$d['s_class_name'].'</td>
-                                <td>'.$d['div_name'].'</td>
-                                <td>'.$d['batch_name'].'</td>
-                                <td>
-                                    <button type="button" class="btn btn-danger" id="del-btn" data-control="'.$d['p_class_ids'].'">Delete</button>
-                                </td>        
-                            </tr>';
-                    }
-                ?>
-            </tbody>
-        </table>
+        
     </main>
 </body>
 

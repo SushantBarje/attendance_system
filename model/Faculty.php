@@ -649,8 +649,9 @@ class Faculty extends Database {
 
 	public function getCourses(){
 		try{
-			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id ORDER BY b.dept_id,c.s_class_id,d.sem_id";
-			$stmt = $this->connect()->prepare($sql);
+			$con = $this->connect();
+			$sql = "SELECT a.*, b.dept_name, c.s_class_name, d.sem_name FROM courses AS a INNER JOIN department AS b ON a.dept_id = b.dept_id JOIN student_class AS c ON a.s_class_id = c.s_class_id JOIN semester as d ON a.sem_id = d.sem_id ORDER BY b.dept_name";
+			$stmt = $con->prepare($sql);
 			$stmt->execute();
 			return $stmt->fetchAll();
 		}
@@ -831,6 +832,18 @@ class Faculty extends Database {
 		}
 	}
 
+	public function getClassByDeptAndAcademicYear($data){
+		try{
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.dept_id = ? AND a.academic_id = ?";
+			$stmt = $this->connect()->prepare($sql);
+			$stmt->execute($data);
+			return $stmt->fetchAll();
+		}
+		catch (PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
 	public function getClassByYearDivisionAcademicAndFaculty($data){
 		try{
 			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, i.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i ON a.div_id = i.div_id WHERE a.academic_id = ? AND a.s_class_id = ? AND a.div_id = ? AND a.sem_id = ? AND a.faculty_id = ?";
@@ -968,7 +981,7 @@ class Faculty extends Database {
 
 	public function getStudentByDeptDivisionAndYear($data){
 		try{
-			$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name, SUM(b.status) as total_present FROM student as a LEFT JOIN attendance as b ON a.prn_no = b.student_id WHERE dept_id = ? AND year_id = ? AND div_id = ? AND b.class_id = ? GROUP BY a.prn_no ORDER BY roll_no+0 ASC ";
+			$sql = "SELECT prn_no, roll_no,first_name, middle_name, last_name, SUM(b.status) as total_present FROM student as a LEFT JOIN attendance as b ON a.prn_no = b.student_id AND a.dept_id = ? AND a.year_id = ? AND a.div_id = ? AND b.class_id = ? GROUP BY a.prn_no ORDER BY roll_no+0 ASC ";
 			$stmt = $this->connect()->prepare($sql);
 			$stmt->execute($data);
 			return $stmt->fetchAll();
@@ -1178,7 +1191,8 @@ class Faculty extends Database {
 	public function findClassByAcademicYearAndClassYear($data){
 		try{
 			$con = $this->connect();
-			$sql = "SELECT a.class_id FROM attendance as a JOIN class as b ON a.class_id = b.class_id WHERE b.academic_id = ? AND b.s_class_id = ? AND a.class_id = ? AND DATE(a.date_time) BETWEEN(?) AND (?);";
+	
+			$sql = "SELECT a.class_id FROM attendance as a JOIN class as b ON a.class_id = b.class_id WHERE a.class_id = ? AND DATE(a.date_time) BETWEEN(?) AND (?);";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetchAll();
 		}catch(PDOException $e){
@@ -1233,17 +1247,24 @@ class Faculty extends Database {
 	public function getHodReportYearWise($query, $data){
 		try{
 			$con = $this->connect();
-			$con->query("SET @sql = NULL");
-            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(a.class_id = ''', class.class_id, ''', a.status, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) INTO @sql FROM courses LEFT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query." ORDER BY courses.course_id+0");
-            $stmt->execute($data);
-            $stmt = $con->prepare("SET @sql = CONCAT('SELECT  b.roll_no, CONCAT(b.last_name,'' '', b.first_name,'' '', b.middle_name) as student_name, a.student_id, ', @sql ,' FROM attendance as a JOIN student as b ON a.student_id = b.prn_no JOIN class as c ON a.class_id = c.class_id GROUP BY a.student_id ORDER BY b.roll_no+0')");
-            $stmt->execute();
-            $stmt = $con->prepare("PREPARE stmt FROM @sql");
-            $stmt->execute();
-            $stmt = $con->prepare("EXECUTE stmt");
-            $stmt->execute();
-            $each_sub_total = $stmt->fetchAll();
-            $con->query("DEALLOCATE PREPARE stmt");
+			// $con->query("SET @sql = NULL");
+            // $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(a.class_id = ''', class.class_id, ''', a.status, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) INTO @sql FROM courses LEFT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query." ORDER BY courses.course_id+0");
+            // $stmt->execute($data);
+            // $stmt = $con->prepare("SET @sql = CONCAT('SELECT  b.roll_no, CONCAT(b.last_name,'' '', b.first_name,'' '', b.middle_name) as student_name, a.student_id, ', @sql ,' FROM attendance as a JOIN student as b ON a.student_id = b.prn_no JOIN class as c ON a.class_id = c.class_id GROUP BY a.student_id ORDER BY b.roll_no+0')");
+            // $stmt->execute();
+            // $stmt = $con->prepare("PREPARE stmt FROM @sql");
+            // $stmt->execute();
+            // $stmt = $con->prepare("EXECUTE stmt");
+            // $stmt->execute();
+            // $each_sub_total = $stmt->fetchAll();
+            // $con->query("DEALLOCATE PREPARE stmt");
+
+			$sql = "SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(a.class_id = ''', class.class_id, ''', a.status, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) as string FROM courses RIGHT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query.";";
+			$stmt =$con->prepare($sql);
+			if($stmt->execute($data)){
+				$string = $stmt->fetch()['string'];
+				$sql = "";
+			}
 
 
 			$con = $this->connect();
