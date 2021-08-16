@@ -89,7 +89,7 @@ function processOnChangeClass(){
 
 function processAddStudent(){
     $('#add-student').on("submit",function(e){
-        
+        start_load();
         e.preventDefault();
         var data = {};
         $('#add-student input').each(function(k,v){
@@ -153,6 +153,7 @@ function processAddStudent(){
                 }
             }
         })
+        end_load();
     })
 }
 
@@ -1223,6 +1224,7 @@ function processAjaxClass(){
 function performReport(){
     $(document).on("submit", "#report-hod", function(e){
         e.preventDefault();
+        start_load();
     if($("#report-hod #select-acd").val() != "" && $("#report-hod #select-year").val() != "" && $("#report-hod #select-div").val() != "" && $("#report-hod #s_sem").val() != "" && $("#report-hod #select-class").val() == ""){
             console.log("sushant");
             $.ajax({
@@ -1247,7 +1249,7 @@ function performReport(){
                             } 
 
                             var columns = Object.keys(res.data[0]);
-                            var class_columns = columns.slice(3);
+                            var class_columns = columns.slice(5);
                             var numColClass = class_columns.length;
                             var table_header_1 = '<tr>\
                                                     <th colspan="2">Class :</th>\
@@ -1270,8 +1272,8 @@ function performReport(){
                             var th_2;
                             var total_sum_lectures = 0;
                             for(var i = 0; i < numColTotal; i++){
-                                total_sum_lectures += parseInt(columns[i]);
-                                th_2 += '<th>'+columns[i]+'</th>' 
+                                total_sum_lectures += parseInt(columns[i].lectures);
+                                th_2 += '<th>'+columns[i].lectures+'</th>' 
                             }
                             th_2 += '<th>'+total_sum_lectures+'</th>'
                             th_2 += "<th>-</th></tr>";
@@ -1308,7 +1310,7 @@ function performReport(){
                                     autoWidth:  false,
                                     fixedColumns:   {
                                         leftColumns: 2,
-                                        rightColumns: 1
+                                        rightColumns: 2
                                     },
                                 }
                             )
@@ -1480,7 +1482,9 @@ function performReport(){
                 })
             }
         }
+        start_load();
     })
+    
 }
 
 
@@ -1649,6 +1653,7 @@ function processAddPractClass(){
 
 
 function processPracticalReport(){
+    
     var acd = year = sem = div = class_id = from_date = till_date = " "; 
     function takePractReportInput(){
         acd = $("#report-pract #select-acd")
@@ -1698,11 +1703,12 @@ function processPracticalReport(){
                 }
             })
         }else{
-            console.log("empty");
+            //alert("Fill all details");
         }
     });
 
     $("#report-pract").on("submit", function(e){
+        start_load();
         e.preventDefault();
         takePractReportInput();
 
@@ -1720,7 +1726,7 @@ function processPracticalReport(){
                 }
             }
         })
-
+        end_load();
         function DrawpracticalReportTableOfCombinedClass(res){
             switch(res.error){
                 case "empty":

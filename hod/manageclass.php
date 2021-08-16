@@ -32,6 +32,7 @@
     <title>Manage Classes</title>
 </head>
 <body>
+<script>start_load();</script>
 <?php   include "hodHeader.php" ?>
     <main>
         <h2 class="head">Manage Class</h2>
@@ -390,8 +391,8 @@
                 </div>
             </div>
         </div>
-        
     </main>
+<script>end_load();</script>
 </body>
 
 </html>

@@ -37,7 +37,7 @@
     <script src="../assets/TableExport/TableExport-master/src/stable/js/tableexport.min.js"></script>
     <script src="../assets/table2excel/jquery-table2excel-master/dist/jquery.table2excel.min.js"></script>
     <script src="../assets/js/hod/script.js"></script>
-    <title>Generate Reports</title>
+    <title>Theory Report</title>
     <style> 
         th, td { white-space: nowrap;}
        .btn-toolbar{
@@ -49,9 +49,10 @@
 </head>
 <body>
 <body>
+<script>start_load();</script>
 <?php   include "hodHeader.php" ?>
     <main>
-        <h2 class="head">Report</h2>
+        <h2 class="head">Theory Report</h2>
         <form id="report-hod" method="post">
             <div class="row mt-3">
                 <div class="form-group col-sm-3">
@@ -172,6 +173,7 @@
             </table>
         </div>
     </main>
+<script>end_load();</script>
 </body>
 
 </html>

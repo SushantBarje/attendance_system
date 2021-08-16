@@ -125,6 +125,25 @@
                                             <input type="text" class="form-control form-control-sm" placeholder="Last Name" name="lname" required>
                                         </div>
                                     </div>
+                                    <?php
+                                        $result = $user->getDepartmentByName(['First Year']);
+                                        if($_SESSION['dept'] == $result[0]["dept_id"]){
+                                    ?>
+                                    <div class="form-row">
+                                        <label for="dept">Select Department</label>
+                                        <select name="dept" class="form-control form-control-sm" id="dept">
+                                            <option value=" "> </option>
+                                            <?php 
+                                                $data = $user->getDepartment();
+                                                foreach($data as $d){
+                                                    echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
+                                                }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <?php
+                                        }
+                                    ?>
                                     <div class="form-row">
                                         <div class="form-group col-sm-5">
                                             <label for="roll_no"><b>Roll No.</b></label>
