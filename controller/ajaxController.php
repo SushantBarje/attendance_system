@@ -142,5 +142,9 @@ if($req == "addAcademicYear"){
 }else if($req == "get_theory_class_by_acd"){
     $r = $faculty->showTheroyClassByAcademicYear();
     die($r);
+}else if($req = "promote_class"){
+    $r = $faculty->promoteStudentYear();
+    echo $r;
+    die();
 }
 ob_end_flush();

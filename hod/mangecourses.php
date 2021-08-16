@@ -28,6 +28,7 @@
     <title>Add Department</title>
 </head>
 <body>
+    <script>start_load();</script>
     <?php include "hodHeader.php"; ?>
     <main>
         <div class="cards">
@@ -168,5 +169,6 @@
             </div>
         </div>
     </main>
+    <script>end_load();</script>
 </body>
 </html>

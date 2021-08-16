@@ -10,6 +10,7 @@
     $dept_name = $user->getDepartmentById([isset($_SESSION['dept']) ? $_SESSION['dept'] : '']);
     echo '<script> var dept_name = "'.$dept_name[0]['dept_name'].'"</script>';
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -51,14 +52,17 @@
     //     });
     // });
 </script> -->
+
 <style> 
     th, td { white-space: nowrap;}
 </style>
 </head>
 <body>
+<script>start_load();</script>
 <?php   include "hodHeader.php" ?>
 <main>
-    <h2 class="head">Report</h2>
+ 
+    <h2 class="head">Practical Report</h2>
     <form id="report-pract">
         <div class="row mt-3">
             <div class="form-group col-sm-2">
@@ -144,5 +148,6 @@
             </table>
         </div>
 </main>
+<script>end_load();</script>
 </body>
 </html>
