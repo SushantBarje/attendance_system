@@ -1247,17 +1247,17 @@ class Faculty extends Database {
 	public function getHodReportYearWise($query, $data){
 		try{
 			$con = $this->connect();
-			// $con->query("SET @sql = NULL");
-            // $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(a.class_id = ''', class.class_id, ''', a.status, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) INTO @sql FROM courses LEFT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query." ORDER BY courses.course_id+0");
-            // $stmt->execute($data);
-            // $stmt = $con->prepare("SET @sql = CONCAT('SELECT  b.roll_no, CONCAT(b.last_name,'' '', b.first_name,'' '', b.middle_name) as student_name, a.student_id, ', @sql ,' FROM attendance as a JOIN student as b ON a.student_id = b.prn_no JOIN class as c ON a.class_id = c.class_id GROUP BY a.student_id ORDER BY b.roll_no+0')");
-            // $stmt->execute();
-            // $stmt = $con->prepare("PREPARE stmt FROM @sql");
-            // $stmt->execute();
-            // $stmt = $con->prepare("EXECUTE stmt");
-            // $stmt->execute();
-            // $each_sub_total = $stmt->fetchAll();
-            // $con->query("DEALLOCATE PREPARE stmt");
+			$con->query("SET @sql = NULL");
+            $stmt = $con->prepare("SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(a.class_id = ''', class.class_id, ''', a.status, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) INTO @sql FROM courses LEFT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query." ORDER BY courses.course_id+0");
+            $stmt->execute($data);
+            $stmt = $con->prepare("SET @sql = CONCAT('SELECT  b.roll_no, CONCAT(b.last_name,'' '', b.first_name,'' '', b.middle_name) as student_name, a.student_id, ', @sql ,' FROM attendance as a JOIN student as b ON a.student_id = b.prn_no JOIN class as c ON a.class_id = c.class_id GROUP BY a.student_id ORDER BY b.roll_no+0')");
+            $stmt->execute();
+            $stmt = $con->prepare("PREPARE stmt FROM @sql");
+            $stmt->execute();
+            $stmt = $con->prepare("EXECUTE stmt");
+            $stmt->execute();
+            $each_sub_total = $stmt->fetchAll();
+            $con->query("DEALLOCATE PREPARE stmt");
 
 			$sql = "SELECT GROUP_CONCAT(DISTINCT CONCAT( 'SUM(IF(a.class_id = ''', class.class_id, ''', a.status, NULL)) AS ', CONCAT('`',courses.course_name,'`'))) as string FROM courses RIGHT JOIN class ON courses.course_id = class.course_id LEFT JOIN attendance ON attendance.class_id = class.class_id WHERE ".$query.";";
 			$stmt =$con->prepare($sql);
@@ -1537,6 +1537,17 @@ class Faculty extends Database {
 			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, j.div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as j ON a.div_id = j.div_id WHERE class_id = ? AND a.faculty_id = ?;";
 			$stmt = $con->prepare($sql);
 			if($stmt->execute($data)) return $stmt->fetch();
+		}catch(PDOException $e){
+			return array("e" => $e->getMessage());
+		}
+	}
+
+	public function updateStudentYearPromote($data){
+		try{
+			$con = $this->connect();
+			$sql = "UPDATE student SET year_id = ? WHERE year_id = ?";
+			$stmt = $con->prepare($sql);
+			if($stmt->execute($data)) return true;
 		}catch(PDOException $e){
 			return array("e" => $e->getMessage());
 		}

@@ -54,6 +54,10 @@
                     <a href="practical_report.php"><span class="las la-clipboard-list"></span>
                         <span>Practical Reports</span></a>
                 </li>
+                <li>
+                    <a href="promotion.php"><span class="las la-clipboard-list"></span>
+                        <span>Promote Student</span></a>
+                </li>
             </ul>
         </div>
     </div>

@@ -1211,6 +1211,16 @@ class FacultyController extends Faculty {
     //     if(isset($result['e']))
     // }
 
+    public function promoteStudentYear(){
+       if($this->checkEmpty()) return json_encode(array("error" => "empty"));
+       $year_id = $this->verifyInput($_POST['year_id']);
+       $prev_year_id = $this->verifyInput($_POST['prev_id']);
+       $result = $this->getStudentByClass();
+       $result = $this->updateStudentYearPromote([$year_id, $prev_year_id]);
+       var_dump($result);
+       if(!$result) return json_encode(array('error' => "notupdate"));
+       return json_encode(array("error" => "none", "data" => $result));
+    }
    
     
     public function getFacultyId(){

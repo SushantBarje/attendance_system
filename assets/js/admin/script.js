@@ -31,6 +31,7 @@ $(document).ready(function(){
     processAjaxYear()
     processPracticalReport()
     //processAdminAdvReport()
+    processPromote();
 });
 
 function processAddAcademicYear(){
@@ -1889,5 +1890,22 @@ function processPracticalReport(){
     }); 
 }
 
+
+function processPromote(){
+    $('.promote-btn').on('click', function(e){
+        e.preventDefault();
+        year_id = $(this).data('id');
+        prev_id = $(this).data('prev-id');
+        $.ajax({
+            url: '../controller/ajaxController.php?action=promote_class',
+            type: 'POST',
+            data : {'year_id' : year_id, 'prev_id': prev_id},
+            dataType: 'json',
+            success : function(res){
+                console.log(res);
+            }
+        })
+    })
+}
 
 
