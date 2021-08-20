@@ -66,6 +66,10 @@
                     <a href="practical_report.php"><span class="las la-users"></span>
                         <span>Practical Report</span></a>
                 </li>
+                <li>
+                <a href="promotion.php"><span class="las la-users"></span>
+                        <span>Promotion</span></a>
+                </li>
             </ul>
         </div>
     </div>

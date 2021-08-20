@@ -7,6 +7,8 @@ window.end_load = function(){
     })
 }
 
+
+
 $(document).ready(function(){
     $("#acad-table").DataTable();
     $("#dept-table").DataTable();
@@ -32,6 +34,7 @@ $(document).ready(function(){
     processPracticalReport()
     //processAdminAdvReport()
     processPromote();
+    processResetDate();
 });
 
 function processAddAcademicYear(){
@@ -822,6 +825,21 @@ function processAdminReport(){
                     $("#export").attr("hidden", true);
                     console.log(res);
                     switch(res.error){
+                        case "notfound":
+                            $("#export").show();
+                            if($.fn.dataTable.isDataTable("#admin-report-adv")){
+                                $("#admin-report-adv").DataTable().destroy();
+                                $("#admin-report-adv thead").html(" ");
+                                $("#admin-report-adv tbody").html(" ");
+                            } 
+                            $("#export").attr("hidden", false);
+                            if($.fn.dataTable.isDataTable("#admin-report")){
+                                $("#admin-report").DataTable().destroy();
+                                $("#admin-report thead").html(" ");
+                                $("#admin-report tbody").html(" ");
+                            } 
+
+                            alert("Attendance Report not available");
                         case "none":
                                 $("#export").show();
                                 if($.fn.dataTable.isDataTable("#admin-report-adv")){
@@ -837,7 +855,7 @@ function processAdminReport(){
                                 } 
 
                                 var columns = Object.keys(res.data[0]);
-                                var class_columns = columns.slice(3);
+                                var class_columns = columns.slice(5);
                                 var numColClass = class_columns.length;
                                 var table_header_1 = '<tr>\
                                                         <th colspan="2">Class :</th>\
@@ -856,12 +874,12 @@ function processAdminReport(){
     
                                 var total_header = "<tr><th>Total No. of Lectures</th>";
                                 var columns = Object.values(res.lectures);
-                                var numColTotal = class_columns.length;
+                                console.log(columns);
                                 var th_2;
                                 var total_sum_lectures = 0;
-                                for(var i = 0; i < numColTotal; i++){
-                                    total_sum_lectures += parseInt(columns[i]);
-                                    th_2 += '<th>'+columns[i]+'</th>' 
+                                for(var i = 0; i < numColClass; i++){
+                                    total_sum_lectures += parseInt(columns[i].lectures);
+                                    th_2 += '<th>'+columns[i].lectures+'</th>' 
                                 }
                                 th_2 += '<th>'+total_sum_lectures+'</th>'
                                 th_2 += "<th>-</th></tr>";
@@ -895,7 +913,7 @@ function processAdminReport(){
                                         autoWidth:  false,
                                         fixedColumns:   {
                                             leftColumns: 2,
-                                            rightColumns: 1
+                                            rightColumns: 2
                                         },
                                     }
                                 )
@@ -1061,7 +1079,7 @@ function processAdminReport(){
                                         autoWidth:  false,
                                         fixedColumns:   {
                                             leftColumns: 2,
-                                            rightColumns: 1
+                                            rightColumns: 2
                                         },
                                         dom: 'Bfrtip',
                                         buttons: [
@@ -1187,12 +1205,14 @@ function processPracticalReport(){
                     console.log(res);
                     switch(res.error){
                         case "empty":
+                            $("#export").attr("hidden", "true");
                             class_id.prop("disabled", true);
                             class_id.val("");
                             class_id.text("");
                             alert("Please fill all details!");
                             break;
                         case "notfound":
+                            $("#export").attr("hidden", "true");
                             class_id.val(" ");
                             class_id.text("No class found");
                             break;
@@ -1240,6 +1260,7 @@ function processPracticalReport(){
         function DrawpracticalReportTableOfCombinedClass(res){
             switch(res.error){
                 case "empty":
+                    $("#export").attr("hidden", "true");
                     if($.fn.dataTable.isDataTable("#hod-report-adv")){
                         $("#hod-report-adv").DataTable().destroy();
                         $("#hod-report-adv thead").html(" ");
@@ -1252,6 +1273,7 @@ function processPracticalReport(){
                     alert("Please Fill Required Fields!");
                 
                 case "none":
+                    $("#export").attr("hidden", "false");
                     if($.fn.dataTable.isDataTable("#hod-report-adv")){
                         $("#hod-report-adv").DataTable().destroy();
                         $("#hod-report-adv thead").html(" ");
@@ -1310,7 +1332,7 @@ function processPracticalReport(){
                             autoWidth:  false,
                             fixedColumns:   {
                                 leftColumns: 2,
-                                rightColumns: 1
+                                rightColumns: 2
                             },
                         }
                     )
@@ -1329,6 +1351,7 @@ function processPracticalReport(){
         function DrawpracticalReportTableOfParticularClass(res){
             switch(res.error){
                 case "empty":
+                    $("#export").attr("hidden", "true");
                     if($.fn.dataTable.isDataTable("#hod-report-adv")){
                         $("#hod-report-adv").DataTable().destroy();
                         $("#hod-report-adv thead").html(" ");
@@ -1340,6 +1363,7 @@ function processPracticalReport(){
                     alert("Enter all Details...");
                     break;
                 case "notfound":
+                    $("#export").attr("hidden", "true");
                     if($.fn.dataTable.isDataTable("#hod-report-adv")){
                         $("#hod-report-adv").DataTable().destroy();
                         $("#hod-report-adv thead").html(" ");
@@ -1352,6 +1376,7 @@ function processPracticalReport(){
                     $("#report-pract #select-class-report").val(" ");
                     break;
                 case "date":
+                    $("#export").attr("hidden", "true");
                     if($.fn.dataTable.isDataTable("#hod-report-adv")){
                         $("#hod-report-adv").DataTable().destroy();
                         $("#hod-report-adv thead").html(" ");
@@ -1363,6 +1388,7 @@ function processPracticalReport(){
                     alert("Please Enter Correct Date");
                     break;
                 case "none":
+                    $("#export").attr("hidden", "false");
                     if($.fn.dataTable.isDataTable(".staff-pract-report")){
                         $(".report-tables").html(" ");
                     }  
@@ -1474,7 +1500,7 @@ function processPracticalReport(){
                                 autoWidth:  false,
                                 fixedColumns:   {
                                     leftColumns: 2,
-                                    rightColumns: 1
+                                    rightColumns: 2
                                 }
                             }
                         );
@@ -1893,19 +1919,41 @@ function processPracticalReport(){
 
 function processPromote(){
     $('.promote-btn').on('click', function(e){
-        e.preventDefault();
-        year_id = $(this).data('id');
-        prev_id = $(this).data('prev-id');
-        $.ajax({
-            url: '../controller/ajaxController.php?action=promote_class',
-            type: 'POST',
-            data : {'year_id' : year_id, 'prev_id': prev_id},
-            dataType: 'json',
-            success : function(res){
-                console.log(res);
-            }
-        })
+        if(confirm("Do you really want to promote class?")){
+            e.preventDefault();
+            year_id = $(this).data('id');
+            prev_id = $(this).data('prev-id');
+            $.ajax({
+                url: '../controller/ajaxController.php?action=promote_class',
+                type: 'POST',
+                data : {'year_id' : year_id, 'prev_id': prev_id},
+                dataType: 'json',
+                success : function(res){
+                    console.log(res);
+                    switch(res.error){
+                        case "empty":
+                            alert("Server Error!");
+                            break;
+                        case "notfound":
+                            alert("Not Found");
+                            break;
+                        case "exists":
+                            alert("First promote the existing class");
+                            break;
+                        case "none":
+                            alert("Promoted students sucessfully");
+                            break;
+                    }
+                }
+            })
+        }
     })
 }
 
+
+function processResetDate(){
+    $("#reset").on("click", function(){
+        $("input[type=date]").val(new Date());
+    })
+}
 

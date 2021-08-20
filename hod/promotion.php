@@ -3,7 +3,7 @@
     require_once __DIR__ . '\..\vendor\autoload.php';
     use app\controller\FacultyController;
     $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 0){
+    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 1){
         header('Location:../index.php');
     }
 ?>
@@ -47,7 +47,7 @@
     </style>
 </head>
 <body>
-    <?php include "adminHeader.php"; ?>
+    <?php include "hodHeader.php"; ?>
     <main>
         <div class="container">
             <div class="row">
@@ -61,6 +61,7 @@
                                     for($i = 1; $i < count($data); $i++){
                                         echo '<div class="button-box"><button class="btn btn-success btn-lg promote-btn" aria-pressed="false" data-prev-id="'.$data[$i-1]['s_class_id'].'" data-id="'.$data[$i]['s_class_id'].'">'.$data[$i-1]['s_class_name'].' to '.$data[$i]['s_class_name'].'</button></div>';
                                     } 
+                                    echo '<div class="button-box"><button class="btn btn-success btn-lg promote-btn" aria-pressed="false" data-prev-id="'.$data[$i-1]['s_class_id'].'" data-id="5">Promote '.$data[$i-1]['s_class_name'].'</button></div>';
                                 }
                             ?>
                     </div>
