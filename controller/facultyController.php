@@ -986,7 +986,7 @@ class FacultyController extends Faculty
             if (!$till_data) return (array("error" => "noattend"));
         }
 
-        $result = $this->getClassByYearDivisionAcademicAndDept([$_POST['academic_year'], $_POST['s_class_year'], $_POST['div_id'], $this->dept]);
+        $result = $this->getClassByYearDivisionAcademicAndDept([$_POST['academic_year'], $this->class, $this->s_div, $this->dept]);
         if (!$result) json_encode(array("error" => "noclass"));
         else {
             //var_dump($_POST);
@@ -997,6 +997,7 @@ class FacultyController extends Faculty
             // }else{
             //    $result["each_total"], "total" => $result['total'], "lectures" =>$result['total_lectures']
             // } 
+            if (isset($result['e'])) return json_encode(array("error" => "notfound"));
             return json_encode(array("error" => "none", "data" => $result['report'], "lectures" => $result['lectures']));
             // if($from == 1 && $till == 1){
             //     $query .= " AND date_time >= DATE(?) AND date_time <= DATE(?) ";
@@ -1156,7 +1157,7 @@ class FacultyController extends Faculty
     public function showPracticalReport()
     {
         $data = [];
-    
+
         if (empty($_POST['academic_year']) || empty($_POST['year']) || empty($_POST['sem']) || empty($_POST['div_id'])) return json_encode(array("error" => "empty"));
         $query = $this->getReportInput()[0];
         $data = $this->getReportInput()[1];
@@ -1165,7 +1166,7 @@ class FacultyController extends Faculty
             $this->faculty_id = $_SESSION['faculty_id'];
             $data[] = $_SESSION['faculty_id'];
         }
-        
+
         if ($_SESSION['role_id'] == 2 && $_POST['class'] == " ") return json_encode(array("error" => "empty"));
         if ($_POST['class'] != " " && $_POST['class'] != "" && $_POST['class']) {
             $this->course_id = $this->verifyInput($_POST['class']);
@@ -1241,10 +1242,12 @@ class FacultyController extends Faculty
         $year_id = $this->verifyInput($_POST['year_id']);
         $prev_year_id = $this->verifyInput($_POST['prev_id']);
         $result = $this->getStudentByYear([$year_id, $_SESSION['dept']]);
-        if ($result) return json_encode(array("error" => "exists"));
+        if (count($result) > 0) {
+            return json_encode(array("error" => "exists"));
+        }
         $result = $this->updateStudentYearPromote([$year_id, $prev_year_id]);
         if (!$result) return json_encode(array('error' => "notupdate"));
-        return json_encode(array("error" => "none", "data" => $result));
+        return json_encode(array("error" => "none"));
     }
 
 

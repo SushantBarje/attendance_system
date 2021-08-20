@@ -121,7 +121,7 @@
     <div class="report-tables">
         
     </div>
-    <button type="button" class="btn btn-success" id="export">Print</button>
+    <button type="button" class="btn btn-success" id="export" hidden="true">Print</button>
     <div id="tableWrap">
         <table id="hod-report-adv" class="table cell-border stripe row-border order-column" style="width:100%">
             <thead>

@@ -23,6 +23,10 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.3.2/css/fixedColumns.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="../assets/TableExport/TableExport-master/src/stable/css/tableexport.min.css">
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
+    <script defer src="../assets/fontawesome/js/brands.js"></script>
+    <script defer src="../assets/fontawesome/js/solid.js"></script>
+    <script defer src="../assets/fontawesome/js/fontawesome.js"></script>
 
     <style> 
         th, td { white-space: nowrap;}
@@ -99,12 +103,17 @@
                         </div>
                         <div class="col-sm-3">
                             <label for="till-date">End Date</label>
-                            <input type="date" class="form-control form-control-sm" name="till-date" id="till-date">
+                            <input type="date" class="form-control form-control-sm" name="till-date" id="till-date"/>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="reset"> </label>
+                            <button type="button" id="reset" class="btn btn-danger form-control"><span><i class="fas fa-history"></i></span> Reset Date</button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col offset-5">
-                        <button class="btn btn-success mt-2" id="get-report" type="button">Check</button>
+                            
+                            <button class="btn btn-success mt-2" id="get-report" type="button">Check</button>
                         </div>
                     </div>
                 </form>
