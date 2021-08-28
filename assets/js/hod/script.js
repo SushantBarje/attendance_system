@@ -44,6 +44,9 @@ $(document).ready(function(){
     performReport();
     processAddPractClass();
     processPracticalReport();
+    processResetDate();
+    processManageClassesOnChange();
+    processManagePracticalClassesOnChange()
     //processSemesterBelongsClass();
     //exportTable();
     //ajaxClassSemWise()
@@ -1611,7 +1614,7 @@ function processAddPractClass(){
                             alert("Please Fill all the fields");
                             break;
                         case "exists":
-                            alert("HOD already Exists");
+                            alert("Practical Class already Exists");
                             break;
                         case "notinsert":
                             alert("Data Not Inserted");
@@ -2382,4 +2385,106 @@ function processPracticalReport(){
     });
 
     
+}
+
+function processResetDate(){
+    $("#reset").on("click", function(){
+        $("input[type=date]").val(new Date());
+    })
+}
+
+function processManageClassesOnChange(){
+    $("#manageclass-select-acd").on("change", function(e){
+        e.preventDefault();
+        var acd_id = $(this).val();
+        console.log(acd_id);
+        $.ajax({
+            url: "../controller/ajaxController.php?action=get_classes_acd",
+            type: "POST",
+            data: {"acd_id" : acd_id},
+            dataType: 'json',
+            success : function(res){
+                console.log(res);
+                switch(res.error){
+                    case "empty": 
+                        alert("No Theory class Found");
+                        break;
+                    case "notfound":
+                        alert("No Theory class Found");
+                        break;
+                    case "none":
+                        var html = "";
+                            console.log(res.data.length);
+                            if(res.data.length < 1) {
+                                $('#class-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            }else{
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr>\
+                                    <td>'+res.data[i].class_id+'</td>\
+                                    <td>'+res.data[i].course_name+'</td>\
+                                    <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
+                                    <td>'+res.data[i].s_class_name+'</td>\
+                                    <td>'+res.data[i].div_name+'</td>\
+                                    <td>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                    </td>\
+                                </tr>'
+                                }
+                            
+                                $('#class-table tbody').html(html)
+                            
+                            }
+                            break;
+                }
+            }
+        });
+    });
+}
+
+function processManagePracticalClassesOnChange(){
+    $("#manageclass-select-acd-pract").on("change", function(e){
+        e.preventDefault();
+        var acd_id = $(this).val();
+        console.log(acd_id);
+        $.ajax({
+            url: "../controller/ajaxController.php?action=get_classes_acd_pract",
+            type: "POST",
+            data: {"acd_id" : acd_id},
+            dataType: 'json',
+            success : function(res){
+                console.log(res);
+                switch(res.error){
+                    case "empty": 
+                        alert("No Practical class Found");
+                        break;
+                    case "notfound":
+                        alert("No Practoal class Found");
+                        break;
+                    case "none":
+                        var html = "";
+                            console.log(res.data.length);
+                            if(res.data.length < 1) {
+                                $('#pract-class-table tbody').html("<tr><td colspan='2'>Nothing Found</td></tr>");
+                            }else{
+                             
+                                for(var i = 0; i < res.data.length; i++){
+                                    html += '<tr>\
+                                    <td hidden>'+res.data[i].p_class_id+'</td>\
+                                    <td>'+res.data[i].course_name+'</td>\
+                                    <td>'+res.data[i].faculty_name+'</td>\
+                                    <td>'+res.data[i].s_class_name+'</td>\
+                                    <td>'+res.data[i].div_name+'</td>\
+                                    <td>'+res.data[i].batch_name+'</td>\
+                                    <td>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].p_class_id+'">Delete</button>\
+                                    </td>\
+                                </tr>'
+                                }
+                                $('#pract-class-table tbody').html(html);
+                            }
+                            break;  
+                }
+            }
+        });
+    });
 }

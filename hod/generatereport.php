@@ -103,19 +103,23 @@
                 </div>
             </div>
             <div class="row">
-                <div class="form-group col-sm-4">
+                <div class="form-group col-sm-3">
                     <label for="select-class">Select Class :</label>
                     <select class="form-control form-control-sm" name="class" id="select-class">
                         <option value=""> </option>
                     </select>
                 </div>
-                <div class="form-group col-sm-4">
+                <div class="form-group col-sm-3">
                     <label for="from-date">From :</label>
                     <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="from-date" id="from-date">
                 </div>
-                <div class="form-group col-sm-4">
+                <div class="form-group col-sm-3">
                     <label for="till-date">Till :</label>
                     <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="till-date" id="till-date">
+                </div>
+                <div class="form-group col-sm-3">
+                    <label for="reset"> </label>
+                    <button type="button" id="reset" class="btn btn-danger form-control"><span><i class="fas fa-history"></i></span> Reset Date</button>
                 </div>
             </div>
             <div class="row">

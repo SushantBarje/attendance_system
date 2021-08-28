@@ -602,7 +602,7 @@ class FacultyController extends Faculty
 
         if (count($p) > 0) return json_encode(array("error" => "already", "count" => $p));
         if (count($c) > 0) return json_encode(array("error" => "notinsert", "count" => $c));
-        $getclass = $this->getPractClassByDept([(int)$this->dept]);
+        $getclass = $this->getPractClassByDept([(int)$this->dept, (int)$this->acd_year]);
         return json_encode(array("error" => "none", "data" => $getclass));
     }
 
@@ -1250,6 +1250,30 @@ class FacultyController extends Faculty
         return json_encode(array("error" => "none"));
     }
 
+    /**
+     * Get the classes of particular academic year. 
+     */
+    public function showClassesAcademicYearWise()
+    {
+        if ($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->acd_year = $this->verifyInput($_POST['acd_id']);
+        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        $result = $this->getClassByAcademicYear([$this->acd_year]);
+        if (!$result) return json_encode(array("error" => "notfound"));
+        if (isset($result['e'])) return json_encode(array("error" => "Server Error!"));
+        return json_encode(array("error" => "none", "data" => $result));
+    }
+
+    public function showPracticalClassByDeptAndAcademicId(){
+        if ($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        $this->acd_year = $this->verifyInput($_POST['acd_id']);
+        $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
+        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept']; 
+        $result = $this->getPractClassByDept([$this->dept,$this->acd_year]);
+        if (!$result) return json_encode(array("error" => "notfound"));
+        if (isset($result['e'])) return json_encode(array("error" => "Server Error!"));
+        return json_encode(array("error" => "none", "data" => $result));
+    }
 
     public function getFacultyId()
     {
