@@ -56,7 +56,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
     <h2 class="head">Report</h2>
     <form id="report">
         <div class="row mt-3">
-            <div class="form-group col-sm-2">
+            <div class="form-group col-sm-3">
                 <label for="acd-year">Academic Year</label>
                 <select class="form-control form-control-sm report-select-input" name="academic_year" id="select-acd">
                     <option value=" "> </option>
@@ -69,7 +69,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
                     ?>
                 </select>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                 <label for="select-year" class="mr-sm-2">Year: </label>
                 <select id="select-year" name="year" class="form-control form-control-sm mr-3 report-select-input"> 
                     <option value=" "> </option>
@@ -82,7 +82,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
                     ?>  
                 </select>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <label for="select-div" class="mr-sm-2">Division: </label>
                 <select id="select-div" name="div_id" class="form-control form-control-sm mr-3 report-select-input"> 
                     <option value=" "> </option>
@@ -95,7 +95,7 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
                     ?>  
                 </select>
             </div>
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-3">
                 <label for="select-class">Select Semester :</label>
                 <select class="form-control form-control-sm report-select-input" name="sem" id="s_sem" disabled>
                     <option value=" "> </option>
@@ -103,20 +103,24 @@ if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION[
             </div>  
         </div>
         <div class="row">
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-3">
                 <label for="select-class">Select Class :</label>
                 <select class="form-control form-control-sm" name="class" id="select-class" disabled>
                     <option value=" "> </option>
                 </select>
             </div>
             <?php date_default_timezone_set("Asia/Kolkata");?>
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-3">
                 <label for="from-date">FROM :</label>
                 <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="from-date" id="from-date">
             </div>
-            <div class="form-group col-sm-4">
+            <div class="form-group col-sm-3">
                 <label for="till-date">Till :</label>
                 <input class="form-control form-control-sm" type="date" max="<?php echo date("Y-m-d") ?>" name="till-date" id="till-date">
+            </div>
+            <div class="form-group col-sm-3">
+                <label for="reset"> </label>
+                <button type="button" id="reset" class="btn btn-danger form-control"><span><i class="fas fa-history"></i></span> Reset Date</button>
             </div>
         </div>
         <div class="row">

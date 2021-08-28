@@ -30,7 +30,8 @@
 <body>
 <?php   include "staffHeader.php" ?>
     <main>
-    <table id="student-table" class="table table-striped table-bordered nowrap" cellspacing="0" width="100%">
+    <h2 class="head mb-4">Students </h2>
+    <table id="student-table" class="table table-striped table-bordered nowrap " cellspacing="0" width="100%">
                 <thead>
                     <tr border="4px">
                     
@@ -41,22 +42,9 @@
                         <th>Department</th>
                         <th>Div</th>
                         <th>Batch</th>
-                        <th>Edit</th>
+                        
                     </tr>
                 </thead>
-                <!-- <tfoot>
-                    <tr border="4px">
-                        <th></th>
-                        <th>PRN</th>
-                        <th>Name</th>
-                        <th>Roll no</th>
-                        <th>Class </th>
-                        <th>Department</th>
-                        <th>Div</th>
-                        <th>Batch</th>
-                        <th>Edit</th>
-                    </tr>
-                </tfoot> -->
                 
                 <tbody>
                     <?php 
@@ -70,10 +58,7 @@
                                     <td class="edit-dept" id="'.$d['dept_id'].'">'.$d['dept_name'].'</td>
                                     <td class="edit-div" id="'.$d['div_id'].'">'.$d['div_name'].'</td>
                                     <td class="edit-batch" id="'.$d['batch_id'].'">'.$d['batch_name'].'</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-sm" id="edit-btn" data-control="'.$d['prn_no'].'" data-toggle="modal" data-target="#editStudentModal"><span> <i class="fas fa-edit"></i></span> Edit</button>
-                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['prn_no'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
-                                    </td>        
+                                        
                                 </tr>';
                         }                           
                     ?>

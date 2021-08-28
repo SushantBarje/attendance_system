@@ -1,12 +1,16 @@
 <?php
-    namespace app\hod;
-    require_once __DIR__ . '\..\vendor\autoload.php';
-    use app\controller\FacultyController;
-    $user = new FacultyController();
-    if(!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 1){
-        echo '<script> alert("Invalid User")</script>';
-        header('Location:../index.php');
-    }
+
+namespace app\hod;
+
+require_once __DIR__ . '\..\vendor\autoload.php';
+
+use app\controller\FacultyController;
+
+$user = new FacultyController();
+if (!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION['role_id'] != 1) {
+    echo '<script> alert("Invalid User")</script>';
+    header('Location:../index.php');
+}
 ?>
 
 
@@ -22,8 +26,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
-    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css"></style>
-    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script> 
+    <link rel="stylesheet" href="http://cdn.datatables.net/1.10.2/css/jquery.dataTables.min.css">
+    </style>
+    <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="../assets/fontawesome/css/all.css">
     <script defer src="../assets/fontawesome/js/brands.js"></script>
     <script defer src="../assets/fontawesome/js/solid.js"></script>
@@ -31,9 +36,12 @@
     <script src="../assets/js/hod/script.js"></script>
     <title>Manage Classes</title>
 </head>
+
 <body>
-<script>start_load();</script>
-<?php   include "hodHeader.php" ?>
+    <script>
+        start_load();
+    </script>
+    <?php include "hodHeader.php" ?>
     <main>
         <h2 class="head">Manage Class</h2>
         <div class="container">
@@ -42,14 +50,14 @@
                     <form>
                         <div class="form-group">
                             <label for="select-acd">Select Academic Year</label>
-                            <select name="academic_year" class="form-control" id="select-acd">
+                            <select name="academic_year" class="form-control" id="manageclass-select-acd">
                                 <option value=""></option>
                                 <?php
-                                    $result = $user->getAcademicYear();
-                                    if(!$result) echo '<option>No Academic Year</option>';
-                                    foreach($result as $r){
-                                        echo '<option values="'.$r['acedemic_id'].'">'.$r['academic_descr'].'</option>';
-                                    }
+                                $result = $user->getAcademicYear();
+                                if (!$result) echo '<option>No Academic Year</option>';
+                                foreach ($result as $r) {
+                                    echo '<option value="' . $r['acedemic_id'] . '">' . $r['academic_descr'] . '</option>';
+                                }
                                 ?>
                             </select>
                         </div>
@@ -58,9 +66,9 @@
             </div>
             <div class="row mt-3 mb-3">
                 <div class="col-12 col-sm-12">
-                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#manageClassModal">
-                    + Allocate Theory Class
-                </button>
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#manageClassModal">
+                        + Allocate Theory Class
+                    </button>
                 </div>
             </div>
             <!-- Button to Open the Modal -->
@@ -81,35 +89,53 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
-                                $last_acd = $user->getLastAcademicYear();
-                                $data = $user->getClassByDeptAndAcademicYear([$_SESSION['dept'], $last_acd['acedemic_id']]);
-                                foreach($data as $d){
-                                    echo '<tr>
-                                            <td>'.$d['class_id'].'</td>
-                                            <td>'.$d['course_name'].'</td>
-                                            <td>'.$d['first_name'].' '.$d['last_name'].'</td>
-                                            <td>'.$d['s_class_name'].'</td>
-                                            <td>'.$d['div_name'].'</td>
+                            <?php
+                            $last_acd = $user->getLastAcademicYear();
+                            $data = $user->getClassByDeptAndAcademicYear([$_SESSION['dept'], $last_acd['acedemic_id']]);
+                            foreach ($data as $d) {
+                                echo '<tr>
+                                            <td>' . $d['class_id'] . '</td>
+                                            <td>' . $d['course_name'] . '</td>
+                                            <td>' . $d['first_name'] . ' ' . $d['last_name'] . '</td>
+                                            <td>' . $d['s_class_name'] . '</td>
+                                            <td>' . $d['div_name'] . '</td>
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['class_id'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
+                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="' . $d['class_id'] . '"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
                                             </td>        
                                         </tr>';
-                                }
+                            }
                             ?>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <hr/>
+            <hr />
             <div class="row">
                 <div class="col-12 mt-3 mb-3">
                     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#managePracticalClassModal">
-                    + Allocate Practical Class
+                        + Allocate Practical Class
                     </button>
                 </div>
             </div>
-            
+            <div class="row mt-3">
+                <div class="col-sm-12">
+                    <form>
+                        <div class="form-group">
+                            <label for="select-acd-pract">Select Academic Year</label>
+                            <select name="academic_year" class="form-control" id="manageclass-select-acd-pract">
+                                <option value=""></option>
+                                <?php
+                                $result = $user->getAcademicYear();
+                                if (!$result) echo '<option>No Academic Year</option>';
+                                foreach ($result as $r) {
+                                    echo '<option value="' . $r['acedemic_id'] . '">' . $r['academic_descr'] . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-12">
                     <table id="pract-class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
@@ -128,23 +154,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
-                                $data = $user->getPractClassByDept([$_SESSION['dept']]);
-                            
-                                foreach($data as $d){
-                                    echo '<tr>
-                                            <td hidden>'.$d['p_class_ids'].'</td>
+                            <?php
+                            $last_acd = $user->getLastAcademicYear();
+                            $data = $user->getPractClassByDept([$_SESSION['dept'], $last_acd['acedemic_id']]);
+
+                            foreach ($data as $d) {
+                                echo '<tr>
+                                            <td hidden>' . $d['p_class_ids'] . '</td>
                                     
-                                            <td>'.$d['course_name'].'</td>
-                                            <td>'.$d['faculty_name'].'</td>
-                                            <td>'.$d['s_class_name'].'</td>
-                                            <td>'.$d['div_name'].'</td>
-                                            <td>'.$d['batch_name'].'</td>
+                                            <td>' . $d['course_name'] . '</td>
+                                            <td>' . $d['faculty_name'] . '</td>
+                                            <td>' . $d['s_class_name'] . '</td>
+                                            <td>' . $d['div_name'] . '</td>
+                                            <td>' . $d['batch_name'] . '</td>
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'.$d['p_class_ids'].'"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
+                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="' . $d['p_class_ids'] . '"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
                                             </td>        
                                         </tr>';
-                                }
+                            }
                             ?>
                         </tbody>
                     </table>
@@ -170,10 +197,10 @@
                                     <select name="acd_year" id="acd_year" class="form-control form-control-sm">
                                         <option value=" "></option>
                                         <?php
-                                            $data = $user->getAcademicYear();
-                                            foreach($data as $d){
-                                                echo '<option value="'.$d['acedemic_id'].'">'.$d['academic_descr'].'</option>';
-                                            }
+                                        $data = $user->getAcademicYear();
+                                        foreach ($data as $d) {
+                                            echo '<option value="' . $d['acedemic_id'] . '">' . $d['academic_descr'] . '</option>';
+                                        }
                                         ?>
                                     </select>
                                 </div>
@@ -181,13 +208,13 @@
                                     <label for="faculty_S">Select Faculty</label>
                                     <select name="faculty_s" class="form-control form-control-sm" id="faculty_s">
                                         <option value=" "> </option>
-                                        <?php 
-                                            $data = $user->getFacultyByDept([$_SESSION['dept']]);
-                                            if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                            foreach($data as $d){
-                                                echo '<option value="'.$d['faculty_id'].'">'.$d['first_name'].' '.$d['last_name'].'</option>';
-                                            }
-                                            echo '<option value="other">Select From Other Department</option>';
+                                        <?php
+                                        $data = $user->getFacultyByDept([$_SESSION['dept']]);
+                                        if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                        foreach ($data as $d) {
+                                            echo '<option value="' . $d['faculty_id'] . '">' . $d['first_name'] . ' ' . $d['last_name'] . '</option>';
+                                        }
+                                        echo '<option value="other">Select From Other Department</option>';
                                         ?>
                                     </select>
                                 </div>
@@ -196,12 +223,12 @@
                                         <label for="dept_s">Select Department</label>
                                         <select name="dept_id" class="form-control form-control-sm" id="foreign_dept_s">
                                             <option value=" "> </option>
-                                            <?php 
-                                                $data = $user->getDepartment();
-                                                if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
-                                                }
+                                            <?php
+                                            $data = $user->getDepartment();
+                                            if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                            foreach ($data as $d) {
+                                                echo '<option value="' . $d['dept_id'] . '">' . $d['dept_name'] . '</option>';
+                                            }
                                             ?>
                                         </select>
                                     </div>
@@ -216,26 +243,26 @@
                                     <div class="form-group col-sm-12" id="select-div">
                                         <label for="div_s">Select Division</label>
                                         <select class="form-control selectpicker " name="div_id[]" id="div_s" multiple data-live-search="true">
-                                            <?php 
-                                                $data = $user->getDivBelongsDept([$_SESSION['dept']]);
-                                                if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
-                                                }
+                                            <?php
+                                            $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                                            if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                            foreach ($data as $d) {
+                                                echo '<option value="' . $d['div_id'] . '">' . $d['div_name'] . '</option>';
+                                            }
                                             ?>
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label for="courses_s">Select Courses</label>
                                     <select class="form-control selectpicker " name="courses[]" id="courses_s" multiple data-live-search="true">
-                                        <?php 
-                                            $data = $user->getCoursesByDept([$_SESSION['dept']]);
-                                            if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                            foreach($data as $d){
-                                                echo '<option value="'.$d['course_id'].'">'.$d['course_name'].'</option>';
-                                            }
+                                        <?php
+                                        $data = $user->getCoursesByDept([$_SESSION['dept']]);
+                                        if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                        foreach ($data as $d) {
+                                            echo '<option value="' . $d['course_id'] . '">' . $d['course_name'] . '</option>';
+                                        }
                                         ?>
                                     </select>
                                 </div>
@@ -253,12 +280,12 @@
                 </div>
             </div>
         </div>
-        
-        
+
+
         <div class="cards">
             <div class="container">
                 <!-- Button to Open the Modal -->
-                
+
 
                 <!-- The Modal -->
                 <div class="modal" id="managePracticalClassModal">
@@ -280,10 +307,10 @@
                                         <select name="acd_year" id="acd_year_pract" class="form-control form-control-sm select-input-field">
                                             <option value=" "></option>
                                             <?php
-                                                $data = $user->getAcademicYear();
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['acedemic_id'].'">'.$d['academic_descr'].'</option>';
-                                                }
+                                            $data = $user->getAcademicYear();
+                                            foreach ($data as $d) {
+                                                echo '<option value="' . $d['acedemic_id'] . '">' . $d['academic_descr'] . '</option>';
+                                            }
                                             ?>
                                         </select>
                                     </div>
@@ -291,13 +318,13 @@
                                         <label for="faculty_S">Select Faculty</label>
                                         <select name="faculty_s" class="form-control form-control-sm select-input-field" id="faculty_s_pract">
                                             <option value=" "> </option>
-                                            <?php 
-                                                $data = $user->getFacultyByDept([$_SESSION['dept']]);
-                                                if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                foreach($data as $d){
-                                                    echo '<option value="'.$d['faculty_id'].'">'.$d['first_name'].' '.$d['last_name'].'</option>';
-                                                }
-                                                echo '<option value="other">Select From Other Department</option>';
+                                            <?php
+                                            $data = $user->getFacultyByDept([$_SESSION['dept']]);
+                                            if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                            foreach ($data as $d) {
+                                                echo '<option value="' . $d['faculty_id'] . '">' . $d['first_name'] . ' ' . $d['last_name'] . '</option>';
+                                            }
+                                            echo '<option value="other">Select From Other Department</option>';
                                             ?>
                                         </select>
                                     </div>
@@ -306,12 +333,12 @@
                                             <label for="dept_s">Select Department</label>
                                             <select name="dept_id" class="form-control form-control-sm select-input-field" id="foreign_dept_s_pract">
                                                 <option value=" "> </option>
-                                                <?php 
-                                                    $data = $user->getDepartment();
-                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                    foreach($data as $d){
-                                                        echo '<option value="'.$d['dept_id'].'">'.$d['dept_name'].'</option>';
-                                                    }
+                                                <?php
+                                                $data = $user->getDepartment();
+                                                if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                                foreach ($data as $d) {
+                                                    echo '<option value="' . $d['dept_id'] . '">' . $d['dept_name'] . '</option>';
+                                                }
                                                 ?>
                                             </select>
                                         </div>
@@ -326,13 +353,13 @@
                                         <div class="form-group col-sm-4">
                                             <label for="div">Select Year</label>
                                             <select class="form-control form-control-sm select-input-field" name="year" id="year_s_pract">
-                                                    <option value=" "> </option>
-                                                <?php 
-                                                    $data = $user->getYearBelongsDept([$_SESSION['dept']]);
-                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                    foreach($data as $d){
-                                                        echo '<option value="'.$d['year_id'].'">'.$d['s_class_name'].'</option>';
-                                                    }
+                                                <option value=" "> </option>
+                                                <?php
+                                                $data = $user->getYearBelongsDept([$_SESSION['dept']]);
+                                                if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                                foreach ($data as $d) {
+                                                    echo '<option value="' . $d['year_id'] . '">' . $d['s_class_name'] . '</option>';
+                                                }
                                                 ?>
                                             </select>
                                         </div>
@@ -345,12 +372,12 @@
                                         <div class="form-group col-sm-4">
                                             <label for="div">Select Division</label>
                                             <select class="form-control form-control-sm select-input-field" name="div" id="div_s_pract">
-                                                <?php 
-                                                    $data = $user->getDivBelongsDept([$_SESSION['dept']]);
-                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                    foreach($data as $d){
-                                                        echo '<option value="'.$d['div_id'].'">'.$d['div_name'].'</option>';
-                                                    }
+                                                <?php
+                                                $data = $user->getDivBelongsDept([$_SESSION['dept']]);
+                                                if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                                foreach ($data as $d) {
+                                                    echo '<option value="' . $d['div_id'] . '">' . $d['div_name'] . '</option>';
+                                                }
                                                 ?>
                                             </select>
                                         </div>
@@ -358,25 +385,25 @@
                                     <div class="form-group">
                                         <label for="courses_s">Select Course</label>
                                         <select class="form-control" name="courses" id="courses_s_pract">
-                                            
+
                                         </select>
                                     </div>
-                                    
+
                                     <div class="row">
                                         <div class="form-group col-sm-12">
                                             <label for="batch">Select Batches</label>
                                             <select class="form-control selectpicker " name="batches[]" id="batch_s_pract" multiple data-live-search="true">
-                                                <?php 
-                                                    $data = $user->getBatch();
-                                                    if(!$data) echo '<option value="'.' '.'">Nothing Found</option>';
-                                                    foreach($data as $d){
-                                                        echo '<option value="'.$d['batch_id'].'">'.$d['batch_name'].'</option>';
-                                                    }
+                                                <?php
+                                                $data = $user->getBatch();
+                                                if (!$data) echo '<option value="' . ' ' . '">Nothing Found</option>';
+                                                foreach ($data as $d) {
+                                                    echo '<option value="' . $d['batch_id'] . '">' . $d['batch_name'] . '</option>';
+                                                }
                                                 ?>
                                             </select>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Modal footer -->
                                     <div class="modal-footer">
                                         <button type="button" id="practical-submit" class="btn btn-success">Add</button>
@@ -392,7 +419,9 @@
             </div>
         </div>
     </main>
-<script>end_load();</script>
+    <script>
+        end_load();
+    </script>
 </body>
 
 </html>

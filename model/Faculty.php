@@ -906,14 +906,11 @@ class Faculty extends Database
 	{
 		try {
 			$con = $this->connect();
-			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id WHERE a.academic_id = ? AND a.faculty_id = ?";
+			$addquery = count($data) > 1 ?  "AND a.faculty_id = ?" : " ";
+			$sql = "SELECT a.*, b.first_name, b.last_name, c.course_name, d.dept_name, e.s_class_name, g.sem_name, h.academic_descr, div_name FROM class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON a.course_id = c.course_id JOIN department as d ON a.dept_id = d.dept_id JOIN student_class as e ON a.s_class_id = e.s_class_id JOIN semester as g ON a.sem_id = g.sem_id JOIN academic_year as h ON a.academic_id = h.acedemic_id JOIN division as i On a.div_id = i.div_id WHERE a.academic_id = ?" . $addquery;
 			$stmt = $con->prepare($sql);
 			if ($stmt->execute($data)) {
-				if ($stmt->rowCount() > 0) {
-					return $stmt->fetchAll();
-				} else {
-					return false;
-				}
+				return $stmt->fetchAll();
 			}
 		} catch (PDOException $e) {
 			return array("e" => $e->getMessage());
@@ -1153,7 +1150,7 @@ class Faculty extends Database
 	{
 		try {
 			$con = $this->connect();
-			$sql = "SELECT a.faculty_id, a.dept_id, a.year_id, a.sem_id, d.div_name , group_concat(a.p_class_id) as p_class_ids, group_concat(a.batch_id) as batch_ids, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE a.dept_id = ? GROUP BY a.faculty_id,a.course_id";
+			$sql = "SELECT a.academic_id, a.faculty_id, a.dept_id, a.year_id, a.sem_id, d.div_name , group_concat(a.p_class_id) as p_class_ids, group_concat(a.batch_id) as batch_ids, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE a.dept_id = ? AND a.academic_id = ? GROUP BY a.faculty_id,a.course_id";
 			$stmt = $con->prepare($sql);
 			if ($stmt->execute($data)) return $stmt->fetchAll();
 		} catch (PDOException $e) {
@@ -1587,7 +1584,6 @@ class Faculty extends Database
 			$sql = "SELECT batch_name,a.prn_no, c.roll_no, CONCAT(c.first_name,' ',c.middle_name,' ',c.last_name) as student_name, SUM(a.status) as total, (SUM(a.status)/COUNT(a.status))*100 as percent, " . $string . " FROM pract_attend as a JOIN practical_class as b ON a.p_class_id = b.p_class_id JOIN student as c ON a.prn_no = c.prn_no JOIN batch as d on b.batch_id = d.batch_id WHERE " . $query . " GROUP BY a.prn_no ORDER BY d.batch_id,c.roll_no+0;";
 			$stmt = $con->prepare($sql);
 			if ($stmt->execute($data)) return $stmt->fetchAll();
-	
 		} catch (PDOException $e) {
 			return array("e" => $e->getMessage());
 		}

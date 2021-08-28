@@ -15,6 +15,7 @@ $(document).ready(function(){
     processPracticalClassByAcademicYear()
     processTheoryClassByAcademicYear()
     processSubmitAttendance();
+    processResetDate()
 });
 
 // function getClassAcademic(){
@@ -1172,3 +1173,9 @@ function processTheoryClassByAcademicYear(){
 //         }
 //     })
 // }
+
+function processResetDate(){
+    $("#reset").on("click", function(){
+        $("input[type=date]").val(new Date());
+    })
+}
