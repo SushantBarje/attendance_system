@@ -548,7 +548,7 @@ class FacultyController extends Faculty
             }
         }
         if (count($dup) > 0) return json_encode(array("error" => "dup", "count" => count($dup)));
-        $getclass = $this->getClassByDept([$_SESSION['dept']]);
+        $getclass = $this->getClassByDeptAndAcademicYear([$_SESSION['dept'], $this->acd_year]);
         return json_encode(array("error" => "none", "data" => $getclass));
     }
 
@@ -561,12 +561,15 @@ class FacultyController extends Faculty
 
     public function removeClass()
     {
-        if ($this->checkEmpty()) return json_encode(array("error" => "empty"));
+        if ($this->checkEmpty()){
+            return json_encode(array("error" => "empty"));
+        }
         $this->class_id = (int)$this->verifyInput($_POST['id']);
+        $this->acd_year = isset($_POST['acd_id']) ? $this->verifyInput($_POST['acd_id']) : "";
         //if(!$this->getStudentById([$this->class_id])) return json_encode(array("error" => "notexists"));
         $result = $this->deleteClassById([$this->class_id]);
         if ($result) {
-            $getdata = $_SESSION['role_id'] === 0 ? $this->getAllClass() : $this->getClassByDept([$_SESSION['dept']]);
+            $getdata = $_SESSION['role_id'] === 0 ? $this->getAllClass() : $this->getClassByDeptAndAcademicYear([$_SESSION['dept'], $this->acd_year, ]);
         } else {
             return json_encode(array("error" => "notinsert"));
         }
@@ -1258,7 +1261,8 @@ class FacultyController extends Faculty
         if ($this->checkEmpty()) return json_encode(array("error" => "empty"));
         $this->acd_year = $this->verifyInput($_POST['acd_id']);
         $this->faculty_id = isset($_POST['faculty_id']) ? $this->verifyInput($_POST['faculty_id']) : $_SESSION['faculty_id'];
-        $result = $this->getClassByAcademicYear([$this->acd_year]);
+        $this->dept = isset($_POST['dept_id']) ? $this->verifyInput($_POST['dept_id']) : $_SESSION['dept'];
+        $result = $this->getClassByDeptAndAcademicYear([ $this->dept, $this->acd_year]);
         if (!$result) return json_encode(array("error" => "notfound"));
         if (isset($result['e'])) return json_encode(array("error" => "Server Error!"));
         return json_encode(array("error" => "none", "data" => $result));

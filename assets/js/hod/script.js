@@ -490,7 +490,6 @@ function processAddClass(){
     });
 
     $("#add-class-form #foreign_dept_s").on("change", function(){
-        var id = $(this).val();
         $.ajax({
             url : "../controller/ajaxController.php?action=get_faculty_dept_wise",
             type : "POST",
@@ -569,13 +568,14 @@ function processAddClass(){
                             }else{
                                 for(var i = 0; i < res.data.length; i++){
                                     html += '<tr>\
+                                    <td id="acd_id_td" hidden>'+res.data[i].academic_id+'</td>\
                                     <td>'+res.data[i].class_id+'</td>\
                                     <td>'+res.data[i].course_name+'</td>\
                                     <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
                                     <td>'+res.data[i].s_class_name+'</td>\
                                     <td>'+res.data[i].div_name+'</td>\
                                     <td>\
-                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-id="'+res.data[i].academic_id+'" data-control="'+res.data[i].class_id+'">Delete</button>\
                                     </td>\
                                 </tr>'
                                 }
@@ -595,12 +595,14 @@ function processAddClass(){
 
 
 function processDeleteClass(){
-    $('#add-class-form #class-table').on("click","#add-class-form #del-btn",function(){
+    $('#class-table').on("click","#del-btn",function(){
+        console.log("hello");
         if(confirm("Are you sure you want to delete ?")){
             var data = {};
-            $.when(
-                data['id'] = $(this).attr("data-control")
-            ).then(() => {
+            //$.when(
+                data['id'] = $(this).attr("data-control"),
+                data['acd_id'] = $(this).data('id');
+            //).then(() => {
                 console.log(data);
                 $('#addClassModal #add-staff').trigger("reset");
                 $('#addClassModal').modal('hide');
@@ -623,15 +625,16 @@ function processDeleteClass(){
                                 if(res.data.length < 1) {
                                     $('#class-table tbody').html("<tr><td colspan='4'>Nothing Found</td></tr>");
                                 }else{
-                                    var html = " ";
+                                    var html = "";
                                     for(var i = 0; i < res.data.length; i++){
                                         html += '<tr>\
                                                     <td>'+res.data[i].class_id+'</td>\
                                                     <td>'+res.data[i].course_name+'</td>\
                                                     <td>'+res.data[i].last_name+' '+ res.data[i].first_name+'</td>\
                                                     <td>'+res.data[i].s_class_name+'</td>\
+                                                    <td>'+res.data[i].div_name+'</div>\
                                                     <td>\
-                                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-id="'+res.data[i].academic_id+'" data-control="'+res.data[i].class_id+'">Delete</button>\
                                                     </td>\
                                                 </tr>'
                                     }
@@ -643,7 +646,7 @@ function processDeleteClass(){
                         }
                     }
                 })
-            })  
+            //})  
         }
     })
 }
@@ -2426,11 +2429,11 @@ function processManageClassesOnChange(){
                                     <td>'+res.data[i].s_class_name+'</td>\
                                     <td>'+res.data[i].div_name+'</td>\
                                     <td>\
-                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="'+res.data[i].class_id+'">Delete</button>\
+                                        <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-id="'+res.data[i].academic_id+'" data-control="'+res.data[i].class_id+'">Delete</button>\
                                     </td>\
                                 </tr>'
                                 }
-                            
+                                $("#acd_year_thead_theory").html('Academic Year - '+res.data[0].academic_descr);
                                 $('#class-table tbody').html(html)
                             
                             }
@@ -2480,6 +2483,7 @@ function processManagePracticalClassesOnChange(){
                                     </td>\
                                 </tr>'
                                 }
+                                $("#acd_year_thead_pract").html('Academic Year - '+res.data[0].academic_descr);
                                 $('#pract-class-table tbody').html(html);
                             }
                             break;  

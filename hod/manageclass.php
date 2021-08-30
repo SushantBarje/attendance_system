@@ -73,9 +73,15 @@ if (!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION
             </div>
             <!-- Button to Open the Modal -->
             <div class="row">
+                <?php
+                $last_acd = $user->getLastAcademicYear();
+                ?>
                 <div class="col-12 col-sm-12">
                     <table id="class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
                         <thead>
+                            <tr>
+                                <th colspan="6" style="text-align:center" id="acd_year_thead_theory">Academic Year - <?php echo $last_acd['academic_descr'] ?></th>
+                            </tr>
                             <tr>
                                 <th colspan="6">Theroy</th>
                             </tr>
@@ -93,14 +99,14 @@ if (!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION
                             $last_acd = $user->getLastAcademicYear();
                             $data = $user->getClassByDeptAndAcademicYear([$_SESSION['dept'], $last_acd['acedemic_id']]);
                             foreach ($data as $d) {
-                                echo '<tr>
+                                echo '  <tr>
                                             <td>' . $d['class_id'] . '</td>
                                             <td>' . $d['course_name'] . '</td>
                                             <td>' . $d['first_name'] . ' ' . $d['last_name'] . '</td>
                                             <td>' . $d['s_class_name'] . '</td>
                                             <td>' . $d['div_name'] . '</td>
                                             <td>
-                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-control="' . $d['class_id'] . '"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
+                                                <button type="button" class="btn btn-danger btn-sm" id="del-btn" data-id="' . $d['academic_id'] . '" data-control="' . $d['class_id'] . '"><span><i class="fas fa-trash-alt"></i></span> Delete</button>
                                             </td>        
                                         </tr>';
                             }
@@ -138,8 +144,14 @@ if (!isset($_SESSION['role_id']) || !isset($_SESSION['faculty_id']) || $_SESSION
             </div>
             <div class="row">
                 <div class="col-12">
+                    <?php
+                        $last_acd = $user->getLastAcademicYear();
+                    ?>
                     <table id="pract-class-table" class="table table-sm table-bordered table-hover cell-border nowrap" cellspacing="0" width="100%">
                         <thead>
+                            <tr>
+                                <th colspan="6" style="text-align:center" id="acd_year_thead_pract">Academic Year - <?php echo $last_acd['academic_descr'] ?></th>
+                            </tr>
                             <tr>
                                 <th colspan="7">Practical</th>
                             </tr>

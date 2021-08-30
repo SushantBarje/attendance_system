@@ -1150,7 +1150,7 @@ class Faculty extends Database
 	{
 		try {
 			$con = $this->connect();
-			$sql = "SELECT a.academic_id, a.faculty_id, a.dept_id, a.year_id, a.sem_id, d.div_name , group_concat(a.p_class_id) as p_class_ids, group_concat(a.batch_id) as batch_ids, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE a.dept_id = ? AND a.academic_id = ? GROUP BY a.faculty_id,a.course_id";
+			$sql = "SELECT academic_descr, a.academic_id, a.faculty_id, a.dept_id, a.year_id, a.sem_id, d.div_name , group_concat(a.p_class_id) as p_class_ids, group_concat(a.batch_id) as batch_ids, c.course_name, CONCAT(b.first_name, ' ', b.last_name) as faculty_name, g.s_class_name, group_concat(DISTINCT h.batch_name) as batch_name  FROM practical_class as a JOIN faculty as b ON a.faculty_id = b.faculty_id JOIN courses as c ON c.course_id = a.course_id JOIN division as d ON a.div_id = d.div_id JOIN batch as e ON a.batch_id = e.batch_id JOIN academic_year as f ON a.academic_id = f.acedemic_id JOIN student_class as g ON c.s_class_id = g.s_class_id JOIN batch as h ON a.batch_id = h.batch_id WHERE a.dept_id = ? AND a.academic_id = ? GROUP BY a.faculty_id,a.course_id";
 			$stmt = $con->prepare($sql);
 			if ($stmt->execute($data)) return $stmt->fetchAll();
 		} catch (PDOException $e) {
