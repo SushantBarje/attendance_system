@@ -2,8 +2,8 @@
 require_once __DIR__ .'/vendor/autoload.php';
 require_once __DIR__ .'/links/links.php';
 
-use app\Controller\FacultyController;
-use app\Controller\StudentController;
+use app\controller\FacultyController;
+use app\controller\StudentController;
 
 $user = new FacultyController();
 $student = new StudentController();
