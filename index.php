@@ -1,8 +1,8 @@
 <?php
     require_once __DIR__ .'\vendor\autoload.php';
     require_once __DIR__.'\links\links.php';
-    use app\controller\FacultyController;
-    use app\controller\StudentController;
+    use app\Controller\FacultyController;
+    use app\Controller\StudentController;
     $user = new FacultyController();
     $student = new StudentController();
     if(isset($_REQUEST['faculty-login'])){

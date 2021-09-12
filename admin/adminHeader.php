@@ -67,7 +67,6 @@
                Online Attendence System
             </h2>
             <div class="user-wrapper">
-                <img src="../img/2.jpg" width="30px" height="30px" alt="">
                 <div>
                     <h4><?php echo $_SESSION['first_name']." ".$_SESSION['last_name']?></h4>
                     <small>

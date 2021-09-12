@@ -28,8 +28,8 @@
 <body>
     <?php include "adminHeader.php"; ?>
     <main>
-        <h2 class="head">Report</h2>
-        <div class="cards">
+        <h2 class="head">Courses</h2>
+        <div class="cards mt-3">
             <div class="container">
                 <!-- Button to Open the Modal -->
                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#courseAddModal">
