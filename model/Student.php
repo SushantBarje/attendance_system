@@ -1,6 +1,6 @@
 <?php
-namespace app\model;
-use app\database\Database;
+namespace app\Model;
+use app\Database\Database;
 use PDOException;
 
 class Student extends Database {

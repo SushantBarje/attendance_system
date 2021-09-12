@@ -1,8 +1,8 @@
 <?php
 
-namespace app\controller;
+namespace app\Controller;
 
-use app\model\Faculty;
+use app\Model\Faculty;
 use PDO;
 use \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 

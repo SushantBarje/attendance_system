@@ -1,6 +1,6 @@
 <?php
-namespace app\controller;
-use app\model\Student;
+namespace app\Controller;
+use app\Model\Student;
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

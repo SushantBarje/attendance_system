@@ -1,9 +1,9 @@
 <?php
 
-namespace app\model;
+namespace app\Model;
 
 use \PDOException;
-use app\database\Database;
+use app\Database\Database;
 use PDO;
 
 class Faculty extends Database
