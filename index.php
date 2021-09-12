@@ -1,22 +1,25 @@
 <?php
-    require_once __DIR__ .'\vendor\autoload.php';
-    require_once __DIR__.'\links\links.php';
-    use app\Controller\FacultyController;
-    use app\Controller\StudentController;
-    $user = new FacultyController();
-    $student = new StudentController();
-    if(isset($_REQUEST['faculty-login'])){
-        $err = $user->userLogin();
-        if(isset($err["invalid"])) echo '<script> alert("'.$err['invalid'].'")</script>';
-    }
-    if(isset($_REQUEST['student-login'])){
-        $err = $student->studentLogin();
-        if(isset($err["invalid"])) echo '<script> alert("'.$err['invalid'].'")</script>';
-    }
+require_once __DIR__ .'/vendor/autoload.php';
+require_once __DIR__ .'/links/links.php';
+
+use app\Controller\FacultyController;
+use app\Controller\StudentController;
+
+$user = new FacultyController();
+$student = new StudentController();
+if (isset($_REQUEST['faculty-login'])) {
+    $err = $user->userLogin();
+    if (isset($err["invalid"])) echo '<script> alert("' . $err['invalid'] . '")</script>';
+}
+if (isset($_REQUEST['student-login'])) {
+    $err = $student->studentLogin();
+    if (isset($err["invalid"])) echo '<script> alert("' . $err['invalid'] . '")</script>';
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -28,9 +31,10 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="CSS/login.css">
     <?php
-        OfflineStylesFiles();
+    OfflineStylesFiles();
     ?>
 </head>
+
 <body>
     <div class="container-fluid" id="heading">
         <div class="row mb-5">
@@ -89,10 +93,11 @@
     </form> -->
 
     <?php
-        OfflineJsFiles();
+    OfflineJsFiles();
     ?>
 </body>
+
 </html>
 <?php
-    
+
 ?>
